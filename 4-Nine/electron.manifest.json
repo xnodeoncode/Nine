@@ -1,5 +1,5 @@
 {
-  "executable": "Aquiis.SimpleStart",
+  "executable": "Nine",
   "splashscreen": {
     "imageFile": "wwwroot/assets/splash.png"
   },
@@ -7,17 +7,17 @@
     "--enable-features=VaapiVideoDecoder",
     "--disable-dev-shm-usage"
   ],
-  "name": "aquiis",
-  "description": "Aquiis Property Management",
-  "author": "Aquiis",
+  "name": "nine",
+  "description": "Nine Property Management",
+  "author": "Nine",
   "singleInstance": false,
   "environment": "Production",
   "aspCoreBackendPort": 8888,
   "build": {
-    "appId": "com.aquiis.propertymanagement",
-    "productName": "Aquiis",
+    "appId": "com.nineapp.nine",
+    "productName": "Nine",
     "copyright": "Copyright © 2026",
-    "buildVersion": "1.1.2",
+    "buildVersion": "1.0.0",
     "compression": "normal",
     "directories": {
       "output": "../../../bin/Desktop"
@@ -53,7 +53,7 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "Aquiis"
+      "shortcutName": "Nine"
     },
     "linux": {
       "target": "AppImage",
@@ -67,8 +67,8 @@
       },
       "extraFiles": [
         {
-          "from": "Assets/com.aquiis.propertymanagement.appdata.xml",
-          "to": "usr/share/metainfo/com.aquiis.propertymanagement.appdata.xml"
+          "from": "Assets/com.nineapp.nine.appdata.xml",
+          "to": "usr/share/metainfo/com.nineapp.nine.appdata.xml"
         }
       ]
     }

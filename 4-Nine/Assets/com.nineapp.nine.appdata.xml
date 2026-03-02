@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
-  <id>com.aquiis.propertymanagement</id>
+  <id>com.nineapp.nine</id>
   <metadata_license>MIT</metadata_license>
   <project_license>MIT</project_license>
-  <name>Aquiis Property Management</name>
-  <summary>Modern property management software for small landlords</summary>
+  <name>Nine Property Management</name>
+  <summary>Property management perfected for portfolios of up to nine properties</summary>
   
   <description>
     <p>
-      Aquiis SimpleStart is a standalone desktop application designed for landlords managing 1-9 residential rental properties. 
-      Built with modern technology, it provides professional-grade property management features without the complexity or 
-      subscription costs of enterprise solutions.
+      Nine. is a standalone desktop application designed for landlords managing up to nine residential rental properties.
+      The 9-property limit is our identity, not a limitation — built for independent landlords who want professional-grade
+      features without the complexity or subscription costs of enterprise solutions.
     </p>
     <p>Key Features:</p>
     <ul>
@@ -29,7 +29,7 @@
     </p>
   </description>
   
-  <launchable type="desktop-id">com.aquiis.propertymanagement.desktop</launchable>
+  <launchable type="desktop-id">com.nineapp.nine.desktop</launchable>
   
   <screenshots>
     <screenshot type="default">
@@ -50,62 +50,22 @@
     </screenshot>
   </screenshots>
   
-  <url type="homepage">https://github.com/xnodeoncode/Aquiis</url>
-  <url type="bugtracker">https://github.com/xnodeoncode/Aquiis/issues</url>
-  <url type="help">https://github.com/xnodeoncode/Aquiis/blob/main/README.md</url>
+  <url type="homepage">https://github.com/xnodeoncode/nine</url>
+  <url type="bugtracker">https://github.com/xnodeoncode/nine/issues</url>
+  <url type="help">https://github.com/xnodeoncode/nine/blob/main/README.md</url>
   
   <developer id="com.github.xnodeoncode">
     <name>xnodeoncode</name>
   </developer>
   
   <provides>
-    <binary>AquiisPropertyManagement</binary>
+    <binary>Nine</binary>
   </provides>
   
   <releases>
-    <release version="1.1.2" date="2026-03-01">
+    <release version="1.0.0" date="2026-03-02">
       <description>
-        <p>AppImageHub Compliance Release</p>
-        <ul>
-          <li>Embedded MIT license metadata in AppImage desktop file for catalog integration</li>
-          <li>Configured electron.manifest.json with desktop.entry for automated CI detection</li>
-          <li>No functional changes - metadata enhancement only</li>
-          <li>Database schema v1.1.0 unchanged</li>
-        </ul>
-      </description>
-    </release>
-    <release version="1.1.1" date="2026-02-28">
-      <description>
-        <p>Bug Fix and Enhancement Release</p>
-        <ul>
-          <li>Fixed brand theme flicker on repeated NavLink clicks</li>
-          <li>Fixed login double-submit causing blank page redirect</li>
-          <li>Windows database encryption implementation using DPAPI</li>
-          <li>Windows installer deployment (replaced portable executable)</li>
-          <li>Hidden Electron menu bar for native desktop experience</li>
-          <li>Optimized MutationObserver for improved performance</li>
-          <li>Enhanced documentation with cross-references</li>
-        </ul>
-      </description>
-    </release>
-    <release version="1.1.0" date="2026-02-19">
-      <description>
-        <p>Security and Schema Enhancement Release</p>
-        <ul>
-          <li>Database encryption at rest with SQLCipher AES-256</li>
-          <li>Sample data management system with IsSampleData flags</li>
-          <li>Content Security Policy (CSP) headers for web security</li>
-          <li>Multi-tenant data integrity enhancements</li>
-          <li>Database schema v1.1.0 with automatic migrations</li>
-          <li>OS keychain integration for password caching (Linux)</li>
-          <li>Automatic database location migration</li>
-          <li>New application naming convention</li>
-        </ul>
-      </description>
-    </release>
-    <release version="1.0.0" date="2026-01-28">
-      <description>
-        <p>First stable release for public distribution</p>
+        <p>Initial release of Nine. — rebranded from Aquiis SimpleStart</p>
         <ul>
           <li>Complete property, tenant, and lease management</li>
           <li>Automated invoicing and payment tracking</li>
