@@ -295,7 +295,7 @@ namespace Nine.Application.Services
             if (organization == null || organization.IsDeleted)
                 return false;
 
-            // Check user limit for SimpleStart (MaxOrganizationUsers > 0)
+            // Check user limit for Nine (MaxOrganizationUsers > 0)
             if (_settings.MaxOrganizationUsers > 0)
             {
                 var currentUserCount = await _dbContext.OrganizationUsers
@@ -308,8 +308,8 @@ namespace Nine.Application.Services
                 if (currentUserCount >= _settings.MaxOrganizationUsers)
                 {
                     throw new InvalidOperationException(
-                        $"User limit reached. SimpleStart allows maximum {_settings.MaxOrganizationUsers} user accounts (including system account). " +
-                        "Upgrade to Aquiis Professional for unlimited users.");
+                        $"User limit reached. Nine allows maximum {_settings.MaxOrganizationUsers} user accounts (including system account). " +
+                        "Upgrade to Nine Professional for unlimited users.");
                 }
             }
 

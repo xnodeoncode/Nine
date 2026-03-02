@@ -125,7 +125,7 @@ namespace Nine.Application.Services
             {
                 await _emailProvider.SendEmailAsync(
                     testEmail,
-                    "Aquiis Email Configuration Test",
+                    "Nine Email Configuration Test",
                     "<h2>Configuration Test Successful!</h2>" +
                     "<p>This is a test email to verify your SendGrid configuration is working correctly.</p>" +
                     "<p>If you received this email, your email integration is properly configured.</p>");

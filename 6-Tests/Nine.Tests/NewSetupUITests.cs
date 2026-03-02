@@ -1,7 +1,7 @@
 using Microsoft.Playwright.NUnit;
 using Microsoft.Playwright;
 
-namespace Aquiis.UI.SimpleStart.Tests;
+namespace Nine.Tests;
 
 [Parallelizable(ParallelScope.Self)]
 [TestFixture]
@@ -29,7 +29,7 @@ public class NewSetupUITests : PageTest
         await Page.GotoAsync("http://localhost:5197/");
         await Page.GetByRole(AriaRole.Button, new() { Name = "Create Account" }).ClickAsync();
         await Page.GetByRole(AriaRole.Textbox, new() { Name = "Organization Name" }).ClickAsync();
-        await Page.GetByRole(AriaRole.Textbox, new() { Name = "Organization Name" }).FillAsync("Aquiis");
+        await Page.GetByRole(AriaRole.Textbox, new() { Name = "Organization Name" }).FillAsync("Nine");
         await Page.GetByRole(AriaRole.Textbox, new() { Name = "Organization Name" }).PressAsync("Tab");
         await Page.Locator("select[id='Input.State']").SelectOptionAsync(new[] { "TX" });
         await Page.Locator("select[id='Input.State']").PressAsync("Tab");

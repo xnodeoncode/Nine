@@ -1,4 +1,4 @@
-# Aquiis SimpleStart - Database Management Guide
+# Nine - Database Management Guide
 
 **Version:** 1.1.2  
 **Last Updated:** March 1, 2026  
@@ -24,7 +24,7 @@
 
 ## 📋 Overview
 
-Aquiis SimpleStart uses **SQLite** as its database engine - a lightweight, file-based database that requires no server installation or configuration. This guide covers everything you need to know about managing your database, protecting your data, and recovering from issues.
+Nine uses **SQLite** as its database engine - a lightweight, file-based database that requires no server installation or configuration. This guide covers everything you need to know about managing your database, protecting your data, and recovering from issues.
 
 ### What You'll Learn
 
@@ -63,19 +63,19 @@ Your database contains **all your property management data:**
 **Linux:**
 
 ```bash
-~/.config/Aquiis/Data/app_v1.1.0.db
+~/.config/Nine/Data/app_v1.1.0.db
 ```
 
 **Windows:**
 
 ```
-%APPDATA%\Aquiis\Data\app_v1.1.0.db
+%APPDATA%\Nine\Data\app_v1.1.0.db
 ```
 
 **Full path examples:**
 
-- **Linux:** `/home/username/.config/Aquiis/Data/app_v1.1.0.db`
-- **Windows:** `C:\Users\YourName\AppData\Roaming\Aquiis\Data\app_v1.1.0.db`
+- **Linux:** `/home/username/.config/Nine/Data/app_v1.1.0.db`
+- **Windows:** `C:\Users\YourName\AppData\Roaming\Nine\Data\app_v1.1.0.db`
 
 ### Database Structure
 
@@ -94,7 +94,7 @@ The database file is a **single SQLite file** containing:
 
 ### Schema Version
 
-Aquiis SimpleStart v1.1.0 uses schema version `1.1.0`. This tracks the database structure and ensures compatibility.
+Nine v1.1.0 uses schema version `1.1.0`. This tracks the database structure and ensures compatibility.
 
 **Check your schema version:**
 
@@ -104,7 +104,7 @@ Aquiis SimpleStart v1.1.0 uses schema version `1.1.0`. This tracks the database 
 
 ### Auto-Migration System
 
-When you upgrade Aquiis SimpleStart to a new version:
+When you upgrade Nine to a new version:
 
 1. Application detects current schema version
 2. Compares with required schema version
@@ -182,7 +182,7 @@ See the **[Compatibility Matrix](Compatibility-Matrix.md)** for detailed informa
 
 **Step-by-step:**
 
-1. **Open Aquiis SimpleStart**
+1. **Open Nine**
 2. **Navigate to:** Settings → Database
 3. **Click:** "Backup & Restore" tab
 4. **Click:** "Create Backup" button
@@ -194,8 +194,8 @@ See the **[Compatibility Matrix](Compatibility-Matrix.md)** for detailed informa
 - **Filename:** `backup_YYYYMMDD_HHMMSS.db`
   - Example: `backup_20260218_143022.db` (February 18, 2026 at 2:30:22 PM)
 - **Location:** `Data/Backups/` folder
-  - Linux: `~/.config/Aquiis/Data/Backups/`
-  - Windows: `%APPDATA%\Aquiis\Data\Backups\`
+  - Linux: `~/.config/Nine/Data/Backups/`
+  - Windows: `%APPDATA%\Nine\Data\Backups\`
 - **Size:** Same as database file (~5-200 MB)
 
 **Best practice:** Create a manual backup **before**:
@@ -258,17 +258,17 @@ For **maximum protection**, copy backups to multiple locations:
 
 ```bash
 # Copy all backups to USB drive
-cp ~/.config/Aquiis/Data/Backups/*.db /media/usb/AquiisBackups/
+cp ~/.config/Nine/Data/Backups/*.db /media/usb/NineBackups/
 
 # Or use rsync for incremental backups
-rsync -av ~/.config/Aquiis/Data/Backups/ /media/usb/AquiisBackups/
+rsync -av ~/.config/Nine/Data/Backups/ /media/usb/NineBackups/
 ```
 
 **Windows:**
 
 ```powershell
 # Copy all backups to USB drive
-Copy-Item "$env:APPDATA\Aquiis\Data\Backups\*.db" "E:\AquiisBackups\" -Recurse
+Copy-Item "$env:APPDATA\Nine\Data\Backups\*.db" "E:\NineBackups\" -Recurse
 ```
 
 **Automated cloud sync:**
@@ -387,10 +387,10 @@ If the application won't start or database UI is unavailable:
 
 ```bash
 # Stop the application first
-pkill Aquiis
+pkill Nine
 
 # Navigate to data directory
-cd ~/.config/Aquiis/Data/
+cd ~/.config/Nine/Data/
 
 # Backup current (corrupted) database
 mv app_v1.1.0.db app_v1.1.0.db.corrupted
@@ -399,7 +399,7 @@ mv app_v1.1.0.db app_v1.1.0.db.corrupted
 cp Backups/backup_20260218_143022.db app_v1.1.0.db
 
 # Restart application
-./Aquiis-SimpleStart-1.1.0.AppImage
+./Nine-1.1.0.AppImage
 ```
 
 **Windows:**
@@ -408,7 +408,7 @@ cp Backups/backup_20260218_143022.db app_v1.1.0.db
 # Stop the application first (close window or Task Manager)
 
 # Navigate to data directory
-cd $env:APPDATA\Aquiis\Data
+cd $env:APPDATA\Nine\Data
 
 # Backup current (corrupted) database
 Move-Item app_v1.1.0.db app_v1.1.0.db.corrupted
@@ -506,7 +506,7 @@ If you reset by mistake, **immediately restore** from the pre-reset backup:
 
 ### Automatic Health Monitoring
 
-Aquiis SimpleStart monitors database health continuously:
+Nine monitors database health continuously:
 
 - **On startup** - Integrity check before application loads
 - **Every hour** - Background health check via scheduled tasks
@@ -607,7 +607,7 @@ Aquiis SimpleStart monitors database health continuously:
 
 **Causes:**
 
-- Another Aquiis instance running
+- Another Nine instance running
 - Background backup in progress
 - Database file open in SQLite browser tool
 - System file lock from crash
@@ -618,10 +618,10 @@ Aquiis SimpleStart monitors database health continuously:
 
    ```bash
    # Linux
-   ps aux | grep Aquiis
+   ps aux | grep Nine
 
    # Windows (Task Manager)
-   # Look for multiple Aquiis.SimpleStart.exe processes
+   # Look for multiple Nine.exe processes
    ```
 
    - Close extra instances
@@ -644,12 +644,12 @@ Aquiis SimpleStart monitors database health continuously:
    ```bash
    # Only if application is definitely closed
    # Linux
-   rm ~/.config/Aquiis/Data/app_v1.1.0.db-wal
-   rm ~/.config/Aquiis/Data/app_v1.1.0.db-shm
+   rm ~/.config/Nine/Data/app_v1.1.0.db-wal
+   rm ~/.config/Nine/Data/app_v1.1.0.db-shm
 
    # Windows
-   del %APPDATA%\Aquiis\Data\app_v1.1.0.db-wal
-   del %APPDATA%\Aquiis\Data\app_v1.1.0.db-shm
+   del %APPDATA%\Nine\Data\app_v1.1.0.db-wal
+   del %APPDATA%\Nine\Data\app_v1.1.0.db-shm
    ```
 
 ### Issue 2: Database Corruption
@@ -799,10 +799,10 @@ Aquiis SimpleStart monitors database health continuously:
 
    ```bash
    # Linux
-   ls -la ~/.config/Aquiis/Data/
+   ls -la ~/.config/Nine/Data/
 
    # Windows
-   dir %APPDATA%\Aquiis\Data
+   dir %APPDATA%\Nine\Data
    ```
 
 2. **Search for database file:**
@@ -822,8 +822,8 @@ Aquiis SimpleStart monitors database health continuously:
 
 4. **Fix permissions (Linux):**
    ```bash
-   chmod 644 ~/.config/Aquiis/Data/app_v1.1.0.db
-   chown $USER:$USER ~/.config/Aquiis/Data/app_v1.1.0.db
+   chmod 644 ~/.config/Nine/Data/app_v1.1.0.db
+   chown $USER:$USER ~/.config/Nine/Data/app_v1.1.0.db
    ```
 
 ---
@@ -886,7 +886,7 @@ SELECT * FROM Invoices WHERE DueDate < date('now') AND Status = 'Pending';
 - **Do NOT** modify data directly (UPDATE, DELETE, INSERT)
 - Bypasses application logic and audit trails
 - Can cause corruption or data inconsistencies
-- Close tool before starting Aquiis (prevents lock conflicts)
+- Close tool before starting Nine (prevents lock conflicts)
 
 ### Data Export
 
@@ -917,11 +917,11 @@ GROUP BY l.PropertyId, p.PropertyName;
 
 ### Database Encryption
 
-SQLite databases are **not encrypted** by default. Aquiis SimpleStart v1.1.0 includes database encryption options:
+SQLite databases are **not encrypted** by default. Nine v1.1.0 includes database encryption options:
 
 **Option 1: SQLCipher (Included in v1.1.0)**
 
-SQLCipher provides AES-256 encryption for database files. This is integrated into Aquiis SimpleStart v1.1.0:
+SQLCipher provides AES-256 encryption for database files. This is integrated into Nine v1.1.0:
 
 - **Enable encryption:** Settings → Database → Security → Enable Database Encryption
 - **AES-256 encryption** of entire database file
@@ -952,7 +952,7 @@ SQLCipher provides AES-256 encryption for database files. This is integrated int
 
 ### Multi-Computer Sync
 
-Aquiis SimpleStart is designed as single-computer desktop application. Multi-computer sync is **not officially supported** but possible with caveats:
+Nine is designed as single-computer desktop application. Multi-computer sync is **not officially supported** but possible with caveats:
 
 **Cloud sync approach:**
 
@@ -966,17 +966,17 @@ Aquiis SimpleStart is designed as single-computer desktop application. Multi-com
 - Sync conflicts if edits made offline
 - Poor performance over network
 
-**Recommendation:** Use one computer as primary. For multi-computer access, wait for Aquiis Professional (web-based, v2.0.0).
+**Recommendation:** Use one computer as primary. For multi-computer access, wait for Nine Professional (web-based, v2.0.0).
 
 ### Schema Migrations & Model Optimization
 
-Aquiis uses **EF Core migrations** to manage schema changes and a **compiled model** to eliminate EF's runtime model-build cost.
+Nine uses **EF Core migrations** to manage schema changes and a **compiled model** to eliminate EF's runtime model-build cost.
 
 #### EF Core Compiled Model
 
 On first startup, EF Core normally reflects over all 40+ entity classes to build its internal model — this adds several seconds to every app launch. A **compiled model** pre-builds this at publish time instead, reducing startup time significantly.
 
-The compiled model lives in `1-Aquiis.Infrastructure/Data/CompiledModels/` and is auto-discovered via an assembly attribute — no code wiring is needed.
+The compiled model lives in `1-Nine.Infrastructure/Data/CompiledModels/` and is auto-discovered via an assembly attribute — no code wiring is needed.
 
 **When to regenerate the compiled model:**
 
@@ -997,16 +997,16 @@ Whenever the entity model changes, run both commands from the solution root:
 ```bash
 # 1. Add the migration
 dotnet ef migrations add <MigrationName> \
-  --project 1-Aquiis.Infrastructure \
-  --startup-project 4-Aquiis.SimpleStart
+  --project 1-Nine.Infrastructure \
+  --startup-project 4-Nine
 
 # 2. Regenerate the compiled model
 dotnet ef dbcontext optimize \
-  --project 1-Aquiis.Infrastructure \
-  --startup-project 4-Aquiis.SimpleStart \
+  --project 1-Nine.Infrastructure \
+  --startup-project 4-Nine \
   --context ApplicationDbContext \
   --output-dir Data/CompiledModels \
-  --namespace Aquiis.Infrastructure.Data.CompiledModels
+  --namespace Nine.Infrastructure.Data.CompiledModels
 ```
 
 Check in both the migration files and the updated `CompiledModels/` folder together in the same commit.
@@ -1105,8 +1105,8 @@ dotnet tool update dotnet-ef -g
 
 **A:**
 
-- **Linux:** `~/.config/Aquiis/Data/Backups/`
-- **Windows:** `%APPDATA%\Aquiis\Data\Backups\`
+- **Linux:** `~/.config/Nine/Data/Backups/`
+- **Windows:** `%APPDATA%\Nine\Data\Backups\`
 
 ### Q: Can I restore a backup from an older version?
 
@@ -1116,7 +1116,7 @@ dotnet tool update dotnet-ef -g
 
 **A:** If both the main database and all backups are lost, **data cannot be recovered** unless you have off-site backups (cloud, USB drive). This is why the 3-2-1 backup rule is critical.
 
-### Q: Can I access the database while Aquiis is running?
+### Q: Can I access the database while Nine is running?
 
 **A:** For **read-only** queries with SQLite tools: YES (WAL mode allows concurrent reads). For **write operations**: NO (will cause database lock conflicts).
 
@@ -1126,7 +1126,7 @@ dotnet tool update dotnet-ef -g
 
 1. On old computer: Create backup
 2. Copy backup file to new computer (USB drive, cloud)
-3. Install Aquiis SimpleStart on new computer
+3. Install Nine on new computer
 4. Copy backup to: `Data/Backups/` folder on new computer
 5. Restore from backup
 
@@ -1157,11 +1157,11 @@ Use application UI for all changes.
 
 ### Q: How large can the database get?
 
-**A:** SQLite theoretical limit is **281 TB**. Practical limit for Aquiis SimpleStart: **2-4 GB** (depends on available RAM). A typical small landlord database: **50-200 MB** after 5 years.
+**A:** SQLite theoretical limit is **281 TB**. Practical limit for Nine: **2-4 GB** (depends on available RAM). A typical small landlord database: **50-200 MB** after 5 years.
 
 ### Q: Can I have multiple databases?
 
-**A:** Not directly supported in v1.1.0. You can manually swap database files, but only one can be active at a time. For multi-organization use, wait for Aquiis Professional.
+**A:** Not directly supported in v1.1.0. You can manually swap database files, but only one can be active at a time. For multi-organization use, wait for Nine Professional.
 
 ---
 
@@ -1170,7 +1170,7 @@ Use application UI for all changes.
 Need help with database management? We're here for you!
 
 **Email:** cisguru@outlook.com  
-**GitHub Issues:** [https://github.com/xnodeoncode/Aquiis/issues](https://github.com/xnodeoncode/Aquiis/issues)
+**GitHub Issues:** [https://github.com/xnodeoncode/nine/issues](https://github.com/xnodeoncode/nine/issues)
 
 **When contacting support about database issues, include:**
 

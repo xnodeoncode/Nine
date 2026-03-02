@@ -1,4 +1,4 @@
-# Aquiis - Property Management System
+# Nine - Property Management System
 
 ![.NET 10.0](https://img.shields.io/badge/.NET-10.0-blue)
 ![ASP.NET Core](https://img.shields.io/badge/ASP.NET%20Core-10.0-blueviolet)
@@ -6,11 +6,11 @@
 ![Entity Framework](https://img.shields.io/badge/Entity%20Framework-10.0-green)
 ![SQLite](https://img.shields.io/badge/Database-SQLite-lightblue)
 
-A comprehensive web-based property management system built with ASP.NET Core 10.0 and Blazor Server. Aquiis streamlines rental property management for property owners and managers with an intuitive interface and robust feature set.
+A comprehensive web-based property management system built with ASP.NET Core 10.0 and Blazor Server. Nine streamlines rental property management for property owners and managers with an intuitive interface and robust feature set.
 
 ## 🏢 Overview
 
-Aquiis is designed to simplify property management operations through a centralized platform that handles everything from property, tenant, and lease tracking to document storage and rental invoice and expense tracking. Built with modern web technologies including AI (GitHub Copilot and Claude Sonnet), it provides a responsive, secure, and scalable solution for DIY landlords and property managers.
+Nine is designed to simplify property management operations through a centralized platform that handles everything from property, tenant, and lease tracking to document storage and rental invoice and expense tracking. Built with modern web technologies including AI (GitHub Copilot and Claude Sonnet), it provides a responsive, secure, and scalable solution for DIY landlords and property managers.
 
 ## ✨ Key Features
 
@@ -109,8 +109,8 @@ Aquiis is designed to simplify property management operations through a centrali
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/xnodeoncode/Aquiis.git
-cd Aquiis
+git clone https://github.com/xnodeoncode/nine.git
+cd Nine
 ```
 
 ### 2. Build the Application
@@ -122,7 +122,7 @@ dotnet build
 ### 3. Run Database Migrations
 
 ```bash
-cd Aquiis.SimpleStart
+cd 4-Nine
 dotnet ef database update
 ```
 
@@ -145,7 +145,7 @@ Open your browser and navigate to:
 
 The project includes pre-configured VS Code settings:
 
-1. Open the workspace file: `Aquiis.code-workspace`
+1. Open the workspace file: `Nine.code-workspace`
 2. Install recommended extensions when prompted
 3. Use **F5** to start debugging
 4. Use **Ctrl+Shift+P** → "Tasks: Run Task" for build operations
@@ -189,7 +189,7 @@ dotnet ef migrations remove
 The application follows Clean Architecture principles with clear separation of concerns:
 
 ```
-Aquiis.SimpleStart/
+4-Nine/
 ├── Core/                                # Domain Layer (no dependencies)
 │   ├── Entities/                        # Domain models & business entities
 │   │   ├── BaseModel.cs                # Base entity with common properties
@@ -466,7 +466,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🏗️ Roadmap
 
-### Upcoming Features via Aquiis Professional
+### Upcoming Features via Nine Professional
 
 - Mobile application support
 - Advanced reporting and analytics
@@ -486,6 +486,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Aquiis** - Streamlining Property Management for the Modern World
+**Nine** - Streamlining Property Management for the Modern World
 
 Built with ❤️ using ASP.NET Core 10.0, Blazor Server, and AI Tools (GitHub Copilot and Claude Sonnet)

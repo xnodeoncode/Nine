@@ -18,7 +18,7 @@ using Microsoft.Data.Sqlite;
 namespace Nine.Extensions;
 
 /// <summary>
-/// Extension methods for configuring Electron-specific services for SimpleStart.
+/// Extension methods for configuring Electron-specific services for Nine.
 /// </summary>
 public static class ElectronServiceExtensions
 {
@@ -85,8 +85,8 @@ public static class ElectronServiceExtensions
         // ✅ Register Application layer (includes Infrastructure internally) with encryption interceptor
         services.AddApplication(connectionString, encryptionPassword, interceptor);
 
-        // Register Identity database context (SimpleStart-specific) with encryption interceptor
-        services.AddDbContext<SimpleStartDbContext>((serviceProvider, options) =>
+        // Register Identity database context (Nine-specific) with encryption interceptor
+        services.AddDbContext<NineDbContext>((serviceProvider, options) =>
         {
             options.UseSqlite(connectionString);
             if (interceptor != null)
@@ -105,7 +105,7 @@ public static class ElectronServiceExtensions
         services.AddScoped<IDatabaseService>(sp => 
             new DatabaseService(
                 sp.GetRequiredService<Nine.Infrastructure.Data.ApplicationDbContext>(),
-                sp.GetRequiredService<SimpleStartDbContext>(),
+                sp.GetRequiredService<NineDbContext>(),
                 sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<DatabaseService>>()));
 
         services.AddDatabaseDeveloperPageExceptionFilter();
@@ -123,7 +123,7 @@ public static class ElectronServiceExtensions
             options.Password.RequireLowercase = true;
             options.Password.RequiredUniqueChars = 4; // Prevent patterns like "aaa111!!!"
         })
-        .AddEntityFrameworkStores<SimpleStartDbContext>()
+        .AddEntityFrameworkStores<NineDbContext>()
         .AddDefaultTokenProviders();
 
         // Configure cookie authentication for Electron
@@ -186,8 +186,8 @@ public static class ElectronServiceExtensions
             {
                 // Database is encrypted - try to get password from keychain
                 var keychain = OperatingSystem.IsWindows()
-                    ? (IKeychainService)new WindowsKeychainService("SimpleStart-Electron")
-                    : new LinuxKeychainService("SimpleStart-Electron"); // Pass app name to prevent keychain conflicts
+                    ? (IKeychainService)new WindowsKeychainService("Nine-Electron")
+                    : new LinuxKeychainService("Nine-Electron"); // Pass app name to prevent keychain conflicts
                 
                 Console.WriteLine("Attempting to retrieve encryption password from keychain...");
                 var password = keychain.RetrieveKey();

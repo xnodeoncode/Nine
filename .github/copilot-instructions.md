@@ -1,4 +1,4 @@
-# Aquiis Property Management System - AI Agent Instructions
+# Nine Property Management System - AI Agent Instructions
 
 ## Development Workflow
 
@@ -42,7 +42,7 @@ feature/Phase-X-Feature-Name
 
    ```bash
    # Ensure build succeeds with 0 errors
-   dotnet build Aquiis.sln
+   dotnet build Nine.sln
 
    # Switch to development and merge
    git checkout development
@@ -50,7 +50,7 @@ feature/Phase-X-Feature-Name
    git merge feature/Phase-X-Feature-Name
 
    # Test the merged code in development
-   dotnet build Aquiis.sln
+   dotnet build Nine.sln
    dotnet test
    ```
 
@@ -73,7 +73,7 @@ feature/Phase-X-Feature-Name
    git pull origin main
 
    # Test locally to verify
-   dotnet build Aquiis.sln
+   dotnet build Nine.sln
    dotnet test
    ```
 
@@ -87,7 +87,7 @@ feature/Phase-X-Feature-Name
 
 ## Project Overview
 
-Aquiis is a multi-tenant property management system built with **ASP.NET Core 9.0 + Blazor Server**. It manages properties, tenants, leases, invoices, payments, documents, inspections, and maintenance requests with role-based access control.
+Nine is a multi-tenant property management system built with **ASP.NET Core 9.0 + Blazor Server**. It manages properties, tenants, leases, invoices, payments, documents, inspections, and maintenance requests with role-based access control.
 
 ## Architecture Fundamentals
 
@@ -100,12 +100,12 @@ Aquiis is a multi-tenant property management system built with **ASP.NET Core 9.
 
 ### Service Layer Architecture
 
-Aquiis uses a **layered service architecture** with entity-specific services inheriting from a base service:
+Nine uses a **layered service architecture** with entity-specific services inheriting from a base service:
 
 **Service Hierarchy:**
 
 ```
-BaseService<TEntity>                    (2-Aquiis.Application/Services/BaseService.cs)
+BaseService<TEntity>                    (2-Nine.Application/Services/BaseService.cs)
   ├─ LeaseService                       (Entity-specific CRUD + business logic)
   ├─ PropertyService
   ├─ TenantService
@@ -113,7 +113,7 @@ BaseService<TEntity>                    (2-Aquiis.Application/Services/BaseServi
   ├─ MaintenanceService
   └─ [Entity]Service
 
-Workflow Services                       (2-Aquiis.Application/Services/Workflows/)
+Workflow Services                       (2-Nine.Application/Services/Workflows/)
   ├─ LeaseWorkflowService               (Complex lease lifecycle management)
   ├─ ApplicationWorkflowService         (Rental application processing)
   └─ AccountWorkflowService             (User account workflows)
@@ -321,29 +321,29 @@ private async Task CreateProperty()
 
 ### Component Architecture
 
-Aquiis uses a **three-tier component hierarchy** to enable code reuse across SimpleStart and Professional products while maintaining different complexity levels:
+Nine uses a **three-tier component hierarchy** to enable code reuse across Nine and Professional products while maintaining different complexity levels:
 
 **Component Tiers:**
 
 ```
-Entity Components (Tier 1)          (3-Aquiis.UI.Shared/Components/Entities/)
+Entity Components (Tier 1)          (3-Nine.Shared.UI/Components/Entities/)
   ├─ Pure presentation components
   ├─ Minimal business logic
   ├─ Maximum reusability
   └─ Examples: LeaseListView, PropertyCard, TenantSearchBox
 
-Feature Components (Tier 2)         (3-Aquiis.UI.Shared/Features/)
+Feature Components (Tier 2)         (3-Nine.Shared.UI/Features/)
   ├─ Fully-featured implementations
   ├─ Complete CRUD operations
   ├─ Business logic included
   ├─ Service injection
   └─ Examples: LeaseManagement, PropertyManagement, TenantManagement
 
-Product Pages (Tier 3)              (4-Aquiis.SimpleStart/Features/ or 5-Aquiis.Professional/Features/)
+Product Pages (Tier 3)              (4-Nine/Features/ or 5-Nine.Professional (not included)/Features/)
   ├─ Composition layer
   ├─ Product-specific UX
   ├─ Routing decisions
-  └─ Examples: SimpleStart uses Feature components directly, Professional uses custom compositions
+  └─ Examples: Nine uses Feature components directly, Professional uses custom compositions
 ```
 
 **When to Use Each Tier:**
@@ -353,15 +353,15 @@ Product Pages (Tier 3)              (4-Aquiis.SimpleStart/Features/ or 5-Aquiis.
   - Usage: `<LeaseListView Leases="@leases" GroupedLeases="@groupedLeases" />`
 - **Feature Component**: Complete feature implementation ready to use
   - Example: `LeaseManagement.razor` provides full lease CRUD with navigation
-  - Usage: SimpleStart: `<LeaseManagement />` (5 lines), Professional: Custom composition
+  - Usage: Nine: `<LeaseManagement />` (5 lines), Professional: Custom composition
 - **Product Page**: Top-level routing and product-specific UX
-  - Example: SimpleStart `/propertymanagement/leases` → Uses LeaseManagement directly
+  - Example: Nine `/propertymanagement/leases` → Uses LeaseManagement directly
   - Example: Professional `/leases` → Custom layout with LeaseListView + custom panels
 
 **File Naming & Organization:**
 
 ```
-3-Aquiis.UI.Shared/
+3-Nine.Shared.UI/
   ├── Components/
   │   ├── Common/          (Cross-cutting: EntityFilterBar, Modal, etc.)
   │   └── Entities/        (Entity-specific: Leases/, Properties/, Tenants/)
@@ -370,10 +370,10 @@ Product Pages (Tier 3)              (4-Aquiis.SimpleStart/Features/ or 5-Aquiis.
       ├── LeaseManagement/
       └── TenantManagement/
 
-4-Aquiis.SimpleStart/Features/
+4-Nine/Features/
   └── PropertyManagement/Index.razor (@page "/propertymanagement/leases")
 
-5-Aquiis.Professional/Features/
+5-Nine.Professional (not included)/Features/
   └── Leases/Index.razor (@page "/leases")
 ```
 
@@ -391,10 +391,10 @@ The `Components/Common/` folder contains reusable components used across all ent
 - **Modal.razor**: Reusable modal dialog with customizable content and actions
 - **ConfirmDialog.razor**: Confirmation prompts with Yes/No actions
 
-**Example: SimpleStart vs Professional Usage:**
+**Example: Nine vs Professional Usage:**
 
 ```csharp
-// SimpleStart: Direct feature usage (simple, fast to implement)
+// Nine: Direct feature usage (simple, fast to implement)
 @page "/propertymanagement/leases"
 <LeaseManagement />
 
@@ -559,7 +559,7 @@ Properties follow a status-driven lifecycle (string values from `ApplicationCons
 
 ```csharp
 @page "/propertymanagement/entities/create"
-@using Aquiis.SimpleStart.Components.PropertyManagement.Entities
+@using Nine.Components.PropertyManagement.Entities
 @attribute [Authorize(Roles = "Administrator,PropertyManager")]
 @inject PropertyService PropertyService
 @inject UserContextService UserContext
@@ -640,8 +640,8 @@ public async Task<Entity> AddEntityAsync(Entity entity)
 
 1. **EF Core Migrations**: Primary approach for schema changes
    - Migrations stored in `Data/Migrations/`
-   - Run `dotnet ef migrations add MigrationName --project Aquiis.SimpleStart`
-   - Apply with `dotnet ef database update --project Aquiis.SimpleStart`
+   - Run `dotnet ef migrations add MigrationName --project Nine`
+   - Apply with `dotnet ef database update --project Nine`
    - Generate SQL script: `dotnet ef migrations script --output schema.sql`
 2. **SQL Scripts**: Reference scripts in `Data/Scripts/` (not executed, for documentation)
 3. Update `ApplicationDbContext.cs` with DbSet and entity configuration
@@ -654,7 +654,7 @@ public async Task<Entity> AddEntityAsync(Entity entity)
 
 - **Ctrl+Shift+B** to run `dotnet watch` (hot reload, default build task)
 - **F5** in VS Code to debug (configured in `.vscode/launch.json`)
-- Or: `dotnet run` in `Aquiis.SimpleStart/` directory
+- Or: `dotnet run` in `Nine/` directory
 - Default URLs: Check terminal output for ports
 - Default admin: `superadmin@example.local` / `SuperAdmin@123!`
 
@@ -760,12 +760,12 @@ Components/PropertyManagement/[Entity]/
 
 1. **Create entity model** inheriting `BaseModel` with `OrganizationId` property
 2. **Add DbSet** to `ApplicationDbContext` with proper relationships and configuration
-3. **Create EF Core migration**: `dotnet ef migrations add [Name] --project Aquiis.SimpleStart`
+3. **Create EF Core migration**: `dotnet ef migrations add [Name] --project Nine`
 4. **Create entity-specific service** inheriting `BaseService<TEntity>`:
    - Add constructor with dependencies (DbContext, Logger, UserContext, Settings)
    - Override `ValidateEntityAsync()` for business rules
    - Add entity-specific query methods with org filtering
-   - Register service in DI container (`2-Aquiis.Application/DependencyInjection.cs`)
+   - Register service in DI container (`2-Nine.Application/DependencyInjection.cs`)
 5. **Create workflow service** (if complex state transitions needed):
    - Inherit from `BaseWorkflowService`
    - Implement `IWorkflowState<TStatus>` if status machine required
@@ -782,7 +782,7 @@ Components/PropertyManagement/[Entity]/
 **Example Entity Service Creation:**
 
 ```csharp
-// 2-Aquiis.Application/Services/[Entity]Service.cs
+// 2-Nine.Application/Services/[Entity]Service.cs
 public class DocumentService : BaseService<Document>
 {
     public DocumentService(

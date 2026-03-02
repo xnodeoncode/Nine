@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Identity;
 namespace Nine.Entities;
 
 /// <summary>
-/// SimpleStart user entity for authentication and authorization.
-/// Extends IdentityUser with SimpleStart-specific properties.
+/// Nine user entity for authentication and authorization.
+/// Extends IdentityUser with Nine-specific properties.
 /// </summary>
 public class ApplicationUser : IdentityUser
 {

@@ -99,7 +99,7 @@ public class ElectronPathService : IPathService
         if (HybridSupport.IsElectronActive)
         {
             // Use sync method to ensure consistent path resolution
-            // This matches the startup behavior and uses "Aquiis" as the app name
+            // This matches the startup behavior and uses "Nine" as the app name
             return GetUserDataPathSync();
         }
         else
@@ -118,7 +118,7 @@ public class ElectronPathService : IPathService
         {
             // Determine OS-specific user data path without Electron API
             string basePath;
-            var appName = "Aquiis";
+            var appName = "Nine";
             
             if (OperatingSystem.IsWindows())
             {

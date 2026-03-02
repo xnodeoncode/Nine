@@ -110,7 +110,7 @@ namespace Nine.Application.Services
             {
                 await _smsProvider.SendSMSAsync(
                     testPhoneNumber,
-                    "Aquiis SMS Configuration Test: This message confirms your Twilio integration is working correctly.");
+                    "Nine SMS Configuration Test: This message confirms your Twilio integration is working correctly.");
 
                 return OperationResult.SuccessResult("Test SMS sent successfully! Check your phone.");
             }

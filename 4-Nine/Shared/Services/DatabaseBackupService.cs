@@ -52,7 +52,7 @@ namespace Nine.Shared.Services
                 Directory.CreateDirectory(backupDir);
 
                 var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
-                var backupFileName = $"Aquiis_Backup_{backupReason}_{timestamp}.db";
+                var backupFileName = $"Nine_Backup_{backupReason}_{timestamp}.db";
                 var backupPath = Path.Combine(backupDir, backupFileName);
 
                 _logger.LogInformation("Backup will be created at: {BackupPath}", backupPath);

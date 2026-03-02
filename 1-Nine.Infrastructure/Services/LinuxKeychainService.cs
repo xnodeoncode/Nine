@@ -17,8 +17,8 @@ public class LinuxKeychainService : IKeychainService
     /// <summary>
     /// Initialize keychain service with app-specific identifier
     /// </summary>
-    /// <param name="appName">Application name (e.g., "SimpleStart-Web", "SimpleStart-Electron", "Professional-Web") to prevent keychain conflicts</param>
-    public LinuxKeychainService(string appName = "Aquiis-Electron")
+    /// <param name="appName">Application name (e.g., "Nine-Web", "Nine-Electron", "Professional-Web") to prevent keychain conflicts</param>
+    public LinuxKeychainService(string appName = "Nine-Electron")
     {
         // Make keychain entry unique per application to prevent password conflicts
         _keyValue = $"database-encryption-{appName}";
@@ -31,7 +31,7 @@ public class LinuxKeychainService : IKeychainService
     /// <param name="keyHex">Hex-encoded encryption key</param>
     /// <param name="label">Human-readable label for the key</param>
     /// <returns>True if stored successfully</returns>
-    public bool StoreKey(string keyHex, string label = "Aquiis Database Encryption Key")
+    public bool StoreKey(string keyHex, string label = "Nine Database Encryption Key")
     {
         if (!OperatingSystem.IsLinux())
             return false;

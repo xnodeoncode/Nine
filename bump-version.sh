@@ -1,13 +1,13 @@
 #!/bin/bash
 
-# Aquiis Semantic Version Bumper
+# Nine Semantic Version Bumper
 # Usage: ./bump-version.sh [major|minor|patch]
 
 set -e
 
 VERSION_TYPE="${1:-patch}"
-CSPROJ_FILE="4-Aquiis.SimpleStart/Aquiis.SimpleStart.csproj"
-APPSETTINGS_FILE="4-Aquiis.SimpleStart/appsettings.json"
+CSPROJ_FILE="4-Nine/Nine.csproj"
+APPSETTINGS_FILE="4-Nine/appsettings.json"
 
 # Colors for output
 RED='\033[0;31m'
@@ -15,7 +15,7 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
-echo -e "${YELLOW}🔄 Aquiis Version Bumper${NC}"
+echo -e "${YELLOW}🔄 Nine Version Bumper${NC}"
 echo ""
 
 # Extract current version from .csproj
@@ -110,7 +110,7 @@ echo -e "   $CURRENT_VERSION → ${GREEN}$NEW_VERSION${NC}"
 echo ""
 echo -e "${YELLOW}Next steps:${NC}"
 echo "   1. Review changes: git diff"
-echo "   2. Build and test: dotnet build Aquiis.sln"
+echo "   2. Build and test: dotnet build Nine.sln"
 echo "   3. Commit: git add . && git commit -m 'chore: bump version to $NEW_VERSION'"
 echo "   4. Tag: git tag v$NEW_VERSION"
 echo "   5. Push: git push && git push --tags"

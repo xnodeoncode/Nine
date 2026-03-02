@@ -124,7 +124,7 @@ public class DatabaseEncryptionService
             await Task.Delay(200);
 
             // Store password in keychain (best effort - don't fail if keychain unavailable)
-            var stored = _keychain.StoreKey(password, "Aquiis Database Encryption Password");
+            var stored = _keychain.StoreKey(password, "Nine Database Encryption Password");
             if (!stored)
             {
                 _logger.LogWarning("Failed to store password in keychain - you'll need to enter it manually on next startup");

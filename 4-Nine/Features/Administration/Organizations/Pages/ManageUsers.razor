@@ -67,8 +67,8 @@
                         <div class="alert alert-warning m-3 mb-0">
                             <i class="bi bi-exclamation-triangle"></i>
                             <strong>User Limit Reached</strong><br />
-                            SimpleStart allows 3 user accounts (1 system + 2 login users).<br />
-                            <small>Upgrade to <strong>Aquiis Professional</strong> for unlimited users and advanced features.</small>
+                            Nine allows up to 3 user accounts (1 system + 2 login users).<br />
+                            <small>Upgrade to <strong>Nine Professional</strong> for unlimited users and advanced features.</small>
                         </div>
                     }
                     <div class="card-body p-0">
@@ -238,7 +238,7 @@
     private string selectedRole = ApplicationConstants.OrganizationRoles.User;
     private string addUserError = string.Empty;
 
-    // SimpleStart: 3-user limit (excluding system account)
+    // Nine: 3-user limit (excluding system account)
     private bool CanAddMoreUsers => organizationUsers
         .Count(ou => ou.UserId != ApplicationConstants.SystemUser.Id) < 3;
 

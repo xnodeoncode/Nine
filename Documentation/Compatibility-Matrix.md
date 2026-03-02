@@ -1,14 +1,14 @@
-# Aquiis Compatibility Matrix
+# Nine Compatibility Matrix
 
 **Last Updated:** March 1, 2026  
-**Current Release:** v1.1.2 (SimpleStart) | v0.3.0 (Professional)  
-**Next Release:** v1.2.0 (SimpleStart) | v0.3.1 (Professional)
+**Current Release: v1.0.0
+**Next Release: v1.1.0 (planned)
 
 ---
 
 ## Overview
 
-This matrix tracks version compatibility across Aquiis releases, enabling you to:
+This matrix tracks version compatibility across Nine releases, enabling you to:
 
 - ✅ **Verify upgrade/downgrade compatibility** - Check if app versions work with your database
 - ✅ **Identify component versions** - Know which dependencies are installed
@@ -20,16 +20,16 @@ This matrix tracks version compatibility across Aquiis releases, enabling you to
 
 ---
 
-## SimpleStart Version History
+## Nine Version History
 
 | Release Date | App Version | Database Schema | .NET SDK | ElectronNET | Bootstrap | QuestPDF  | Migration Required | Breaking Changes | Status             | Download                                                             |
 | ------------ | ----------- | --------------- | -------- | ----------- | --------- | --------- | ------------------ | ---------------- | ------------------ | -------------------------------------------------------------------- |
 | TBD          | **1.2.0**   | v1.2.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | Yes (v1.1.0→1.2.0) | TBD              | **In Development** | -                                                                    |
-| 2026-03-01   | 1.1.2       | v1.1.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | No                 | No               | **Current**        | [Release](https://github.com/xnodeoncode/Aquiis/releases/tag/v1.1.2) |
-| 2026-02-28   | 1.1.1       | v1.1.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | No                 | No               | Previous           | [Release](https://github.com/xnodeoncode/Aquiis/releases/tag/v1.1.1) |
-| 2026-02-18   | 1.1.0       | v1.1.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | Yes (v1.0.0→1.1.0) | New tables/cols  | Superseded         | [Release](https://github.com/xnodeoncode/Aquiis/releases/tag/v1.1.0) |
-| 2026-01-29   | 1.0.1       | v1.0.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | No                 | No               | Superseded         | [Release](https://github.com/xnodeoncode/Aquiis/releases/tag/v1.0.1) |
-| 2026-01-28   | 1.0.0       | v1.0.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | No                 | No               | Superseded         | [Release](https://github.com/xnodeoncode/Aquiis/releases/tag/v1.0.0) |
+| 2026-03-01   | 1.1.2       | v1.1.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | No                 | No               | **Current**        | [Release](https://github.com/xnodeoncode/nine/releases/tag/v1.1.2) |
+| 2026-02-28   | 1.1.1       | v1.1.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | No                 | No               | Previous           | [Release](https://github.com/xnodeoncode/nine/releases/tag/v1.1.1) |
+| 2026-02-18   | 1.1.0       | v1.1.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | Yes (v1.0.0→1.1.0) | New tables/cols  | Superseded         | [Release](https://github.com/xnodeoncode/nine/releases/tag/v1.1.0) |
+| 2026-01-29   | 1.0.1       | v1.0.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | No                 | No               | Superseded         | [Release](https://github.com/xnodeoncode/nine/releases/tag/v1.0.1) |
+| 2026-01-28   | 1.0.0       | v1.0.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | No                 | No               | Superseded         | [Release](https://github.com/xnodeoncode/nine/releases/tag/v1.0.0) |
 
 ## Professional Version History
 
@@ -70,7 +70,7 @@ This matrix tracks version compatibility across Aquiis releases, enabling you to
 | ------------------- | --------------------- | --------------- | ---------------------------------------------- |
 | **SQLite**          | 3.46.0                | Database engine | Via Microsoft.Data.Sqlite                      |
 | **EF Core**         | 10.0.1                | ORM             | Breaking changes uncommon in minor versions    |
-| **Database Schema** | v1.0.0 (SimpleStart)  | Data structure  | Tracks with app version MAJOR.MINOR milestones |
+| **Database Schema** | v1.0.0 (Nine)  | Data structure  | Tracks with app version MAJOR.MINOR milestones |
 |                     | v0.0.0 (Professional) | Data structure  | Pre-v1.0.0 rapid iteration phase               |
 
 ### UI & Front-end
@@ -100,18 +100,18 @@ This matrix tracks version compatibility across Aquiis releases, enabling you to
 
 **Current Schema:**
 
-- **SimpleStart:** v1.1.0 (current)
+- **Nine:** v1.1.0 (current)
 - **Professional:** v0.0.0 (pre-release)
 
 ### Schema Version Strategy
 
-- **v1.1.0** (SimpleStart): Database encryption and sample data features
+- **v1.1.0** (Nine): Database encryption and sample data features
   - Added DatabaseSettings table for encryption state tracking
   - Added IsSampleData column to all entities (30+ tables)
   - Fixed multi-tenant invoice/payment indexes
   - Database filename: `app_v1.1.0.db`
 
-- **v1.0.0** (SimpleStart): Initial production schema
+- **v1.0.0** (Nine): Initial production schema
   - Entity models stabilized for production
   - Schema managed via EF Core Migrations
   - Database filename: `app_v1.0.0.db`
@@ -148,7 +148,7 @@ This matrix tracks version compatibility across Aquiis releases, enabling you to
 | ------------ | ---------- | -------------- | ---------------- | ------------------------------------------------ |
 | v1.0.1       | v1.1.0     | Automatic      | Schema v1.1.0    | New DatabaseSettings table, IsSampleData columns |
 | v1.0.0       | v1.0.1     | None           | No               | Drop-in replacement                              |
-| v0.3.0       | v0.3.1     | Automatic      | Database path    | Same migration as SimpleStart                    |
+| v0.3.0       | v0.3.1     | Automatic      | Database path    | Same migration as Nine                    |
 | v1.x.x       | v2.0.0     | Automatic      | Schema changes   | Future: Major version, backup enforced           |
 
 ---
@@ -213,7 +213,7 @@ This matrix tracks version compatibility across Aquiis releases, enabling you to
 
 | Limitation             | All Versions           | Reason                       |
 | ---------------------- | ---------------------- | ---------------------------- |
-| **Maximum Properties** | 9 (SimpleStart)        | Simple Start tier constraint |
+| **Maximum Properties** | 9 (Nine)        | Simple Start tier constraint |
 | **Maximum Users**      | 3 (1 system + 3 login) | Simplified access control    |
 | **Organizations**      | 1                      | Desktop application scope    |
 | **File Upload Size**   | 10 MB per file         | Performance management       |
@@ -232,7 +232,7 @@ This matrix tracks version compatibility across Aquiis releases, enabling you to
 | **SendGrid**  | Commercial (Optional) | Requires API key and account                                       |
 | **Twilio**    | Commercial (Optional) | Requires credentials and account                                   |
 
-**QuestPDF Community License**: SimpleStart (max 9 properties) qualifies as most users will be under $1M annual revenue. Professional edition users must verify eligibility.
+**QuestPDF Community License**: Nine (max 9 properties) qualifies as most users will be under $1M annual revenue. Professional edition users must verify eligibility.
 
 ---
 
@@ -247,10 +247,10 @@ This matrix tracks version compatibility across Aquiis releases, enabling you to
 ### Getting Help
 
 - 📧 **Email:** cisguru@outlook.com
-- 🐛 **Bug Reports:** [GitHub Issues](https://github.com/xnodeoncode/Aquiis/issues)
-- 💡 **Feature Requests:** [GitHub Discussions](https://github.com/xnodeoncode/Aquiis/discussions)
-- 📖 **Documentation:** [/Documentation/](https://github.com/xnodeoncode/Aquiis/tree/main/Documentation)
-- 🏛️ **Roadmap:** [/Documentation/Roadmap/](https://github.com/xnodeoncode/Aquiis/tree/main/Documentation/Roadmap)
+- 🐛 **Bug Reports:** [GitHub Issues](https://github.com/xnodeoncode/nine/issues)
+- 💡 **Feature Requests:** [GitHub Discussions](https://github.com/xnodeoncode/nine/discussions)
+- 📖 **Documentation:** [/Documentation/](https://github.com/xnodeoncode/nine/tree/main/Documentation)
+- 🏛️ **Roadmap:** [/Documentation/Roadmap/](https://github.com/xnodeoncode/nine/tree/main/Documentation/Roadmap)
 
 ---
 
@@ -265,5 +265,5 @@ This matrix tracks version compatibility across Aquiis releases, enabling you to
 
 ---
 
-**Maintained by:** Aquiis Development Team  
+**Maintained by:** Nine Development Team  
 **Document Version:** 2.0 - Compatibility Matrix

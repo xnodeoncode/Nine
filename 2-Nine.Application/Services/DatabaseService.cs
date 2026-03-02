@@ -12,7 +12,7 @@ namespace Nine.Application.Services;
 public class DatabaseService : IDatabaseService
 {
     private readonly ApplicationDbContext _businessContext;
-    private readonly DbContext _identityContext;  // Product-specific (SimpleStartDbContext or ProfessionalDbContext)
+    private readonly DbContext _identityContext;  // Product-specific (NineDbContext or ProfessionalDbContext)
     private readonly ILogger<DatabaseService> _logger;
 
     public DatabaseService(

@@ -5,7 +5,7 @@
       "label": "watch",
       "command": "dotnet",
       "type": "process",
-      "args": ["watch", "--project", "${workspaceFolder}/Aquiis.SimpleStart"],
+      "args": ["watch", "--project", "${workspaceFolder}/4-Nine"],
       "problemMatcher": "$msCompile",
       "group": {
         "kind": "build",
@@ -16,7 +16,7 @@
       "label": "build",
       "command": "dotnet",
       "type": "process",
-      "args": ["build", "${workspaceFolder}/Aquiis.sln"],
+      "args": ["build", "${workspaceFolder}/Nine.sln"],
       "problemMatcher": "$msCompile"
     },
     {

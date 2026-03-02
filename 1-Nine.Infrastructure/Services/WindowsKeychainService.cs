@@ -8,7 +8,7 @@ namespace Nine.Infrastructure.Services;
 /// <summary>
 /// Secure key storage for Windows using DPAPI (Data Protection API).
 /// Encrypts the database password with the current user's Windows credentials
-/// and stores it in a file under %APPDATA%\Aquiis\. Only the same user on the
+/// and stores it in a file under %APPDATA%\Nine\. Only the same user on the
 /// same machine can decrypt the file — no user interaction needed on retrieval.
 /// </summary>
 [SupportedOSPlatform("windows")]
@@ -19,11 +19,11 @@ public class WindowsKeychainService : IKeychainService
     /// <summary>
     /// Initialize the Windows DPAPI keychain service.
     /// </summary>
-    /// <param name="appName">App-specific identifier to prevent key conflicts (e.g. "SimpleStart-Electron")</param>
-    public WindowsKeychainService(string appName = "Aquiis-Electron")
+    /// <param name="appName">App-specific identifier to prevent key conflicts (e.g. "Nine-Electron")</param>
+    public WindowsKeychainService(string appName = "Nine-Electron")
     {
         var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-        var aquiisDir = Path.Combine(appDataPath, "Aquiis");
+        var aquiisDir = Path.Combine(appDataPath, "Nine");
         Directory.CreateDirectory(aquiisDir);
 
         // Sanitize appName for use as a filename component
@@ -37,7 +37,7 @@ public class WindowsKeychainService : IKeychainService
     /// Store the encryption password using DPAPI. The data is encrypted with the
     /// current user's credentials and written to a binary key file.
     /// </summary>
-    public bool StoreKey(string password, string label = "Aquiis Database Encryption Key")
+    public bool StoreKey(string password, string label = "Nine Database Encryption Key")
     {
         try
         {

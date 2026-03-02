@@ -1,11 +1,11 @@
 #!/bin/bash
 #
-# Aquiis Desktop Integration Installer
-# Automatically creates desktop entry for Aquiis Property Management AppImage
+# Nine Desktop Integration Installer
+# Automatically creates desktop entry for Nine Property Management AppImage
 #
 # Usage: 
 #   First make this script executable: chmod +x install-desktop-integration.sh
-#   Then run: ./install-desktop-integration.sh /path/to/Aquiis-1.1.0-x86_64.AppImage
+#   Then run: ./install-desktop-integration.sh /path/to/Nine-1.0.0-x86_64.AppImage
 #
 
 set -e
@@ -19,7 +19,7 @@ NC='\033[0m' # No Color
 # Check if AppImage path provided
 if [ $# -eq 0 ]; then
     echo -e "${RED}Error: No AppImage path provided${NC}"
-    echo "Usage: $0 /path/to/AquiisPropertyManagement.AppImage"
+    echo "Usage: $0 /path/to/Nine.AppImage"
     exit 1
 fi
 
@@ -36,7 +36,7 @@ APPIMAGE_PATH="$(readlink -f "$APPIMAGE_PATH")"
 APPIMAGE_DIR="$(dirname "$APPIMAGE_PATH")"
 APPIMAGE_NAME="$(basename "$APPIMAGE_PATH")"
 
-echo -e "${GREEN}Aquiis Desktop Integration Installer${NC}"
+echo -e "${GREEN}Nine Desktop Integration Installer${NC}"
 echo "========================================"
 echo ""
 
@@ -101,14 +101,14 @@ fi
 # Create desktop entry
 cat > ~/.local/share/applications/aquiis.desktop << EOF
 [Desktop Entry]
-Name=Aquiis Property Management
+Name=Nine Property Management
 Comment=Multi-tenant property management system for DIY landlords and property managers
 Exec=${APPIMAGE_PATH}
 Icon=${ICON_PATH}
 Type=Application
 Categories=Office;Finance;
 Terminal=false
-StartupWMClass=Aquiis Property Management
+StartupWMClass=Nine Property Management
 X-AppImage-Version=1.1.0
 Keywords=property;management;landlord;rental;lease;tenant;invoice;
 EOF
@@ -141,14 +141,14 @@ echo "✓ AppImage is executable and ready to use"
 echo "✓ Desktop integration installed"
 echo "✓ Icons and application launcher updated"
 echo ""
-echo "Aquiis Property Management should now appear in your application launcher."
-echo "You can search for 'Aquiis' or find it in Office/Finance categories."
+echo "Nine Property Management should now appear in your application launcher."
+echo "You can search for 'Nine' or find it in Office/Finance categories."
 echo ""
 echo "To uninstall desktop integration:"
 echo "  rm ~/.local/share/applications/aquiis.desktop"
 echo "  rm ~/.local/share/icons/hicolor/512x512/apps/aquiis.png"
 echo "  update-desktop-database ~/.local/share/applications/"
 echo ""
-echo "To completely remove Aquiis:"
+echo "To completely remove Nine:"
 echo "  rm $APPIMAGE_PATH"
 echo ""

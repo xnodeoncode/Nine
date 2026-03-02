@@ -1,6 +1,6 @@
-# Aquiis E2E Tests with Playwright
+# Nine E2E Tests with Playwright
 
-End-to-end UI testing for Aquiis property management system using Microsoft Playwright.
+End-to-end UI testing for Nine property management system using Microsoft Playwright.
 
 ## What's Tested
 
@@ -18,7 +18,7 @@ These tests automate the **Phase 5.5 Multi-Organization Management** testing sce
 **Your application must be running** before executing tests:
 
 ```bash
-# Start the application (from /Aquiis.SimpleStart)
+# Start the application (from /4-Nine)
 dotnet watch
 
 # Or use the watch task
@@ -31,7 +31,7 @@ The tests expect the app at: `https://localhost:5001`
 ### All Tests
 
 ```bash
-cd Aquiis.Tests
+cd Nine.Tests
 dotnet test
 ```
 
@@ -76,17 +76,17 @@ Tests use these accounts (must exist in your database):
 
 | User            | Email             | Password | Role            | Organization  |
 | --------------- | ----------------- | -------- | --------------- | ------------- |
-| Owner           | owner1@aquiis.com | Today123 | Owner           | Multiple orgs |
-| Administrator   | jc@example.com    | Today123 | Administrator   | Aquiis        |
-| PropertyManager | jh@example.com    | Today123 | PropertyManager | Aquiis        |
-| User            | mya@example.com   | Today123 | User            | Aquiis        |
+| Owner           | owner1@nine.local | Today123 | Owner           | Multiple orgs |
+| Administrator   | jc@example.com    | Today123 | Administrator   | Nine        |
+| PropertyManager | jh@example.com    | Today123 | PropertyManager | Nine        |
+| User            | mya@example.com   | Today123 | User            | Nine        |
 
 **Ensure these users exist before running tests!**
 
 **Organizations in test database:**
 
-- Aquiis
-- Aquiis - Colorado
+- Nine
+- Nine - Colorado
 
 ## Debugging Failed Tests
 
@@ -95,7 +95,7 @@ Tests use these accounts (must exist in your database):
 Playwright automatically captures screenshots when tests fail:
 
 ```
-Aquiis.Tests/bin/Debug/net9.0/playwright-screenshots/
+Nine.Tests/bin/Debug/net9.0/playwright-screenshots/
 ```
 
 ### Trace Viewer
@@ -149,10 +149,10 @@ Tests are designed for CI/CD pipelines:
 ```yaml
 # GitHub Actions example
 - name: Install Playwright Browsers
-  run: pwsh Aquiis.Tests/bin/Debug/net9.0/playwright.ps1 install --with-deps
+  run: pwsh Nine.Tests/bin/Debug/net9.0/playwright.ps1 install --with-deps
 
 - name: Run E2E Tests
-  run: dotnet test Aquiis.Tests
+  run: dotnet test Nine.Tests
 ```
 
 ## Updating Tests

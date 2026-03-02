@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Aquiis Startup Performance Diagnostic Tool
+# Nine Startup Performance Diagnostic Tool
 # Profiles AppImage startup to identify bottlenecks
 #
 
@@ -10,7 +10,7 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m'
 
-APPIMAGE="${1:-$HOME/Applications/AquiisPropertyManagement-1.0.0.AppImage}"
+APPIMAGE="${1:-$HOME/Applications/Nine-1.0.0.AppImage}"
 
 if [ ! -f "$APPIMAGE" ]; then
     echo -e "${RED}Error: AppImage not found at: $APPIMAGE${NC}"
@@ -18,7 +18,7 @@ if [ ! -f "$APPIMAGE" ]; then
     exit 1
 fi
 
-echo -e "${BLUE}Aquiis Startup Performance Diagnostic${NC}"
+echo -e "${BLUE}Nine Startup Performance Diagnostic${NC}"
 echo "=========================================="
 echo ""
 echo "AppImage: $(basename "$APPIMAGE")"
@@ -110,7 +110,7 @@ if [ -n "$DOTNET_PID" ]; then
     echo -e "${YELLOW}Stopping test instance...${NC}"
     kill $APPIMAGE_PID 2>/dev/null
     sleep 2
-    pkill -9 -f "Aquiis" 2>/dev/null
+    pkill -9 -f "Nine" 2>/dev/null
 else
     echo "  ${RED}Error: .NET process did not start${NC}"
     kill $APPIMAGE_PID 2>/dev/null
@@ -121,14 +121,14 @@ echo -e "${YELLOW}Test 3: System Information${NC}"
 echo "  CPU: $(grep "model name" /proc/cpuinfo | head -1 | cut -d: -f2 | xargs)"
 echo "  RAM: $(free -h | awk '/^Mem:/ {print $2}')"
 echo "  Disk (AppImage): $(df -h "$APPIMAGE" | tail -1 | awk '{print $1 " (" $4 " free)"}')"
-echo "  Disk (Config): $(df -h ~/.config/Aquiis 2>/dev/null | tail -1 | awk '{print $1 " (" $4 " free)")' || echo "Not initialized"}"
+echo "  Disk (Config): $(df -h ~/.config/Nine 2>/dev/null | tail -1 | awk '{print $1 " (" $4 " free)")' || echo "Not initialized"}"
 
 echo ""
 echo -e "${YELLOW}Test 4: Database Check${NC}"
-if [ -f ~/.config/Aquiis/Data/app_v1.0.0.db ]; then
-    DB_SIZE=$(du -h ~/.config/Aquiis/Data/app_v1.0.0.db | cut -f1)
+if [ -f ~/.config/Nine/Data/app_v1.0.0.db ]; then
+    DB_SIZE=$(du -h ~/.config/Nine/Data/app_v1.0.0.db | cut -f1)
     echo "  Database size: $DB_SIZE"
-    echo "  Database location: ~/.config/Aquiis/Data/app_v1.0.0.db"
+    echo "  Database location: ~/.config/Nine/Data/app_v1.0.0.db"
 else
     echo "  Database: Not initialized (first run will be slower)"
 fi

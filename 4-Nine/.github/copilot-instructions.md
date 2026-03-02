@@ -1,4 +1,4 @@
-# Aquiis Property Management System - AI Agent Instructions
+# Nine Property Management System - AI Agent Instructions
 
 ## Development Workflow
 
@@ -7,9 +7,11 @@
 **CRITICAL: Always develop new features on feature branches, never directly on main**
 
 1. **Create Feature Branch**: Before starting any new phase or major feature:
+
    ```bash
    git checkout -b Phase-X-Feature-Name
    ```
+
    - Use descriptive names: `Phase-6-Workflow-Services-and-Automation`
    - Branch from `main` to ensure clean starting point
 
@@ -19,14 +21,15 @@
    - Keep commits focused and atomic
 
 3. **Merge to Main** (only when complete and error-free):
+
    ```bash
    # Ensure build succeeds with 0 errors
-   dotnet build Aquiis.sln
-   
+   dotnet build Nine.sln
+
    # Switch to main and merge
    git checkout main
    git merge Phase-X-Feature-Name
-   
+
    # Push to remote
    git push origin main
    ```
@@ -40,7 +43,7 @@
 
 ## Project Overview
 
-Aquiis is a multi-tenant property management system built with **ASP.NET Core 9.0 + Blazor Server**. It manages properties, tenants, leases, invoices, payments, documents, inspections, and maintenance requests with role-based access control.
+Nine is a multi-tenant property management system built with **ASP.NET Core 10.0 + Blazor Server**. It manages properties, tenants, leases, invoices, payments, documents, inspections, and maintenance requests with role-based access control.
 
 ## Architecture Fundamentals
 
@@ -79,12 +82,12 @@ public async Task<Property> CreatePropertyAsync(Property property)
 {
     var userId = await _userContext.GetUserIdAsync();
     var activeOrgId = await _userContext.GetActiveOrganizationIdAsync();
-    
+
     // Service sets tracking fields - UI never touches these
     property.CreatedBy = userId;
     property.CreatedOn = DateTime.UtcNow;
     property.OrganizationId = activeOrgId;
-    
+
     _dbContext.Properties.Add(property);
     await _dbContext.SaveChangesAsync();
     return property;
@@ -95,18 +98,18 @@ public async Task<bool> UpdatePropertyAsync(Property property)
 {
     var userId = await _userContext.GetUserIdAsync();
     var activeOrgId = await _userContext.GetActiveOrganizationIdAsync();
-    
+
     // Verify property belongs to active organization (security)
     var existing = await _dbContext.Properties
         .FirstOrDefaultAsync(p => p.Id == property.Id && p.OrganizationId == activeOrgId);
-    
+
     if (existing == null) return false;
-    
+
     // Service sets tracking fields
     property.LastModifiedBy = userId;
     property.LastModifiedOn = DateTime.UtcNow;
     property.OrganizationId = activeOrgId; // Prevent org hijacking
-    
+
     _dbContext.Entry(existing).CurrentValues.SetValues(property);
     await _dbContext.SaveChangesAsync();
     return true;
@@ -116,7 +119,7 @@ public async Task<bool> UpdatePropertyAsync(Property property)
 public async Task<List<Property>> GetPropertiesAsync()
 {
     var activeOrgId = await _userContext.GetActiveOrganizationIdAsync();
-    
+
     return await _dbContext.Properties
         .Where(p => p.OrganizationId == activeOrgId && !p.IsDeleted)
         .ToListAsync();
@@ -240,7 +243,6 @@ Properties follow a status-driven lifecycle (string values from `ApplicationCons
 **Key Pages:**
 
 - `GenerateLeaseOffer.razor` - `/propertymanagement/applications/{id}/generate-lease-offer`
-
   - Generates lease offer from approved application
   - Sets `Lease.OfferedOn` and `Lease.ExpiresOn` (30 days)
   - Updates Property.Status to LeasePending
@@ -319,7 +321,7 @@ Properties follow a status-driven lifecycle (string values from `ApplicationCons
 
 ```csharp
 @page "/propertymanagement/entities/create"
-@using Aquiis.SimpleStart.Components.PropertyManagement.Entities
+@using Nine.Components.PropertyManagement.Entities
 @attribute [Authorize(Roles = "Administrator,PropertyManager")]
 @inject PropertyManagementService PropertyService
 @inject UserContextService UserContext
@@ -342,6 +344,7 @@ private async Task CreateEntity()
 ```
 
 **Note:** Do NOT set tracking fields in UI. The service layer automatically sets:
+
 - `CreatedBy` - from `UserContextService.GetUserIdAsync()`
 - `CreatedOn` - `DateTime.UtcNow`
 - `OrganizationId` - from `UserContextService.GetActiveOrganizationIdAsync()`
@@ -366,12 +369,12 @@ public async Task<Entity> AddEntityAsync(Entity entity)
 {
     var userId = await _userContext.GetUserIdAsync();
     var activeOrgId = await _userContext.GetActiveOrganizationIdAsync();
-    
+
     // Service owns this logic - UI never sets these
     entity.CreatedBy = userId;
     entity.CreatedOn = DateTime.UtcNow;
     entity.OrganizationId = activeOrgId;
-    
+
     _dbContext.Entities.Add(entity);
     await _dbContext.SaveChangesAsync();
     return entity;
@@ -399,8 +402,8 @@ public async Task<Entity> AddEntityAsync(Entity entity)
 
 1. **EF Core Migrations**: Primary approach for schema changes
    - Migrations stored in `Data/Migrations/`
-   - Run `dotnet ef migrations add MigrationName --project Aquiis.SimpleStart`
-   - Apply with `dotnet ef database update --project Aquiis.SimpleStart`
+   - Run `dotnet ef migrations add MigrationName --project Nine`
+   - Apply with `dotnet ef database update --project Nine`
    - Generate SQL script: `dotnet ef migrations script --output schema.sql`
 2. **SQL Scripts**: Reference scripts in `Data/Scripts/` (not executed, for documentation)
 3. Update `ApplicationDbContext.cs` with DbSet and entity configuration
@@ -413,7 +416,7 @@ public async Task<Entity> AddEntityAsync(Entity entity)
 
 - **Ctrl+Shift+B** to run `dotnet watch` (hot reload, default build task)
 - **F5** in VS Code to debug (configured in `.vscode/launch.json`)
-- Or: `dotnet run` in `Aquiis.SimpleStart/` directory
+- Or: `dotnet run` in `4-Nine/` directory
 - Default URLs: Check terminal output for ports
 - Default admin: `superadmin@example.local` / `SuperAdmin@123!`
 
@@ -530,6 +533,7 @@ Components/PropertyManagement/[Entity]/
 The project maintains comprehensive documentation organized by implementation status and version:
 
 **Roadmap Folder** (`/Documentation/Roadmap/`):
+
 - **Purpose:** Implementation planning and feature proposals
 - **Status:** Active consideration - may be approved or rejected
 - **Workflow:** One file at a time - focus on current implementation
@@ -537,6 +541,7 @@ The project maintains comprehensive documentation organized by implementation st
 - **Rejection:** Rejected proposals have rejection reason added at the top of the file
 
 **Version Folders** (`/Documentation/vX.X.X/`):
+
 - **Purpose:** Completed implementation notes for each version release
 - **Status:** Historical record of what was actually implemented
 - **Content:** Feature additions, changes, and implementation details for that specific release
@@ -551,6 +556,7 @@ The project follows **Semantic Versioning (MAJOR.MINOR.PATCH)**:
 - **PATCH** version (0.0.X): Bug fixes, minor updates, safe application updates
 
 **Current Development Status:**
+
 - **Production version:** v0.1.1 (in production)
 - **Development version:** v0.2.0 (current work in progress)
 - **Next major milestone:** v1.0.0 (when entity refactoring stabilizes)
@@ -560,6 +566,7 @@ The project follows **Semantic Versioning (MAJOR.MINOR.PATCH)**:
 The database filename and schema version are tracked separately from the application patch version:
 
 **Configuration in `appsettings.json`:**
+
 ```json
 {
   "ConnectionStrings": {
@@ -598,15 +605,15 @@ The database filename and schema version are tracked separately from the applica
 
 **Example Version Progression:**
 
-| App Version | Database File | Schema Version | Notes |
-|-------------|---------------|----------------|-------|
-| v0.1.1 | app_v0.0.0.db | 0.0.0 | Production (active refactoring) |
-| v0.2.0 | app_v0.0.0.db | 0.0.0 | Development (same schema) |
-| v1.0.0 | app_v1.0.0.db | 1.0.0 | Milestone (entities stabilized) |
-| v1.0.5 | app_v1.0.0.db | 1.0.0 | Patches (no DB change) |
-| v1.1.0 | app_v1.1.0.db | 1.1.0 | Minor (new DB file) |
-| v1.1.8 | app_v1.1.0.db | 1.1.0 | Patches (same DB) |
-| v2.0.0 | app_v2.0.0.db | 2.0.0 | Major (breaking changes, migration) |
+| App Version | Database File | Schema Version | Notes                               |
+| ----------- | ------------- | -------------- | ----------------------------------- |
+| v0.1.1      | app_v0.0.0.db | 0.0.0          | Production (active refactoring)     |
+| v0.2.0      | app_v0.0.0.db | 0.0.0          | Development (same schema)           |
+| v1.0.0      | app_v1.0.0.db | 1.0.0          | Milestone (entities stabilized)     |
+| v1.0.5      | app_v1.0.0.db | 1.0.0          | Patches (no DB change)              |
+| v1.1.0      | app_v1.1.0.db | 1.1.0          | Minor (new DB file)                 |
+| v1.1.8      | app_v1.1.0.db | 1.1.0          | Patches (same DB)                   |
+| v2.0.0      | app_v2.0.0.db | 2.0.0          | Major (breaking changes, migration) |
 
 **Implementation Workflow:**
 
@@ -623,6 +630,7 @@ The database filename and schema version are tracked separately from the applica
 3. Document completed features in `/Documentation/v{MAJOR}.{MINOR}.{PATCH}/`
 
 **Pre-v1.0.0 Strategy:**
+
 - Database remains at `app_v0.0.0.db` until v1.0.0
 - Allows rapid iteration and entity refactoring
 - Schema migrations managed via EF Core Migrations folder

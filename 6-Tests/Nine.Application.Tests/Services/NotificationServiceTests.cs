@@ -85,7 +85,7 @@ namespace Nine.Application.Tests
             // Setup ApplicationSettings
             var settings = Options.Create(new ApplicationSettings
             {
-                AppName = "Aquiis",
+                AppName = "Nine",
                 Version = "0.3.0"
             });
 

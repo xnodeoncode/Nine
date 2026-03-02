@@ -136,7 +136,7 @@ public class DatabasePreviewService
         }
 
         await Task.CompletedTask; // Make method async
-        _keychain.StoreKey(password, "Aquiis Database Password");
+        _keychain.StoreKey(password, "Nine Database Password");
         _logger.LogInformation("Password saved to keychain");
     }
 

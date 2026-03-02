@@ -5,13 +5,13 @@ using Nine.Entities;
 namespace Nine.Data;
 
 /// <summary>
-/// SimpleStart database context for Identity management.
-/// Handles all ASP.NET Core Identity tables and SimpleStart-specific user data.
+/// Nine database context for Identity management.
+/// Handles all ASP.NET Core Identity tables and Nine-specific user data.
 /// Shares the same database as ApplicationDbContext using the same connection string.
 /// </summary>
-public class SimpleStartDbContext : IdentityDbContext<ApplicationUser>
+public class NineDbContext : IdentityDbContext<ApplicationUser>
 {
-    public SimpleStartDbContext(DbContextOptions<SimpleStartDbContext> options)
+    public NineDbContext(DbContextOptions<NineDbContext> options)
         : base(options)
     {
     }
@@ -21,6 +21,6 @@ public class SimpleStartDbContext : IdentityDbContext<ApplicationUser>
         base.OnModelCreating(builder);
         
         // Identity table configuration is handled by base IdentityDbContext
-        // Add any SimpleStart-specific user configurations here if needed
+        // Add any Nine-specific user configurations here if needed
     }
 }

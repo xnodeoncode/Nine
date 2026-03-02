@@ -17,19 +17,19 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: "9.0.x"
+          dotnet-version: "10.0.x"
 
       - name: Restore
-        run: dotnet restore Aquiis.sln
+        run: dotnet restore Nine.sln
 
       - name: Build
-        run: dotnet build Aquiis.sln --no-restore --configuration Release
+        run: dotnet build Nine.sln --no-restore --configuration Release
 
       - name: Test Core Layer
-        run: dotnet test 6-Tests/Aquiis.Core.Tests/Aquiis.Core.Tests.csproj --no-build --configuration Release --verbosity normal
+        run: dotnet test 6-Tests/Nine.Core.Tests/Nine.Core.Tests.csproj --no-build --configuration Release --verbosity normal
 
       - name: Test Application Layer
-        run: dotnet test 6-Tests/Aquiis.Application.Tests/Aquiis.Application.Tests.csproj --no-build --configuration Release --verbosity normal
+        run: dotnet test 6-Tests/Nine.Application.Tests/Nine.Application.Tests.csproj --no-build --configuration Release --verbosity normal
 
       - name: Test Shared UI Components (bUnit)
-        run: dotnet test 6-Tests/Aquiis.UI.Shared.Tests/Aquiis.UI.Shared.Tests.csproj --no-build --configuration Release --verbosity normal
+        run: dotnet test 6-Tests/Nine.Shared.UI.Tests/Nine.Shared.UI.Tests.csproj --no-build --configuration Release --verbosity normal

@@ -3,7 +3,7 @@
   <id>com.nineapp.nine</id>
   <metadata_license>MIT</metadata_license>
   <project_license>MIT</project_license>
-  <name>Nine Property Management</name>
+  <name>Nine</name>
   <summary>Property management perfected for portfolios of up to nine properties</summary>
   
   <description>
@@ -34,19 +34,19 @@
   <screenshots>
     <screenshot type="default">
       <caption>Dashboard with property overview and metrics</caption>
-      <image>https://raw.githubusercontent.com/xnodeoncode/Aquiis/main/Documentation/Screenshots/dashboard.png</image>
+      <image>https://raw.githubusercontent.com/xnodeoncode/nine/main/Documentation/Screenshots/dashboard.png</image>
     </screenshot>
     <screenshot>
       <caption>Property management interface</caption>
-      <image>https://raw.githubusercontent.com/xnodeoncode/Aquiis/main/Documentation/Screenshots/property-management.png</image>
+      <image>https://raw.githubusercontent.com/xnodeoncode/nine/main/Documentation/Screenshots/property-management.png</image>
     </screenshot>
     <screenshot>
       <caption>Lease workflow and tenant management</caption>
-      <image>https://raw.githubusercontent.com/xnodeoncode/Aquiis/main/Documentation/Screenshots/lease-workflow.png</image>
+      <image>https://raw.githubusercontent.com/xnodeoncode/nine/main/Documentation/Screenshots/lease-workflow.png</image>
     </screenshot>
     <screenshot>
       <caption>Invoice and payment tracking</caption>
-      <image>https://raw.githubusercontent.com/xnodeoncode/Aquiis/main/Documentation/Screenshots/invoice-tracking.png</image>
+      <image>https://raw.githubusercontent.com/xnodeoncode/nine/main/Documentation/Screenshots/invoice-tracking.png</image>
     </screenshot>
   </screenshots>
   
@@ -65,7 +65,7 @@
   <releases>
     <release version="1.0.0" date="2026-03-02">
       <description>
-        <p>Initial release of Nine. — rebranded from Aquiis SimpleStart</p>
+        <p>Initial release of Nine. — property management desktop application.</p>
         <ul>
           <li>Complete property, tenant, and lease management</li>
           <li>Automated invoicing and payment tracking</li>

@@ -1,14 +1,14 @@
 [Desktop Entry]
-Name=Nine Property Management
+Name=Nine
 Comment=Property management perfected for up to nine properties.
 Exec=Nine-1.0.0-x86_64.AppImage
 Icon=nine
 Type=Application
 Categories=Office;Finance;
 Terminal=false
-StartupWMClass=Nine Property Management
+StartupWMClass=Nine
 X-AppImage-Version=1.0.0
-X-AppImage-Name=Nine Property Management
+X-AppImage-Name=Nine
 X-AppImage-Arch=x86_64
 X-AppImage-Payload-License=MIT
 Keywords=property;management;landlord;rental;lease;tenant;invoice;

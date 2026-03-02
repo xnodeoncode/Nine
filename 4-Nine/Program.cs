@@ -176,7 +176,7 @@ builder.Services.AddSingleton<ToastService>();
 builder.Services.AddSingleton<ThemeService>();
 builder.Services.AddScoped<LeaseRenewalPdfGenerator>();
 builder.Services.AddScoped<FinancialReportService>(); // Professional edition uses MaintenanceRequests
-builder.Services.AddScoped<SimpleStartFinancialReportService>(); // SimpleStart uses Repairs
+builder.Services.AddScoped<NineFinancialReportService>(); // Nine uses Repairs for expense tracking
 builder.Services.AddScoped<FinancialReportPdfGenerator>();
 builder.Services.AddScoped<ChecklistPdfGenerator>();
 builder.Services.AddScoped<DatabaseBackupService>();
@@ -188,7 +188,7 @@ builder.Services.AddScoped<PasswordDerivationService>();
 builder.Services.AddScoped<IKeychainService>(sp =>
 {
     // Pass app name to prevent keychain conflicts between different apps and modes
-    var appName = HybridSupport.IsElectronActive ? "SimpleStart-Electron" : "SimpleStart-Web";
+    var appName = HybridSupport.IsElectronActive ? "Nine-Electron" : "Nine-Web";
     if (OperatingSystem.IsWindows())
         return new WindowsKeychainService(appName);
     return new LinuxKeychainService(appName);
@@ -242,7 +242,7 @@ using (var scope = app.Services.CreateScope())
     {
         // Normal database initialization flow
     var dbService = scope.ServiceProvider.GetRequiredService<IDatabaseService>();
-    var identityContext = scope.ServiceProvider.GetRequiredService<SimpleStartDbContext>();
+    var identityContext = scope.ServiceProvider.GetRequiredService<NineDbContext>();
     var backupService = scope.ServiceProvider.GetRequiredService<DatabaseBackupService>();
     
     // For Electron, handle database initialization and migrations
@@ -255,7 +255,7 @@ using (var scope = app.Services.CreateScope())
 
             Console.WriteLine($"[Program] Beginning migrations Electron database path: {dbPath}");
             
-            // ✅ v1.1.0: Automatic migration from old Electron folder to new Aquiis folder
+            // ✅ v1.0.0: Automatic migration from old Electron folder to Nine config folder
             var basePath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             if (OperatingSystem.IsLinux() || OperatingSystem.IsMacOS())
             {
@@ -273,7 +273,7 @@ using (var scope = app.Services.CreateScope())
             // One-time migration: copy database and backups if old location exists and new doesn't
             if (File.Exists(oldDbPath) && !File.Exists(dbPath))
             {
-                app.Logger.LogInformation("Migrating database from Electron folder to Aquiis folder");
+                app.Logger.LogInformation("Migrating database from Electron folder to Nine folder");
                 app.Logger.LogInformation("Old path: {OldPath}", oldDbPath);
                 app.Logger.LogInformation("New path: {NewPath}", dbPath);
                 
@@ -300,7 +300,7 @@ using (var scope = app.Services.CreateScope())
                     app.Logger.LogInformation("Migrated {Count} backup files", backupFiles.Length);
                 }
                 
-                app.Logger.LogInformation("Database migration from Electron to Aquiis folder completed successfully");
+                app.Logger.LogInformation("Database migration from Electron to Nine folder completed successfully");
             }
             
             var stagedRestorePath = $"{dbPath}.restore_pending";
@@ -750,7 +750,7 @@ if (HybridSupport.IsElectronActive)
     });
     window.RemoveMenu();
     window.OnReadyToShow += () => window.Show();
-    window.SetTitle("Aquiis Property Management");
+    window.SetTitle("Nine Property Management");
     
     // Load appropriate page based on backend availability
     if (!isBackendReady)
@@ -785,7 +785,7 @@ static void HandlePendingRestore(IConfiguration configuration)
     // BUG FIXED: Previously this read the path from appsettings.json DefaultConnection,
     // which is a fallback path (e.g. Infrastructure/Data/app_v0.0.0.db) that is NEVER
     // used by the Electron app. The Electron app stores its database in the OS user-data
-    // directory (e.g. %APPDATA%\Aquiis\app_v1.1.0.db on Windows). This mismatch meant
+    // directory (e.g. %APPDATA%\Nine\app_v1.0.0.db on Windows). This mismatch meant
     // the staged restore was never found and never applied, leaving the app in a broken
     // state after an encrypt→decrypt cycle (the DPAPI key is deleted on successful
     // decryption, so on the next startup the app saw an encrypted DB with no key and
@@ -801,17 +801,17 @@ static void HandlePendingRestore(IConfiguration configuration)
         string basePath;
         if (OperatingSystem.IsWindows())
             basePath = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Aquiis");
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Nine");
         else if (OperatingSystem.IsMacOS())
             basePath = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
-                "Library", "Application Support", "Aquiis");
+                "Library", "Application Support", "Nine");
         else // Linux
             basePath = Path.Combine(
                 Environment.GetEnvironmentVariable("XDG_CONFIG_HOME")
                     ?? Path.Combine(
                         Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".config"),
-                "Aquiis");
+                "Nine");
 
         Directory.CreateDirectory(basePath);
         dbPath = Path.Combine(basePath, dbFileName);

@@ -1,7 +1,7 @@
 {
-  "name": "aquiis-simplestart-electron",
-  "version": "1.1.2",
-  "description": "Aquiis SimpleStart Electron Host",
+  "name": "nine-electron",
+  "version": "1.0.0",
+  "description": "Nine Electron Host",
   "main": "main.js",
   "dependencies": {
     "dasherize": "^2.0.0"

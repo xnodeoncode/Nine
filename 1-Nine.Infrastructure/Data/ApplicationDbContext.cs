@@ -576,7 +576,7 @@ namespace Nine.Infrastructure.Data
                 entity.HasIndex(e => e.OwnerId);
                 entity.HasIndex(e => e.IsActive);
                 
-                // OwnerId is a string foreign key to AspNetUsers (managed by SimpleStartDbContext)
+                // OwnerId is a string foreign key to AspNetUsers (managed by NineDbContext)
                 // No navigation property configured here
             });
 
@@ -590,7 +590,7 @@ namespace Nine.Infrastructure.Data
                     .HasForeignKey(uo => uo.OrganizationId)
                     .OnDelete(DeleteBehavior.Cascade);
                 
-                // UserId and GrantedBy are string foreign keys to AspNetUsers (managed by SimpleStartDbContext)
+                // UserId and GrantedBy are string foreign keys to AspNetUsers (managed by NineDbContext)
                 // No navigation properties configured here
 
                 // Unique constraint: one role per user per organization
@@ -629,7 +629,7 @@ namespace Nine.Infrastructure.Data
                     .HasForeignKey(n => n.OrganizationId)
                     .OnDelete(DeleteBehavior.Cascade);
                 
-                // RecipientUserId is a string foreign key to AspNetUsers (managed by SimpleStartDbContext)
+                // RecipientUserId is a string foreign key to AspNetUsers (managed by NineDbContext)
                 // No navigation property configured here
             });
 
@@ -651,7 +651,7 @@ namespace Nine.Infrastructure.Data
                     .HasForeignKey(np => np.OrganizationId)
                     .OnDelete(DeleteBehavior.Cascade);
                 
-                // UserId is a string foreign key to AspNetUsers (managed by SimpleStartDbContext)
+                // UserId is a string foreign key to AspNetUsers (managed by NineDbContext)
                 // No navigation property configured here
             });
 

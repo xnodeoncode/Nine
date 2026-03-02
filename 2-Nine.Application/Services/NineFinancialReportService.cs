@@ -7,21 +7,21 @@ using Microsoft.EntityFrameworkCore;
 namespace Nine.Application.Services;
 
 /// <summary>
-/// SimpleStart-specific financial report service that uses Repairs for expenses
+/// Nine financial report service that uses Repairs for expenses
 /// instead of MaintenanceRequests (which are used in Professional edition).
 /// </summary>
-public class SimpleStartFinancialReportService
+public class NineFinancialReportService
 {
     private readonly IDbContextFactory<ApplicationDbContext> _contextFactory;
 
-    public SimpleStartFinancialReportService(IDbContextFactory<ApplicationDbContext> contextFactory)
+    public NineFinancialReportService(IDbContextFactory<ApplicationDbContext> contextFactory)
     {
         _contextFactory = contextFactory;
     }
 
     /// <summary>
     /// Generate income statement for a specific period and optional property.
-    /// Uses Repairs for expense tracking (SimpleStart approach).
+    /// Uses Repairs for expense tracking (Nine approach).
     /// </summary>
     public async Task<IncomeStatement> GenerateIncomeStatementAsync(
         Guid organizationId,
@@ -64,7 +64,7 @@ public class SimpleStartFinancialReportService
         statement.TotalRentIncome = totalPayments;
         statement.TotalOtherIncome = 0; // No other income tracked currently
 
-        // Get repair expenses (SimpleStart uses Repairs instead of MaintenanceRequests)
+        // Get repair expenses (Nine uses Repairs instead of MaintenanceRequests)
         var repairsQuery = context.Repairs
             .Where(r => !r.IsDeleted &&
                        r.OrganizationId == organizationId &&
@@ -95,7 +95,7 @@ public class SimpleStartFinancialReportService
 
     /// <summary>
     /// Generate property performance comparison report.
-    /// Uses Repairs for expense tracking (SimpleStart approach).
+    /// Uses Repairs for expense tracking (Nine approach).
     /// </summary>
     public async Task<List<PropertyPerformance>> GeneratePropertyPerformanceAsync(
         Guid organizationId,
@@ -122,7 +122,7 @@ public class SimpleStartFinancialReportService
                            p.PaidOn <= endDate)
                 .SumAsync(p => p.Amount);
 
-            // Calculate expenses from repairs (SimpleStart approach)
+            // Calculate expenses from repairs (Nine approach)
             var expenses = await context.Repairs
                 .Where(r => !r.IsDeleted &&
                            r.PropertyId == property.Id &&
@@ -191,7 +191,7 @@ public class SimpleStartFinancialReportService
 
     /// <summary>
     /// Generate tax report data for Schedule E.
-    /// Uses Repairs for expense tracking (SimpleStart approach).
+    /// Uses Repairs for expense tracking (Nine approach).
     /// </summary>
     public async Task<List<TaxReportData>> GenerateTaxReportAsync(Guid organizationId, int year, Guid? propertyId = null)
     {
@@ -219,7 +219,7 @@ public class SimpleStartFinancialReportService
                            p.PaidOn <= endDate)
                 .SumAsync(p => p.Amount);
 
-            // Get repair expenses (SimpleStart approach)
+            // Get repair expenses (Nine approach)
             var repairExpenses = await context.Repairs
                 .Where(r => !r.IsDeleted &&
                            r.PropertyId == property.Id &&

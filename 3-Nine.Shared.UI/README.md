@@ -1,13 +1,13 @@
-# Aquiis.UI.Shared - Shared UI Component Library
+# Nine.UI.Shared - Shared UI Component Library
 
 ## Overview
 
-`Aquiis.UI.Shared` is a Razor Class Library (RCL) that provides reusable UI components, layouts, and assets shared between Aquiis.SimpleStart and Aquiis.Professional. This library eliminates code duplication and ensures a consistent user experience across all Aquiis products.
+`Nine.UI.Shared` is a Razor Class Library (RCL) that provides reusable UI components, layouts, and assets shared between Nine and Nine.Professional. This library eliminates code duplication and ensures a consistent user experience across all Nine products.
 
 ## Purpose
 
 - **Single-Source Development**: Build UI components once, use in multiple products
-- **Consistency**: Maintain uniform UI/UX across all Aquiis applications
+- **Consistency**: Maintain uniform UI/UX across all Nine applications
 - **Maintainability**: Fix bugs and add features in one place
 - **Testing**: Comprehensive test coverage with bUnit (47 unit tests, 100% passing)
 - **Scalability**: Clear architecture for adding new shared components
@@ -17,7 +17,7 @@
 ### Folder Structure
 
 ```
-Aquiis.UI.Shared/
+Nine.UI.Shared/
 ├── Components/
 │   ├── Common/           # Generic, reusable UI components
 │   │   ├── Modal.razor
@@ -34,7 +34,7 @@ Aquiis.UI.Shared/
 ├── wwwroot/
 │   ├── css/              # Shared stylesheets
 │   └── js/               # Shared JavaScript
-└── 6-Tests/Aquiis.UI.Shared.Tests/  # Unit tests (bUnit)
+└── 6-Tests/Nine.UI.Shared.Tests/  # Unit tests (bUnit)
 ```
 
 ### Design Principles
@@ -47,9 +47,9 @@ Aquiis.UI.Shared/
 
 ## Dependencies
 
-- **Can Reference**: `Aquiis.Application`, `Aquiis.Core`
+- **Can Reference**: `Nine.Application`, `Nine.Core`
 - **Can Reference**: Microsoft.AspNetCore.Components packages
-- **Cannot Reference**: Product-specific projects (SimpleStart, Professional)
+- **Cannot Reference**: Product-specific projects (Nine, Professional)
 
 ## Getting Started
 
@@ -58,15 +58,15 @@ Aquiis.UI.Shared/
 1. Add project reference:
 
    ```xml
-   <ProjectReference Include="..\3-Aquiis.UI.Shared\Aquiis.UI.Shared.csproj" />
+   <ProjectReference Include="..\3-Nine.UI.Shared\Nine.UI.Shared.csproj" />
    ```
 
 2. Add using directive in `_Imports.razor`:
 
    ```razor
-   @using Aquiis.UI.Shared.Components.Common
-   @using Aquiis.UI.Shared.Components.Layout
-   @using Aquiis.UI.Shared.Features.Notifications
+   @using Nine.UI.Shared.Components.Common
+   @using Nine.UI.Shared.Components.Layout
+   @using Nine.UI.Shared.Features.Notifications
    ```
 
 3. Use components in your pages:
@@ -290,7 +290,7 @@ Aquiis.UI.Shared/
         @Body
     </ChildContent>
     <FooterContent>
-        <footer>© 2026 Aquiis</footer>
+        <footer>© 2026 Nine</footer>
     </FooterContent>
 </SharedMainLayout>
 ```
@@ -323,7 +323,7 @@ Aquiis.UI.Shared/
 ### 2. Create Component File
 
 ```bash
-cd 3-Aquiis.UI.Shared
+cd 3-Nine.UI.Shared
 # For common components
 touch Components/Common/YourComponent.razor
 # For feature components
@@ -334,7 +334,7 @@ touch Features/YourFeature/YourComponent.razor
 ### 3. Define Component
 
 ```razor
-@namespace Aquiis.UI.Shared.Components.Common
+@namespace Nine.UI.Shared.Components.Common
 
 <div class="your-component @CssClass">
     @ChildContent
@@ -356,17 +356,17 @@ touch Features/YourFeature/YourComponent.razor
 ### 4. Write Tests
 
 ```bash
-cd 6-Tests/Aquiis.UI.Shared.Tests
+cd 6-Tests/Nine.UI.Shared.Tests
 touch Components/Common/YourComponentTests.cs
 ```
 
 ```csharp
-using Aquiis.UI.Shared.Components.Common;
+using Nine.UI.Shared.Components.Common;
 using Bunit;
 using FluentAssertions;
 using Xunit;
 
-namespace Aquiis.UI.Shared.Tests.Components.Common;
+namespace Nine.UI.Shared.Tests.Components.Common;
 
 public class YourComponentTests : TestContext
 {
@@ -388,7 +388,7 @@ public class YourComponentTests : TestContext
 ### 5. Update Product \_Imports.razor
 
 ```razor
-@using Aquiis.UI.Shared.Components.Common
+@using Nine.UI.Shared.Components.Common
 ```
 
 ### 6. Use in Product Pages
@@ -490,8 +490,8 @@ public class ComponentTests : TestContext
 ### Running Tests
 
 ```bash
-cd /home/cisguru/Source/Aquiis
-dotnet test 6-Tests/Aquiis.UI.Shared.Tests
+cd /home/cisguru/Source/Nine
+dotnet test 6-Tests/Nine.UI.Shared.Tests
 ```
 
 **Current Status**: 47 tests, 100% passing
@@ -503,9 +503,9 @@ dotnet test 6-Tests/Aquiis.UI.Shared.Tests
 ❌ **Avoid**: Product-specific logic
 
 ```razor
-@if (IsSimpleStartEdition)
+@if (IsNineEdition)
 {
-    <div>SimpleStart-only content</div>
+    <div>Nine-only content</div>
 }
 ```
 
@@ -566,7 +566,7 @@ error CS0246: The type or namespace name 'Modal' could not be found
 **Solution**: Add using directive to `_Imports.razor`:
 
 ```razor
-@using Aquiis.UI.Shared.Components.Common
+@using Nine.UI.Shared.Components.Common
 ```
 
 ### CSS Not Applying
@@ -603,7 +603,7 @@ public class LayoutTests : TestContext
 
 1. ✅ Add XML documentation to all public members
 2. ✅ Write unit tests (target >80% coverage)
-3. ✅ Test in both SimpleStart and Professional
+3. ✅ Test in both Nine and Professional
 4. ✅ Update this README if adding new patterns
 5. ✅ Follow existing naming conventions
 
@@ -642,4 +642,4 @@ For questions or issues:
 1. Check this README
 2. Review existing component implementations
 3. Consult the test suite for usage examples
-4. Refer to the [11-Shared-UI-Implementation-Plan.md](../../Documents/Orion/Projects/Aquiis/Plans%20Pending%20Scope/11-Shared-UI-Implementation-Plan.md)
+4. Refer to the [11-Shared-UI-Implementation-Plan.md](../../Documents/Orion/Projects/Nine/Plans%20Pending%20Scope/11-Shared-UI-Implementation-Plan.md)

@@ -46,7 +46,7 @@ public class DatabaseUnlockService
             _logger.LogInformation("Password verification successful");
             
             // Store password in keychain for future use
-            var stored = _keychain.StoreKey(password, "Aquiis Database Encryption Password");
+            var stored = _keychain.StoreKey(password, "Nine Database Encryption Password");
             if (stored)
             {
                 _logger.LogInformation("Password stored in keychain successfully");

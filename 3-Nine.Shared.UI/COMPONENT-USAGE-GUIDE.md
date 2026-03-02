@@ -1,6 +1,6 @@
-# Aquiis.UI.Shared - Component Usage Guide
+# Nine.UI.Shared - Component Usage Guide
 
-This guide provides detailed usage examples and patterns for all shared components in the Aquiis.UI.Shared library.
+This guide provides detailed usage examples and patterns for all shared components in the Nine.UI.Shared library.
 
 ## Table of Contents
 
@@ -738,7 +738,7 @@ Base layout structure providing consistent navigation, header, content area, and
     </ChildContent>
     <FooterContent>
         <footer class="text-center py-3">
-            © 2026 Aquiis. All rights reserved.
+            © 2026 Nine. All rights reserved.
         </footer>
     </FooterContent>
 </SharedMainLayout>
@@ -846,7 +846,7 @@ Base layout structure providing consistent navigation, header, content area, and
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-md-6">
-                        © 2026 Aquiis. All rights reserved.
+                        © 2026 Nine. All rights reserved.
                     </div>
                     <div class="col-md-6 text-end">
                         <a href="/privacy">Privacy</a> |
@@ -923,12 +923,12 @@ Base layout structure providing consistent navigation, header, content area, and
 ### Basic Component Test
 
 ```csharp
-using Aquiis.UI.Shared.Components.Common;
+using Nine.UI.Shared.Components.Common;
 using Bunit;
 using FluentAssertions;
 using Xunit;
 
-namespace Aquiis.UI.Shared.Tests.Components.Common;
+namespace Nine.UI.Shared.Tests.Components.Common;
 
 public class CardTests : TestContext
 {
@@ -1072,14 +1072,14 @@ public class TestAuthorizationPolicyProvider : IAuthorizationPolicyProvider
 
 ```bash
 # Run all tests
-cd /home/cisguru/Source/Aquiis
-dotnet test 6-Tests/Aquiis.UI.Shared.Tests
+cd /home/cisguru/Source/Nine
+dotnet test 6-Tests/Nine.UI.Shared.Tests
 
 # Run specific test class
-dotnet test 6-Tests/Aquiis.UI.Shared.Tests --filter "FullyQualifiedName~CardTests"
+dotnet test 6-Tests/Nine.UI.Shared.Tests --filter "FullyQualifiedName~CardTests"
 
 # Run with detailed output
-dotnet test 6-Tests/Aquiis.UI.Shared.Tests --logger "console;verbosity=detailed"
+dotnet test 6-Tests/Nine.UI.Shared.Tests --logger "console;verbosity=detailed"
 ```
 
 ---

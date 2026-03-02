@@ -34,33 +34,33 @@ else
 fi
 
 # Create application directory
-APP_DIR="database/Aquiis_Property_Management"
+APP_DIR="database/Nine"
 echo ""
 echo "📁 Creating directory: $APP_DIR"
 mkdir -p "$APP_DIR"
 
 # Copy desktop file
 echo "📄 Copying desktop file..."
-cp ~/Source/Aquiis/4-Aquiis.SimpleStart/Assets/aquiis.desktop \
-   "$APP_DIR/aquiis.desktop"
+cp ~/Source/Nine/4-Nine/Assets/nine.desktop \
+   "$APP_DIR/nine.desktop"
 
 # Copy icon
 echo "🎨 Copying icon..."
-cp ~/Source/Aquiis/4-Aquiis.SimpleStart/Assets/icon.png \
-   "$APP_DIR/aquiis.png"
+cp ~/Source/Nine/4-Nine/Assets/icon.png \
+   "$APP_DIR/nine.png"
 
 # Copy AppStream metadata
 echo "📋 Copying AppStream metadata..."
-cp ~/Source/Aquiis/4-Aquiis.SimpleStart/Assets/com.aquiis.propertymanagement.appdata.xml \
-   "$APP_DIR/com.aquiis.propertymanagement.appdata.xml"
+cp ~/Source/Nine/4-Nine/Assets/com.nineapp.nine.appdata.xml \
+   "$APP_DIR/com.nineapp.nine.appdata.xml"
 
 # Copy screenshot (use dashboard as primary)
-if [ -f ~/Source/Aquiis/Documentation/Screenshots/dashboard.png ]; then
+if [ -f ~/Source/Nine/Documentation/Screenshots/dashboard.png ]; then
     echo "📸 Copying screenshot..."
-    cp ~/Source/Aquiis/Documentation/Screenshots/dashboard.png \
+    cp ~/Source/Nine/Documentation/Screenshots/dashboard.png \
        "$APP_DIR/screenshot.png"
 else
-    echo "⚠️  Screenshot not found: ~/Source/Aquiis/Documentation/Screenshots/dashboard.png"
+    echo "⚠️  Screenshot not found: ~/Source/Nine/Documentation/Screenshots/dashboard.png"
     echo "   You'll need to add screenshots manually"
 fi
 
@@ -74,10 +74,10 @@ echo "      - Dashboard (primary screenshot)"
 echo "      - Property management interface"
 echo "      - Lease workflow"
 echo "      - Invoice tracking"
-echo "   3. Save screenshots to: ~/Source/Aquiis/Documentation/Screenshots/"
+echo "   3. Save screenshots to: ~/Source/Nine/Documentation/Screenshots/"
 echo "   4. Verify files in: ~/appimage.github.io/$APP_DIR"
-echo "   5. Create branch: cd ~/appimage.github.io && git checkout -b add-aquiis"
-echo "   6. Commit changes: git add . && git commit -m 'Add Aquiis Property Management'"
-echo "   7. Push: git push origin add-aquiis"
+echo "   5. Create branch: cd ~/appimage.github.io && git checkout -b add-nine"
+echo "   6. Commit changes: git add . && git commit -m 'Add Nine Property Management'"
+echo "   7. Push: git push origin add-nine"
 echo "   8. Create PR on GitHub: https://github.com/AppImage/appimage.github.io/compare"
 echo ""

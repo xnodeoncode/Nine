@@ -11,7 +11,7 @@ pushd "$SCRIPT_DIR" > /dev/null
 
 PR_NUMBER=$1
 # Use absolute path to BACKLOG.md
-BACKLOG_FILE="$HOME/Documents/Orion/Projects/Aquiis/Roadmap/BACKLOG.md"
+BACKLOG_FILE="$HOME/Documents/Orion/Projects/Nine/Roadmap/BACKLOG.md"
 
 if [ -z "$PR_NUMBER" ]; then
     echo "Usage: $0 <PR_NUMBER>"

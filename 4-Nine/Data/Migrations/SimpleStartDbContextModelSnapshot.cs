@@ -9,8 +9,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Nine.Data.Migrations
 {
-    [DbContext(typeof(SimpleStartDbContext))]
-    partial class SimpleStartDbContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(NineDbContext))]
+    partial class NineDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {

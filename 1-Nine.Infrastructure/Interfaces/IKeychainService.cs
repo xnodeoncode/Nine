@@ -7,7 +7,7 @@ namespace Nine.Infrastructure.Interfaces;
 public interface IKeychainService
 {
     /// <summary>Store a password/key in the platform keychain</summary>
-    bool StoreKey(string password, string label = "Aquiis Database Encryption Key");
+    bool StoreKey(string password, string label = "Nine Database Encryption Key");
 
     /// <summary>Retrieve the stored password/key, or null if not found</summary>
     string? RetrieveKey();

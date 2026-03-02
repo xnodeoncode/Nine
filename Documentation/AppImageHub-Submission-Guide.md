@@ -1,6 +1,6 @@
 # AppImageHub Submission Guide
 
-This guide walks through submitting Aquiis Property Management to AppImageHub for improved discoverability.
+This guide walks through submitting Nine Property Management to AppImageHub for improved discoverability.
 
 ## Prerequisites
 
@@ -18,7 +18,7 @@ Launch the application and capture 4 screenshots (see `Documentation/Screenshots
 
 ```bash
 # Launch application
-~/Applications/AquiisPropertyManagement-1.0.0.AppImage
+~/Applications/Nine-1.0.0.AppImage
 
 # Capture dashboard (primary screenshot)
 gnome-screenshot -w -d 2
@@ -49,7 +49,7 @@ gnome-screenshot -w -d 2
 Screenshots must be on GitHub before AppImageHub submission:
 
 ```bash
-cd ~/Source/Aquiis
+cd ~/Source/Nine
 
 # Add screenshots
 git add Documentation/Screenshots/*.png
@@ -86,13 +86,13 @@ git merge upstream/master
 ## Step 5: Run Preparation Script
 
 ```bash
-cd ~/Source/Aquiis/4-Aquiis.SimpleStart/Assets
+cd ~/Source/Nine/4-Nine/Assets
 ./prepare-appimage-hub-submission.sh
 ```
 
 This script will:
 
-- Create `database/Aquiis_Property_Management/` directory
+- Create `database/Nine_Property_Management/` directory
 - Copy desktop file, icon, and AppStream metadata
 - Copy primary screenshot
 - Provide next steps
@@ -100,7 +100,7 @@ This script will:
 ## Step 6: Verify Files
 
 ```bash
-cd ~/appimage.github.io/database/Aquiis_Property_Management
+cd ~/appimage.github.io/database/Nine_Property_Management
 ls -lh
 
 # Should see:
@@ -131,12 +131,12 @@ cd ~/appimage.github.io
 git checkout -b add-aquiis-property-management
 
 # Add files
-git add database/Aquiis_Property_Management/
+git add database/Nine_Property_Management/
 
 # Commit
-git commit -m "Add Aquiis Property Management
+git commit -m "Add Nine Property Management
 
-Aquiis SimpleStart is a property management application for small landlords
+Nine is a property management application for small landlords
 managing 1-9 residential rental properties.
 
 Features:
@@ -147,9 +147,9 @@ Features:
 - Security deposit investment tracking
 - Multi-user support with role-based access
 
-Homepage: https://github.com/xnodeoncode/Aquiis
+Homepage: https://github.com/xnodeoncode/nine
 License: MIT
-AppImage: https://github.com/xnodeoncode/Aquiis/releases/tag/v1.0.0"
+AppImage: https://github.com/xnodeoncode/nine/releases/tag/v1.0.0"
 
 # Push to your fork
 git push origin add-aquiis-property-management
@@ -166,7 +166,7 @@ git push origin add-aquiis-property-management
 **PR Title:**
 
 ```
-Add Aquiis Property Management
+Add Nine Property Management
 ```
 
 **PR Description:**
@@ -174,11 +174,11 @@ Add Aquiis Property Management
 ```markdown
 ## Application Details
 
-**Name:** Aquiis Property Management  
+**Name:** Nine Property Management  
 **Category:** Office, Finance  
 **License:** MIT  
-**Homepage:** https://github.com/xnodeoncode/Aquiis  
-**Download:** https://github.com/xnodeoncode/Aquiis/releases/tag/v1.0.0
+**Homepage:** https://github.com/xnodeoncode/nine  
+**Download:** https://github.com/xnodeoncode/nine/releases/tag/v1.0.0
 
 ## Description
 
@@ -243,7 +243,7 @@ AppImageHub maintainers typically review within 1 week. Common feedback:
 
 Once merged:
 
-1. **Verify listing**: Visit https://appimage.github.io and search for "Aquiis"
+1. **Verify listing**: Visit https://appimage.github.io and search for "Nine"
 2. **Update README**: Add AppImageHub badge
 3. **Monitor feedback**: Watch for user issues on GitHub
 4. **Update listing**: Submit new PR for version updates
@@ -253,7 +253,7 @@ Once merged:
 Add to README.md:
 
 ```markdown
-[![Get it on AppImageHub](https://img.shields.io/badge/AppImageHub-Aquiis%20Property%20Management-blue.svg)](https://appimage.github.io/Aquiis_Property_Management/)
+[![Get it on AppImageHub](https://img.shields.io/badge/AppImageHub-Nine%20Property%20Management-blue.svg)](https://appimage.github.io/Nine_Property_Management/)
 ```
 
 ## Maintenance

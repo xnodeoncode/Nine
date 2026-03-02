@@ -1,4 +1,4 @@
-# Aquiis SimpleStart - Quick Start Guide
+# Nine. - Quick Start Guide
 
 **Version:** 1.1.2  
 **Last Updated:** March 1, 2026  
@@ -8,7 +8,7 @@
 
 ## 📖 Welcome!
 
-This guide will help you get started with Aquiis SimpleStart in just 15 minutes. By the end, you'll have:
+This guide will help you get started with Nine in just 15 minutes. By the end, you'll have:
 
 - ✅ Installed the application
 - ✅ Created your organization
@@ -33,15 +33,15 @@ Before you begin, ensure you have:
 - **Hardware:**
   - 2 GB RAM minimum (4 GB recommended)
   - 500 MB disk space
-- **Downloaded:** Aquiis SimpleStart v1.1.2 installer for your platform
+- **Downloaded:** Nine v1.1.2 installer for your platform
 
 ### Universal Linux Support:
 
-Aquiis is distributed as an AppImage, which runs on all major Linux distributions—including Ubuntu, Debian, Fedora, RedHat, Arch, openSUSE, and more. No installation required: just download, make executable, and run.
+Nine. is distributed as an AppImage, which runs on all major Linux distributions—including Ubuntu, Debian, Fedora, RedHat, Arch, openSUSE, and more. No installation required: just download, make executable, and run.
 
 ### Windows Portable Version:
 
-Aquiis is available as a portable Windows executable (.exe). No installation required—just download, extract, and run. All application data is stored locally in the same folder, making it easy to use Aquiis from a USB drive or move between systems.
+Nine. is available as a portable Windows executable (.exe). No installation required—just download, extract, and run. All application data is stored locally in the same folder, making it easy to use Nine from a USB drive or move between systems.
 
 ---
 
@@ -53,43 +53,43 @@ Aquiis is available as a portable Windows executable (.exe). No installation req
 
 ```bash
 # 1. Download the file
-# File: Aquiis-1.1.2-x86_64.AppImage
+# File: Nine-1.1.2-x86_64.AppImage
 
 # 2. Make it executable
-chmod +x Aquiis-1.1.2-x86_64.AppImage
+chmod +x Nine-1.1.2-x86_64.AppImage
 
 # 3. Run the application
-./Aquiis-1.1.2-x86_64.AppImage
+./Nine-1.1.2-x86_64.AppImage
 ```
 
 **Option B: Debian Package (Ubuntu/Debian users)**
 
 ```bash
 # 1. Install the package
-sudo dpkg -i Aquiis-1.1.0-amd64.deb
+sudo dpkg -i Nine-1.1.0-amd64.deb
 
 # 2. Run the application
-aquiis-simplestart
+nine
 ```
 
 ### Windows Installation
 
 **Option A: NSIS Installer (Recommended)**
 
-1. **Download** `Aquiis-1.1.2-x64-Setup.exe`
+1. **Download** `Nine-1.1.2-x64-Setup.exe`
 2. **Double-click** the installer
 3. **Follow the wizard:**
    - Click "Next" to begin
    - Accept license agreement
-   - Choose installation directory (default: `C:\Program Files\Aquiis SimpleStart\`)
+   - Choose installation directory (default: `C:\Program Files\Nine\`)
    - Create desktop shortcut (recommended)
    - Click "Install"
 4. **Launch** from Start Menu or Desktop shortcut
 
 **Option B: Portable Executable (No installation)**
 
-1. **Download** `Aquiis-1.1.0-x64-Portable.exe`
-2. **Place** in your desired folder (e.g., `C:\Aquiis\`)
+1. **Download** `Nine-1.1.0-x64-Portable.exe`
+2. **Place** in your desired folder (e.g., `C:\Nine\`)
 3. **Double-click** to run
 
 **✅ Checkpoint:** Application window should open showing the New Setup Wizard.
@@ -98,7 +98,7 @@ aquiis-simplestart
 
 ## 🏢 Step 2: Create Your Organization (2 minutes)
 
-When you first launch Aquiis SimpleStart, the **New Setup Wizard** guides you through initial setup.
+When you first launch Nine, the **New Setup Wizard** guides you through initial setup.
 
 ### Organization Setup
 
@@ -151,7 +151,7 @@ After registration, you'll see the main dashboard with:
 - **Dashboard widgets** showing 0 properties, tenants, leases
 - **Welcome message** with quick actions
 
-**Note:** Your account is automatically confirmed in SimpleStart (no email verification step).
+**Note:** Your account is automatically confirmed in Nine (no email verification step).
 
 ---
 
@@ -452,7 +452,7 @@ Later, when you perform the inspection:
 
 In just 15 minutes, you've learned how to:
 
-- ✅ Install Aquiis SimpleStart
+- ✅ Install Nine
 - ✅ Create your organization
 - ✅ Register your user account
 - ✅ Add a property
@@ -470,7 +470,7 @@ In just 15 minutes, you've learned how to:
 
 **Property Management:**
 
-- Add multiple properties (up to 9 in SimpleStart)
+- Add up to nine (9) properties
 - Upload property documents (certificates, insurance, photos)
 - Mark properties as Under Renovation or Off Market
 - Track property value and appreciation
@@ -541,8 +541,8 @@ In just 15 minutes, you've learned how to:
 **Support Channels:**
 
 - 📧 **Email Support:** cisguru@outlook.com
-- 🐛 **Report Bugs:** [GitHub Issues](https://github.com/xnodeoncode/Aquiis/issues)
-- 💡 **Request Features:** [GitHub Discussions](https://github.com/xnodeoncode/Aquiis/discussions)
+- 🐛 **Report Bugs:** [GitHub Issues](https://github.com/xnodeoncode/nine/issues)
+- 💡 **Request Features:** [GitHub Discussions](https://github.com/xnodeoncode/nine/discussions)
 - 📖 **Documentation:** `/Documentation/v1.1.0/`
 
 **Community:**
@@ -636,18 +636,18 @@ In just 15 minutes, you've learned how to:
 
 ### Q: What happens when I reach the 9-property limit?
 
-**A:** When you try to add a 10th property, you'll see an upgrade message explaining that SimpleStart is limited to 9 properties. You can either:
+**A:** When you try to add a 10th property, you'll see an upgrade message explaining that Nine is limited to 9 properties. You can either:
 
 - Remove an inactive property to add a new one
-- Upgrade to Aquiis Professional (future release) for unlimited properties
+- Upgrade to Nine Professional (future release) for unlimited properties
 
 ### Q: Can I have more than 3 users?
 
-**A:** No, SimpleStart is limited to 3 users (1 system account + 2 login users). This is a product-level restriction. For more users, you'll need to upgrade to Aquiis Professional when available.
+**A:** No, Nine is limited to 3 users (1 system account + 2 login users). This is a product-level restriction. For more users, you'll need to upgrade to Nine Professional when available.
 
 ### Q: Is my data stored in the cloud?
 
-**A:** No, Aquiis SimpleStart stores all data **locally on your computer** in a SQLite database file. Your data never leaves your device unless you choose to enable email/SMS notifications or back up to a cloud service.
+**A:** No, Nine stores all data **locally on your computer** in a SQLite database file. Your data never leaves your device unless you choose to enable email/SMS notifications or back up to a cloud service.
 
 ### Q: Do I need internet access?
 
@@ -668,7 +668,7 @@ In just 15 minutes, you've learned how to:
 
 ### Q: What if I accidentally delete something?
 
-**A:** SimpleStart uses **soft delete** - deleted records are marked as deleted but not permanently removed. Contact support for data recovery assistance if needed.
+**A:** Nine uses **soft delete** - deleted records are marked as deleted but not permanently removed. Contact support for data recovery assistance if needed.
 
 ### Q: Can I run this on a Mac?
 
@@ -692,7 +692,7 @@ In just 15 minutes, you've learned how to:
 
 **Linux:**
 
-- Ensure AppImage has execute permissions: `chmod +x Aquiis*.AppImage`
+- Ensure AppImage has execute permissions: `chmod +x Nine*.AppImage`
 - Check system logs: `journalctl -xe`
 - Verify dependencies installed (usually auto-included)
 
@@ -731,7 +731,7 @@ In just 15 minutes, you've learned how to:
 Need help? We're here for you!
 
 **Email:** cisguru@outlook.com  
-**GitHub:** [https://github.com/xnodeoncode/Aquiis](https://github.com/xnodeoncode/Aquiis)
+**GitHub:** [https://github.com/xnodeoncode/nine](https://github.com/xnodeoncode/nine)
 
 **When contacting support, please include:**
 
@@ -752,9 +752,9 @@ Need help? We're here for you!
 2. **Configure automation** - Set up late fees, recurring invoices, backups
 3. **Explore reports** - Generate financial and operational reports
 4. **Customize settings** - Tailor the application to your workflow
-5. **Join the community** - Connect with other landlords using Aquiis
+5. **Join the community** - Connect with other landlords using Nine
 
-**Thank you for choosing Aquiis SimpleStart!** 🏠
+**Thank you for choosing Nine!** 🏠
 
 We hope this Quick Start Guide helped you get up and running quickly. Enjoy managing your properties with confidence!
 

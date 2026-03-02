@@ -5,7 +5,7 @@
 @using Nine.Application.Services.PdfGenerators
 @using Microsoft.AspNetCore.Authorization
 @attribute [OrganizationAuthorize("Owner", "Administrator", "PropertyManager")]
-@inject SimpleStartFinancialReportService FinancialReportService
+@inject NineFinancialReportService FinancialReportService
 @inject FinancialReportPdfGenerator PdfGenerator
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
@@ -15,7 +15,7 @@
 @inject IJSRuntime JSRuntime
 @rendermode InteractiveServer
 
-<PageTitle>Property Performance - Aquiis</PageTitle>
+<PageTitle>Property Performance - Nine</PageTitle>
 
 <div class="container-fluid">
     <div class="row mb-4">

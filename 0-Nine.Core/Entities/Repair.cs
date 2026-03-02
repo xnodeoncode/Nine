@@ -19,7 +19,7 @@ public class Repair : BaseModel
     // Optional Relationships (Soft References)
     /// <summary>
     /// Optional: Links this repair to a MaintenanceRequest workflow (Professional product).
-    /// Null for standalone repairs (SimpleStart product).
+    /// Null for standalone repairs (Nine product).
     /// </summary>
     public Guid? MaintenanceRequestId { get; set; }
 

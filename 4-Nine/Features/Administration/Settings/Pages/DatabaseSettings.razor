@@ -806,7 +806,7 @@
             // Create filename with timestamp
             var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
             var uploadedFileName = Path.GetFileNameWithoutExtension(file.Name);
-            var backupFileName = $"Aquiis_Backup_Uploaded_{uploadedFileName}_{timestamp}.db";
+            var backupFileName = $"Nine_Backup_Uploaded_{uploadedFileName}_{timestamp}.db";
             var backupPath = Path.Combine(backupDir, backupFileName);
             
             // Save the uploaded file

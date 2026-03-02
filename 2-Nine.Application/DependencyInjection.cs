@@ -13,7 +13,7 @@ public static class DependencyInjection
     /// Register Application layer services and Infrastructure internally.
     /// This is the ONLY method products should call for dependency registration.
     /// Note: IDatabaseService must be registered by the product layer since it requires
-    /// the product-specific Identity context (e.g., SimpleStartDbContext).
+    /// the product-specific Identity context (e.g., NineDbContext).
     /// </summary>
     public static IServiceCollection AddApplication(
         this IServiceCollection services,

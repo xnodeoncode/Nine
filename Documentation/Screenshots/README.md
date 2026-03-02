@@ -42,7 +42,7 @@ This directory contains screenshots for the AppImageHub submission.
 
 ```bash
 # Launch application
-~/Applications/AquiisPropertyManagement-1.0.0.AppImage
+~/Applications/Nine-1.0.0.AppImage
 
 # Open GNOME Screenshot
 gnome-screenshot -w -d 2
@@ -110,7 +110,7 @@ Screenshots are referenced in `com.aquiis.propertymanagement.appdata.xml`:
 <screenshots>
   <screenshot type="default">
     <caption>Dashboard with property overview and metrics</caption>
-    <image>https://raw.githubusercontent.com/xnodeoncode/Aquiis/main/Documentation/Screenshots/dashboard.png</image>
+    <image>https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/Screenshots/dashboard.png</image>
   </screenshot>
   <!-- ... additional screenshots ... -->
 </screenshots>
