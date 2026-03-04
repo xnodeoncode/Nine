@@ -43,7 +43,7 @@
       "category": "public.app-category.business"
     },
     "win": {
-      "target": "nsis",
+      "target": ["nsis", "portable"],
       "icon": "bin/Assets/icon.ico",
       "artifactName": "${productName}-${version}-${arch}-Setup.${ext}"
     },
@@ -54,6 +54,9 @@
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "shortcutName": "Nine"
+    },
+    "portable": {
+      "artifactName": "${productName}-${version}-${arch}-Portable.${ext}"
     },
     "linux": {
       "target": "AppImage",
