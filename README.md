@@ -1,24 +1,23 @@
 # Nine.
 
-**Property Management Perfected for Up to Nine Properties**
-
 [![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/xnodeoncode/nine/releases)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![.NET](https://img.shields.io/badge/.NET-10.0-purple.svg)](https://dotnet.microsoft.com/)
 [![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20Windows-lightgrey.svg)](#installation)
+[![Website](https://img.shields.io/badge/website-nineapp.co-blue.svg)](https://nineapp.co/)
 
 ---
 
-**Nine.** is a standalone desktop application for landlords managing up to nine residential rental properties. The 9-property limit is our identity, not a limitation — built for independent landlords who want professional-grade tools without the complexity or subscription costs of enterprise solutions.
+**Nine.** is a desktop application for real estate investors, property managers, and landlords managing up to nine residential rental properties.
 
 Built with ASP.NET Core 10 and Blazor Server, wrapped in Electron for a native desktop experience.
 
 **Perfect for:**
 
-- Independent landlords with a small portfolio
+- Independent property managers and landlords
 - Property owners who self-manage their rentals
-- New landlords building their first portfolio
-- Anyone seeking focused, no-subscription property management software
+- New Real Estate investors building their portfolio
+- Anyone seeking focused, no-subscription, property management software
 
 ## ✨ Key Features
 
@@ -31,35 +30,30 @@ Built with ASP.NET Core 10 and Blazor Server, wrapped in Electron for a native d
 
 ### Tenant Management
 
-- 👥 Complete prospect-to-tenant journey
-- 📝 Digital rental applications with screening
-- ✅ Application approval workflow
-- 🤝 Tenant profiles with contact information
+- Track tenants and leases
 
 ### Lease Management
 
 - 📄 Digital lease creation and management
-- ✍️ Lease offers with acceptance tracking
-- 🔄 Multi-lease support (tenants can have multiple active leases)
-- 💰 Security deposit investment tracking with annual dividends
+- 💰 Security deposit tracking
 
 ### Financial Management
 
-- 🧾 Automated rent invoice generation
+- 🧾 Generate invoices for active leases
 - 💳 Payment tracking by multiple methods
 - ⏰ Automatic late fee application after grace period
 - 📈 Financial reports and payment history
 
 ### Maintenance & Inspections
 
-- 🔧 Maintenance request tracking with vendor assignment
+- 🔧 Capture repair services and costs
 - ✅ Comprehensive 26-item inspection checklist
 - 📅 Scheduled routine inspections
 - 📄 PDF inspection reports
 
 ### Notifications & Automation
 
-- 🔔 In-app, email, and SMS notifications
+- 🔔 In-app notifications
 - ⏰ Automatic late fees and lease expiration warnings
 - 📅 Background tasks for scheduling and cleanup
 - 🎯 Configurable notification preferences
@@ -139,13 +133,13 @@ chmod +x install-desktop-integration.sh
 
 ## 📋 System Requirements
 
-| | Minimum | Recommended |
-|---|---|---|
-| **OS** | Linux (Ubuntu 20.04+) or Windows 10/11 64-bit | Same |
-| **CPU** | 2-core, 1.5 GHz | 4-core, 2.5 GHz |
-| **RAM** | 2 GB | 4 GB |
-| **Disk** | 500 MB | 1 GB |
-| **Display** | 1280x800 | 1920x1080 |
+|             | Minimum                                       | Recommended     |
+| ----------- | --------------------------------------------- | --------------- |
+| **OS**      | Linux (Ubuntu 20.04+) or Windows 10/11 64-bit | Same            |
+| **CPU**     | 2-core, 1.5 GHz                               | 4-core, 2.5 GHz |
+| **RAM**     | 2 GB                                          | 4 GB            |
+| **Disk**    | 500 MB                                        | 1 GB            |
+| **Display** | 1280x800                                      | 1920x1080       |
 
 Nine is distributed as an **AppImage** on Linux (runs on all major distros — no installation required) and a **self-contained .exe** on Windows. All dependencies are bundled.
 
@@ -163,16 +157,16 @@ Optional: SendGrid (email) and Twilio (SMS) accounts for notifications.
 
 ---
 
-## ⚠️ Known Limitations
+## ⚠️ Application Limits
 
-Nine. is intentionally constrained:
+Nine. is intentionally constrained for an optimal user experience:
 
-| Limitation | Value | Reason |
-|---|---|---|
-| **Properties** | Maximum 9 | Focused workflows — it's our identity |
-| **Users** | Maximum 3 (1 system + 2 login) | Simplified access control |
-| **Organizations** | 1 | Desktop application scope |
-| **File uploads** | 10 MB per file | Performance management |
+| Items             | Limit                          | Reason                                |
+| ----------------- | ------------------------------ | ------------------------------------- |
+| **Properties**    | Maximum 9                      | Focused workflows — it's our identity |
+| **Users**         | Maximum 3 (1 system + 2 login) | Simplified access control             |
+| **Organizations** | 1                              | Desktop application scope             |
+| **File uploads**  | 10 MB per file                 | Performance management                |
 
 ---
 
@@ -181,9 +175,7 @@ Nine. is intentionally constrained:
 - **Framework:** ASP.NET Core 10.0 + Blazor Server
 - **Desktop:** ElectronNET 23.6.2
 - **Database:** SQLite with SQLCipher AES-256 encryption
-- **PDF Generation:** QuestPDF
-- **Email:** SendGrid
-- **SMS:** Twilio
+- **PDF Generation:** QuestPDF (<a href='https://www.questpdf.com/license/community.html' target='_blank'>Community License</a>)
 - **UI:** Bootstrap 5.3, Material Design Icons
 
 ---
@@ -213,7 +205,8 @@ dotnet test Nine.sln
 ## 🤝 Contributing
 
 1. **Fork** the repository
-2. **Create a feature branch** from `development`: `git checkout -b feature/your-feature`
+2. **Create a feature branch** from `development`:
+   `git checkout -b feature/your-feature`
 3. Read **[copilot-instructions.md](.github/copilot-instructions.md)** for architecture guidelines
 4. Make changes, write tests, ensure build passes
 5. **Submit a pull request** to `development`
@@ -240,7 +233,11 @@ cd 4-Nine && dotnet watch
 
 ## 📊 Versioning
 
-[Semantic Versioning](https://semver.org/): **MAJOR** = breaking/schema changes · **MINOR** = new features · **PATCH** = bug fixes
+[Semantic Versioning](https://semver.org/):
+
+- **MAJOR** = breaking/schema changes
+- **MINOR** = new features
+- **PATCH** = bug fixes
 
 **Current version:** 1.0.0 · **Database schema:** 1.0.0
 
@@ -266,12 +263,6 @@ cd 4-Nine && dotnet watch
 - 🎯 Code signing for Windows
 - 🎯 Calendar refactoring
 
-### v1.2.0 (Q3 2026)
-
-- 🎯 Tenant portal for online payments and maintenance requests
-- 🎯 Enhanced reporting and customization
-- 💳 Online rent payment processing (Stripe)
-
 ---
 
 ## 📜 License
@@ -282,6 +273,7 @@ Copyright © 2026 CIS Guru. Licensed under the **MIT License** — see [LICENSE]
 
 ## 📞 Support
 
+- 🌐 **Website:** [nineapp.co](https://nineapp.co/)
 - 🐛 **Bug Reports:** [GitHub Issues](https://github.com/xnodeoncode/nine/issues)
 - 💡 **Feature Requests:** [GitHub Discussions](https://github.com/xnodeoncode/nine/discussions)
 - 🔒 **Security Issues:** cisguru@outlook.com (private)
