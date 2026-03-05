@@ -33,3 +33,5 @@ obj/
 
 # VS Code user-specific settings (keep launch.json and tasks.json)
 .vscode/settings.json
+
+*.code-workspace
