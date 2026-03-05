@@ -176,8 +176,8 @@
     // Available brand themes - add new themes here
     private readonly List<string> AvailableBrandThemes = new()
     {
-        "bootstrap",
         "obsidian",
+        "bootstrap",
         "teal"
     };
 
@@ -203,7 +203,7 @@
                 var domTheme = await JSRuntime.InvokeAsync<string>("eval", 
                     "document.documentElement.getAttribute('data-bs-theme') || localStorage.getItem('theme') || 'light'");
                 var domBrandTheme = await JSRuntime.InvokeAsync<string>("eval", 
-                    "document.documentElement.getAttribute('data-brand-theme') || localStorage.getItem('brandTheme') || 'bootstrap'");
+                    "document.documentElement.getAttribute('data-brand-theme') || localStorage.getItem('brandTheme') || 'obsidian'");
                 
                 // Sync the service with the DOM state (which was set by theme.js)
                 if (ThemeService.CurrentTheme != domTheme)
@@ -228,9 +228,9 @@
                 Console.WriteLine($"Error loading themes: {ex.Message}");
                 // Fallback if localStorage not available
                 ThemeService.SetTheme("light");
-                ThemeService.SetBrandTheme("bootstrap");
+                ThemeService.SetBrandTheme("obsidian");
                 await JSRuntime.InvokeVoidAsync("themeManager.setTheme", "light");
-                await JSRuntime.InvokeVoidAsync("themeManager.setBrandTheme", "bootstrap");
+                await JSRuntime.InvokeVoidAsync("themeManager.setBrandTheme", "obsidian");
             }
         }
     }
@@ -293,8 +293,8 @@
     {
         return theme switch
         {
-            "bootstrap" => "Bootstrap",
             "obsidian" => "Obsidian",
+            "bootstrap" => "Bootstrap",
             "teal" => "Teal",
             _ => theme.Substring(0, 1).ToUpper() + theme.Substring(1)
         };
