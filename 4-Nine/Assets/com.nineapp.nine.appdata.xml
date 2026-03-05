@@ -38,19 +38,27 @@
     </screenshot>
     <screenshot>
       <caption>Property management interface</caption>
-      <image>https://raw.githubusercontent.com/xnodeoncode/nine/main/Documentation/Screenshots/property-management.png</image>
+      <image>https://raw.githubusercontent.com/xnodeoncode/nine/main/Documentation/Screenshots/properties.png</image>
     </screenshot>
     <screenshot>
       <caption>Lease workflow and tenant management</caption>
-      <image>https://raw.githubusercontent.com/xnodeoncode/nine/main/Documentation/Screenshots/lease-workflow.png</image>
+      <image>https://raw.githubusercontent.com/xnodeoncode/nine/main/Documentation/Screenshots/lease.png</image>
     </screenshot>
     <screenshot>
       <caption>Invoice and payment tracking</caption>
-      <image>https://raw.githubusercontent.com/xnodeoncode/nine/main/Documentation/Screenshots/invoice-tracking.png</image>
+      <image>https://raw.githubusercontent.com/xnodeoncode/nine/main/Documentation/Screenshots/invoice.png</image>
+    </screenshot>
+     <screenshot>
+      <caption>Calendar list</caption>
+      <image>https://raw.githubusercontent.com/xnodeoncode/nine/main/Documentation/Screenshots/calendar.png</image>
+    </screenshot>
+     <screenshot>
+      <caption>Routine Inspections</caption>
+      <image>https://raw.githubusercontent.com/xnodeoncode/nine/main/Documentation/Screenshots/inspection.png</image>
     </screenshot>
   </screenshots>
   
-  <url type="homepage">https://github.com/xnodeoncode/nine</url>
+  <url type="homepage">https://www.nineapp.co</url>
   <url type="bugtracker">https://github.com/xnodeoncode/nine/issues</url>
   <url type="help">https://github.com/xnodeoncode/nine/blob/main/README.md</url>
   

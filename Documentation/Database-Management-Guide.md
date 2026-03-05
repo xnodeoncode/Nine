@@ -1,6 +1,6 @@
 # Nine - Database Management Guide
 
-**Version:** 1.1.2  
+**Version:** 1.0.0  
 **Last Updated:** March 1, 2026  
 **Audience:** Administrators and Power Users
 
@@ -63,19 +63,19 @@ Your database contains **all your property management data:**
 **Linux:**
 
 ```bash
-~/.config/Nine/Data/app_v1.1.0.db
+~/.config/Nine/Data/app_v1.0.0.db
 ```
 
 **Windows:**
 
 ```
-%APPDATA%\Nine\Data\app_v1.1.0.db
+%APPDATA%\Nine\Data\app_v1.0.0.db
 ```
 
 **Full path examples:**
 
-- **Linux:** `/home/username/.config/Nine/Data/app_v1.1.0.db`
-- **Windows:** `C:\Users\YourName\AppData\Roaming\Nine\Data\app_v1.1.0.db`
+- **Linux:** `/home/username/.config/Nine/Data/app_v1.0.0.db`
+- **Windows:** `C:\Users\YourName\AppData\Roaming\Nine\Data\app_v1.0.0.db`
 
 ### Database Structure
 
@@ -94,13 +94,13 @@ The database file is a **single SQLite file** containing:
 
 ### Schema Version
 
-Nine v1.1.0 uses schema version `1.1.0`. This tracks the database structure and ensures compatibility.
+Nine v1.0.0 uses schema version `1.0.0`. This tracks the database structure and ensures compatibility.
 
 **Check your schema version:**
 
 1. Navigate to **Settings** → **Database**
 2. View **"Database Information"** panel
-3. See \*\*"Schema Version: 1.1.0""
+3. See \*\*"Schema Version: 1.0.0""
 
 ### Auto-Migration System
 
@@ -117,9 +117,9 @@ When you upgrade Nine to a new version:
 **Version Upgrade Compatibility:**  
 Not all version upgrades are supported automatically. Check the **[Compatibility Matrix](Compatibility-Matrix.md)** before upgrading to see if your current version can auto-migrate to the target version, or if manual steps are required.
 
-#### Migration to v1.1.0
+#### Migration to v1.0.0
 
-When upgrading from v1.0.0 to v1.1.0, the following schema changes are automatically applied:
+When upgrading from v1.0.0 to v1.0.0, the following schema changes are automatically applied:
 
 > **Note:** For complete version compatibility information and upgrade paths, see the **[Compatibility Matrix](Compatibility-Matrix.md)**.
 
@@ -149,11 +149,11 @@ When upgrading from v1.0.0 to v1.1.0, the following schema changes are automatic
 **Migration Notes:**
 
 - All changes are additive (no data loss)
-- Migration runs automatically on first startup with v1.1.0
+- Migration runs automatically on first startup with v1.0.0
 - Backup created automatically before migration
 - Typical migration time: 5-15 seconds
 
-**Important:** v1.1.0 application **requires** v1.1.0 database schema - the DatabaseSettings table is queried on startup. Running v1.1.0 app with v1.0.0 database will result in an error.
+**Important:** v1.0.0 application **requires** v1.0.0 database schema - the DatabaseSettings table is queried on startup. Running v1.0.0 app with v1.0.0 database will result in an error.
 
 **Version Compatibility:**  
 See the **[Compatibility Matrix](Compatibility-Matrix.md)** for detailed information about which app versions work with which database versions, and whether automatic migration is available.
@@ -393,13 +393,13 @@ pkill Nine
 cd ~/.config/Nine/Data/
 
 # Backup current (corrupted) database
-mv app_v1.1.0.db app_v1.1.0.db.corrupted
+mv app_v1.0.0.db app_v1.0.0.db.corrupted
 
 # Copy backup to main database
-cp Backups/backup_20260218_143022.db app_v1.1.0.db
+cp Backups/backup_20260218_143022.db app_v1.0.0.db
 
 # Restart application
-./Nine-1.1.0.AppImage
+./Nine-1.0.0.AppImage
 ```
 
 **Windows:**
@@ -411,10 +411,10 @@ cp Backups/backup_20260218_143022.db app_v1.1.0.db
 cd $env:APPDATA\Nine\Data
 
 # Backup current (corrupted) database
-Move-Item app_v1.1.0.db app_v1.1.0.db.corrupted
+Move-Item app_v1.0.0.db app_v1.0.0.db.corrupted
 
 # Copy backup to main database
-Copy-Item Backups\backup_20260218_143022.db app_v1.1.0.db
+Copy-Item Backups\backup_20260218_143022.db app_v1.0.0.db
 
 # Restart application (Start Menu or double-click icon)
 ```
@@ -525,9 +525,9 @@ Nine monitors database health continuously:
    ```
    ✅ Database Health Check: PASSED
 
-   Database file: app_v1.1.0.db
+   Database file: app_v1.0.0.db
    File size: 47.3 MB
-   Schema version: 1.1.0
+   Schema version: 1.0.0
    Connection status: Connected
    Integrity check: PASSED
 
@@ -548,7 +548,7 @@ Nine monitors database health continuously:
 
 - ✅ **Connection status: Connected** - Database accessible
 - ✅ **Integrity check: PASSED** - No corruption detected
-- ✅ **Schema version: 1.1.0** - Matches application version
+- ✅ **Schema version: 1.0.0** - Matches application version
 - ✅ **File accessible: Yes** - Database file readable and writable
 
 **Yellow indicators (warning):**
@@ -644,12 +644,12 @@ Nine monitors database health continuously:
    ```bash
    # Only if application is definitely closed
    # Linux
-   rm ~/.config/Nine/Data/app_v1.1.0.db-wal
-   rm ~/.config/Nine/Data/app_v1.1.0.db-shm
+   rm ~/.config/Nine/Data/app_v1.0.0.db-wal
+   rm ~/.config/Nine/Data/app_v1.0.0.db-shm
 
    # Windows
-   del %APPDATA%\Nine\Data\app_v1.1.0.db-wal
-   del %APPDATA%\Nine\Data\app_v1.1.0.db-shm
+   del %APPDATA%\Nine\Data\app_v1.0.0.db-wal
+   del %APPDATA%\Nine\Data\app_v1.0.0.db-shm
    ```
 
 ### Issue 2: Database Corruption
@@ -679,11 +679,11 @@ Nine monitors database health continuously:
 
    ```bash
    # Attempt to dump and rebuild database
-   sqlite3 app_v1.1.0.db ".dump" | sqlite3 app_v1.1.0_recovered.db
+   sqlite3 app_v1.0.0.db ".dump" | sqlite3 app_v1.0.0_recovered.db
 
    # Replace corrupted database with recovered one
-   mv app_v1.1.0.db app_v1.1.0.db.corrupted
-   mv app_v1.1.0_recovered.db app_v1.1.0.db
+   mv app_v1.0.0.db app_v1.0.0.db.corrupted
+   mv app_v1.0.0_recovered.db app_v1.0.0.db
    ```
 
 3. **Professional data recovery:**
@@ -809,21 +809,21 @@ Nine monitors database health continuously:
 
    ```bash
    # Linux
-   find ~ -name "app_v1.1.0.db" 2>/dev/null
+   find ~ -name "app_v1.0.0.db" 2>/dev/null
 
    # Windows (PowerShell)
-   Get-ChildItem -Path C:\ -Filter "app_v1.1.0.db" -Recurse -ErrorAction SilentlyContinue
+   Get-ChildItem -Path C:\ -Filter "app_v1.0.0.db" -Recurse -ErrorAction SilentlyContinue
    ```
 
 3. **Restore from backup:**
    - If original database lost
    - Copy backup to correct location
-   - Rename to `app_v1.1.0.db`
+   - Rename to `app_v1.0.0.db`
 
 4. **Fix permissions (Linux):**
    ```bash
-   chmod 644 ~/.config/Nine/Data/app_v1.1.0.db
-   chown $USER:$USER ~/.config/Nine/Data/app_v1.1.0.db
+   chmod 644 ~/.config/Nine/Data/app_v1.0.0.db
+   chown $USER:$USER ~/.config/Nine/Data/app_v1.0.0.db
    ```
 
 ---
@@ -841,9 +841,9 @@ Nine monitors database health continuously:
 
 You may notice these files alongside the database:
 
-- `app_v1.1.0.db` - Main database file
-- `app_v1.1.0.db-wal` - Write-Ahead Log (temporary)
-- `app_v1.1.0.db-shm` - Shared Memory file (temporary)
+- `app_v1.0.0.db` - Main database file
+- `app_v1.0.0.db-wal` - Write-Ahead Log (temporary)
+- `app_v1.0.0.db-shm` - Shared Memory file (temporary)
 
 **WAL benefits:**
 
@@ -917,11 +917,11 @@ GROUP BY l.PropertyId, p.PropertyName;
 
 ### Database Encryption
 
-SQLite databases are **not encrypted** by default. Nine v1.1.0 includes database encryption options:
+SQLite databases are **not encrypted** by default. Nine v1.0.0 includes database encryption options:
 
-**Option 1: SQLCipher (Included in v1.1.0)**
+**Option 1: SQLCipher (Included in v1.0.0)**
 
-SQLCipher provides AES-256 encryption for database files. This is integrated into Nine v1.1.0:
+SQLCipher provides AES-256 encryption for database files. This is integrated into Nine v1.0.0:
 
 - **Enable encryption:** Settings → Database → Security → Enable Database Encryption
 - **AES-256 encryption** of entire database file
@@ -1110,7 +1110,7 @@ dotnet tool update dotnet-ef -g
 
 ### Q: Can I restore a backup from an older version?
 
-**A:** Generally yes, if schema versions are compatible. The application will attempt to migrate the backup forward. However, backups from much older versions (e.g., v0.1.0 → v1.1.0) may not work. Always test staged restore first.
+**A:** Generally yes, if schema versions are compatible. The application will attempt to migrate the backup forward. However, backups from much older versions (e.g., v0.1.0 → v1.0.0) may not work. Always test staged restore first.
 
 ### Q: What if I lose all my backups?
 
@@ -1161,7 +1161,7 @@ Use application UI for all changes.
 
 ### Q: Can I have multiple databases?
 
-**A:** Not directly supported in v1.1.0. You can manually swap database files, but only one can be active at a time. For multi-organization use, wait for Nine Professional.
+**A:** Not directly supported in v1.0.0. You can manually swap database files, but only one can be active at a time. For multi-organization use, wait for Nine Professional.
 
 ---
 

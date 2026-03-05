@@ -1,6 +1,6 @@
 [Desktop Entry]
 Name=Nine
-Comment=Property management perfected for up to nine properties.
+Comment=Property management desktop application.
 Exec=Nine-1.0.0-x86_64.AppImage
 Icon=nine
 Type=Application

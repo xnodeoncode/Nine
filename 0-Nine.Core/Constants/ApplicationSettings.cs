@@ -5,6 +5,10 @@ namespace Nine.Core.Constants
         public string AppName { get; set; } = string.Empty;
         public string ProductName { get; set; } = string.Empty;
         public string Version { get; set; } = string.Empty;
+        public string Company { get; set; } = string.Empty;
+        public string Copyright { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public string Website { get; set; } = string.Empty;
         public string Author { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public string Repository { get; set; } = string.Empty;

@@ -63,12 +63,12 @@
                             <label for="paymentMethod" class="form-label">Payment Method *</label>
                             <InputSelect id="paymentMethod" class="form-select" @bind-Value="paymentModel.PaymentMethod">
                                 <option value="">-- Select Payment Method --</option>
-                                <option value="Cash">Cash</option>
-                                <option value="Check">Check</option>
-                                <option value="Credit Card">Credit Card</option>
-                                <option value="Debit Card">Debit Card</option>
-                                <option value="Bank Transfer">Bank Transfer</option>
                                 <option value="Online Payment">Online Payment</option>
+                                <option value="Debit Card">Debit Card</option>
+                                <option value="Credit Card">Credit Card</option>
+                                <option value="Check">Check</option>
+                                <option value="Cash">Cash</option>
+                                <option value="Bank Transfer">Bank Transfer</option>
                                 <option value="Other">Other</option>
                             </InputSelect>
                             <ValidationMessage For="() => paymentModel.PaymentMethod" />
@@ -269,7 +269,7 @@
         public decimal Amount { get; set; }
 
         [Required(ErrorMessage = "Payment method is required.")]
-        public string PaymentMethod { get; set; } = string.Empty;
+        public string PaymentMethod { get; set; } = "Online Payment";
 
         [MaxLength(1000)]
         public string? Notes { get; set; } = string.Empty;

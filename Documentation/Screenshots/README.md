@@ -18,19 +18,19 @@ This directory contains screenshots for the AppImageHub submission.
 - **Caption**: "Dashboard with property overview and metrics"
 - **Status**: ⏳ Needs to be captured
 
-### 2. property-management.png
+### 2. properties.png
 
 - **Content**: Property management interface showing property list or details
 - **Caption**: "Property management interface"
 - **Status**: ⏳ Needs to be captured
 
-### 3. lease-workflow.png
+### 3. lease.png
 
 - **Content**: Lease creation or tenant management screen
 - **Caption**: "Lease workflow and tenant management"
 - **Status**: ⏳ Needs to be captured
 
-### 4. invoice-tracking.png
+### 4. invoice.png
 
 - **Content**: Invoice list or payment tracking screen
 - **Caption**: "Invoice and payment tracking"

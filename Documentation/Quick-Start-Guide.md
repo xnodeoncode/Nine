@@ -1,6 +1,6 @@
 # Nine. - Quick Start Guide
 
-**Version:** 1.1.2  
+**Version:** 1.0.0  
 **Last Updated:** March 1, 2026  
 **Estimated Time:** 15 minutes
 
@@ -33,7 +33,7 @@ Before you begin, ensure you have:
 - **Hardware:**
   - 2 GB RAM minimum (4 GB recommended)
   - 500 MB disk space
-- **Downloaded:** Nine v1.1.2 installer for your platform
+- **Downloaded:** Nine v1.0.0 installer for your platform
 
 ### Universal Linux Support:
 
@@ -53,20 +53,20 @@ Nine. is available as a portable Windows executable (.exe). No installation requ
 
 ```bash
 # 1. Download the file
-# File: Nine-1.1.2-x86_64.AppImage
+# File: Nine-1.0.0-x86_64.AppImage
 
 # 2. Make it executable
-chmod +x Nine-1.1.2-x86_64.AppImage
+chmod +x Nine-1.0.0-x86_64.AppImage
 
 # 3. Run the application
-./Nine-1.1.2-x86_64.AppImage
+./Nine-1.0.0-x86_64.AppImage
 ```
 
 **Option B: Debian Package (Ubuntu/Debian users)**
 
 ```bash
 # 1. Install the package
-sudo dpkg -i Nine-1.1.0-amd64.deb
+sudo dpkg -i Nine-1.0.0-amd64.deb
 
 # 2. Run the application
 nine
@@ -76,7 +76,7 @@ nine
 
 **Option A: NSIS Installer (Recommended)**
 
-1. **Download** `Nine-1.1.2-x64-Setup.exe`
+1. **Download** `Nine-1.0.0-x64-Setup.exe`
 2. **Double-click** the installer
 3. **Follow the wizard:**
    - Click "Next" to begin
@@ -88,7 +88,7 @@ nine
 
 **Option B: Portable Executable (No installation)**
 
-1. **Download** `Nine-1.1.0-x64-Portable.exe`
+1. **Download** `Nine-1.0.0-x64-Portable.exe`
 2. **Place** in your desired folder (e.g., `C:\Nine\`)
 3. **Double-click** to run
 
@@ -531,7 +531,7 @@ In just 15 minutes, you've learned how to:
 
 ### Documentation
 
-- **Release Notes** - What's new in v1.1.0
+- **Release Notes** - What's new in v1.0.0
 - **User Guide** - Comprehensive 10-chapter guide covering all features
 - **Administrator Guide** - System configuration and management
 - **Database Management Guide** - Backup, restore, troubleshooting
@@ -543,7 +543,7 @@ In just 15 minutes, you've learned how to:
 - 📧 **Email Support:** cisguru@outlook.com
 - 🐛 **Report Bugs:** [GitHub Issues](https://github.com/xnodeoncode/nine/issues)
 - 💡 **Request Features:** [GitHub Discussions](https://github.com/xnodeoncode/nine/discussions)
-- 📖 **Documentation:** `/Documentation/v1.1.0/`
+- 📖 **Documentation:** `/Documentation/v1.0.0/`
 
 **Community:**
 
@@ -632,7 +632,7 @@ In just 15 minutes, you've learned how to:
 
 ### Q: Can I import data from another property management system?
 
-**A:** Not directly in v1.1.0. You'll need to manually enter your properties, tenants, and leases. Data import features are planned for a future release.
+**A:** Not directly in v1.0.0. You'll need to manually enter your properties, tenants, and leases. Data import features are planned for a future release.
 
 ### Q: What happens when I reach the 9-property limit?
 
@@ -672,7 +672,7 @@ In just 15 minutes, you've learned how to:
 
 ### Q: Can I run this on a Mac?
 
-**A:** Not in v1.1.0. macOS support is planned for a future release. For now, use a Windows or Linux computer.
+**A:** Not in v1.0.0. macOS support is planned for a future release. For now, use a Windows or Linux computer.
 
 ### Q: Is there a mobile app?
 
