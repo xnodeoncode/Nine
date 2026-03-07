@@ -1,9 +1,7 @@
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Nine.Core.Constants;
-using Nine.Core.Entities;
 using Nine.Core.Interfaces;
 using Nine.Core.Interfaces.Services;
 using Nine.Extensions;
@@ -24,21 +22,17 @@ using Nine.Shared.Components.Account;
 SQLitePCL.Batteries_V2.Init();
 SQLitePCL.raw.sqlite3_initialize();
 
+WebApplication app = null!;
 var builder = WebApplication.CreateBuilder(args);
 
-// Configure for Electron FIRST — this sets HybridSupport.IsElectronActive, which
-// HandlePendingRestore depends on to compute the correct Electron user-data DB path.
-builder.WebHost.UseElectron(args);
+// Configure Electron startup callback — called when Electron's socket bridge is ready.
+builder.WebHost.UseElectron(args, ElectronAppReady);
 
 // CRITICAL: Handle .restore_pending BEFORE any DbContext registration.
-// Must run AFTER UseElectron so HybridSupport.IsElectronActive is true.
 HandlePendingRestore(builder.Configuration);
 
-// Configure URLs - use specific port for Electron
-if (HybridSupport.IsElectronActive)
-{
-    builder.WebHost.UseUrls("http://localhost:8888");
-}
+// Electron-only: always bind to the fixed port Electron expects
+builder.WebHost.UseUrls("http://localhost:8888");
 
 
 
@@ -53,11 +47,8 @@ builder.Services.AddSignalR();
 builder.Services.AddAntiforgery(options =>
 {
     options.HeaderName = "X-CSRF-TOKEN";
-    // Allow cookies over HTTP for Electron/Development
-    if (HybridSupport.IsElectronActive || builder.Environment.IsDevelopment())
-    {
-        options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
-    }
+    // Electron runs over plain HTTP — cookies must not require HTTPS
+    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
 });
 
 
@@ -77,15 +68,8 @@ builder.Services.AddScoped<IdentityUserAccessor>();
 builder.Services.AddScoped<IdentityRedirectManager>();
 builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
 
-// Add platform-specific infrastructure services (Database, Identity, Path services)
-if (HybridSupport.IsElectronActive)
-{
-    builder.Services.AddElectronServices(builder.Configuration);
-}
-else
-{
-    builder.Services.AddWebServices(builder.Configuration);
-}
+// Electron-only: always use Electron services (user-data DB path, etc.)
+builder.Services.AddElectronServices(builder.Configuration);
 
 // Configure organization-based authorization
 builder.Services.AddAuthorization();
@@ -187,8 +171,7 @@ builder.Services.AddScoped<LeaseWorkflowService>();
 builder.Services.AddScoped<PasswordDerivationService>();
 builder.Services.AddScoped<IKeychainService>(sp =>
 {
-    // Pass app name to prevent keychain conflicts between different apps and modes
-    var appName = HybridSupport.IsElectronActive ? "Nine-Electron" : "Nine-Web";
+    var appName = "Nine-Electron";
     if (OperatingSystem.IsWindows())
         return new WindowsKeychainService(appName);
     return new LinuxKeychainService(appName);
@@ -210,12 +193,9 @@ builder.Services.AddScoped<SessionTimeoutService>(sp =>
     var warningMinutes = config.GetValue<int>("SessionTimeout:WarningDurationMinutes", 2);
     var enabled = config.GetValue<bool>("SessionTimeout:Enabled", true);
     
-    // Disable for Electron in development, or use longer timeout
-    if (HybridSupport.IsElectronActive)
-    {
-        timeoutMinutes = 120; // 2 hours for desktop app
-        enabled = false; // Typically disabled for desktop
-    }
+    // Electron desktop app: extended timeout, disabled by default
+    timeoutMinutes = 120;
+    enabled = false;
     
     service.InactivityTimeout = TimeSpan.FromMinutes(timeoutMinutes);
     service.WarningDuration = TimeSpan.FromMinutes(warningMinutes);
@@ -227,7 +207,7 @@ builder.Services.AddScoped<SessionTimeoutService>(sp =>
 // Register background service for scheduled tasks
 builder.Services.AddHostedService<ScheduledTaskService>();
 
-var app = builder.Build();
+app = builder.Build();
 
 // Ensure database is created and migrations are applied
 using (var scope = app.Services.CreateScope())
@@ -245,13 +225,17 @@ using (var scope = app.Services.CreateScope())
     var identityContext = scope.ServiceProvider.GetRequiredService<NineDbContext>();
     var backupService = scope.ServiceProvider.GetRequiredService<DatabaseBackupService>();
     
-    // For Electron, handle database initialization and migrations
-    if (HybridSupport.IsElectronActive)
+    // Electron-only: database initialization and migrations
+    try
     {
-        try
-        {
             var pathService = scope.ServiceProvider.GetRequiredService<IPathService>();
             var dbPath = await pathService.GetDatabasePathAsync();
+
+            // var dbPath = Path.Combine(
+            // Environment.GetEnvironmentVariable("XDG_CONFIG_HOME")
+            //     ?? Path.Combine(
+            //         Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".config"),
+            // "Nine");
 
             Console.WriteLine($"[Program] Beginning migrations Electron database path: {dbPath}");
             
@@ -471,84 +455,9 @@ using (var scope = app.Services.CreateScope())
         }
         catch (Exception ex)
         {
-            app.Logger.LogError(ex, "Failed to initialize database for Electron");
+            app.Logger.LogError(ex, "Failed to initialize database");
             throw;
         }
-    }
-    else
-    {
-        // Web mode - ensure migrations are applied
-        try
-        {
-            app.Logger.LogInformation("Applying database migrations for web mode");
-            
-            // Get database path for web mode
-            // REMOVED: .restore_pending handling now happens BEFORE service registration
-            // This ensures encrypted database detection works correctly
-            // See HandlePendingRestore() called before AddWebServices()
-            
-            // Check if there are pending migrations for both contexts
-            var businessPendingCount = await dbService.GetPendingMigrationsCountAsync();
-            var identityPendingCount = await dbService.GetIdentityPendingMigrationsCountAsync();
-            
-            var isNewDatabase = businessPendingCount == 0 && identityPendingCount == 0;
-            
-            if (businessPendingCount > 0 || identityPendingCount > 0)
-            {
-                var totalCount = businessPendingCount + identityPendingCount;
-                app.Logger.LogInformation("Found {Count} pending migrations ({BusinessCount} business, {IdentityCount} identity)", 
-                    totalCount, businessPendingCount, identityPendingCount);
-                
-                // Create backup before migration
-                var backupPath = await backupService.CreatePreMigrationBackupAsync();
-                if (backupPath != null)
-                {
-                    app.Logger.LogInformation("Database backed up to {BackupPath}", backupPath);
-                }
-            }
-            
-            // Apply migrations to both contexts
-            if (identityPendingCount > 0 || businessPendingCount > 0)
-            {
-                app.Logger.LogInformation("Applying migrations ({Identity} identity, {Business} business)", 
-                    identityPendingCount, businessPendingCount);
-                await dbService.InitializeAsync();
-            }
-            
-            app.Logger.LogInformation("Database migrations applied successfully");
-            
-            // Update DatabaseSettings.DatabaseEncryptionEnabled flag to match actual encryption status
-            var encryptionDetection = scope.ServiceProvider.GetRequiredService<EncryptionDetectionResult>();
-            var currentSettings = await dbService.GetDatabaseSettingsAsync();
-            
-            if (currentSettings.DatabaseEncryptionEnabled != encryptionDetection.IsEncrypted)
-            {
-                app.Logger.LogInformation(
-                    "Updating DatabaseSettings.DatabaseEncryptionEnabled from {Old} to {New} (detected actual status)",
-                    currentSettings.DatabaseEncryptionEnabled,
-                    encryptionDetection.IsEncrypted);
-                await dbService.SetDatabaseEncryptionAsync(encryptionDetection.IsEncrypted, "System-AutoDetect");
-            }
-            else
-            {
-                app.Logger.LogInformation(
-                    "DatabaseSettings.DatabaseEncryptionEnabled already matches actual encryption status: {Status}",
-                    encryptionDetection.IsEncrypted);
-            }
-            
-            // Create initial backup after creating a new database
-            if (isNewDatabase)
-            {
-                app.Logger.LogInformation("New database created, creating initial backup");
-                await backupService.CreateBackupAsync("InitialSetup");
-            }
-        }
-        catch (Exception ex)
-        {
-            app.Logger.LogError(ex, "Failed to apply database migrations");
-            throw;
-        }
-    }
 
     // Validate and update schema version
     var schemaService = scope.ServiceProvider.GetRequiredService<SchemaValidationService>();
@@ -595,39 +504,7 @@ app.UseSession();
 // ✅ SECURITY: Content Security Policy and security headers
 app.UseSecurityHeaders();
 
-// ✅ SECURITY: HTTPS enforcement for production web mode
-if (!HybridSupport.IsElectronActive)
-{
-    if (!app.Environment.IsDevelopment())
-    {
-        // Production: MUST use HTTPS
-        app.UseHttpsRedirection();
-        app.UseHsts();
-
-        // Validate HTTPS is actually configured
-        var httpsUrl = builder.Configuration["Kestrel:Endpoints:Https:Url"];
-        if (string.IsNullOrEmpty(httpsUrl))
-        {
-            app.Logger.LogWarning(
-                "HTTPS not configured in production. " +
-                "Configure Kestrel:Endpoints:Https in appsettings.Production.json or set ASPNETCORE_URLS environment variable.");
-        }
-    }
-    else
-    {
-        // Development: Optional HTTPS (for testing)
-        var useHttps = builder.Configuration.GetValue<bool>("Development:UseHttps", false);
-        if (useHttps)
-        {
-            app.UseHttpsRedirection();
-            app.Logger.LogInformation("HTTPS enabled for development");
-        }
-        else
-        {
-            app.Logger.LogInformation("Running in development without HTTPS");
-        }
-    }
-}
+// Electron-only: no HTTPS redirection — app communicates over localhost HTTP
 
 app.UseAuthentication();
 app.UseAuthorization();
@@ -701,32 +578,20 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-// Start the app for Electron
-try
-{
-    app.Logger.LogInformation("Starting ASP.NET Core server...");
-    await app.StartAsync();
-    app.Logger.LogInformation("ASP.NET Core server started successfully");
-}
-catch (Exception ex)
-{
-    app.Logger.LogCritical(ex, "FATAL: Failed to start ASP.NET Core server");
-    Console.WriteLine($"FATAL ERROR: {ex.Message}");
-    Console.WriteLine($"Stack Trace: {ex.StackTrace}");
-    if (ex.InnerException != null)
-    {
-        Console.WriteLine($"Inner Exception: {ex.InnerException.Message}");
-    }
-    Environment.Exit(1);
-}
+// Run the app — blocks until shutdown. ElectronAppReady fires via the callback
+// registered in UseElectron() once the Electron socket bridge is fully ready.
+await app.RunAsync();
 
-// Open Electron window
-if (HybridSupport.IsElectronActive)
+async Task ElectronAppReady()
 {
+    // Called by ElectronNET when Electron's socket bridge is fully ready.
+    // app is captured from the enclosing scope — guaranteed non-null by the time
+    // this fires, since Electron's ready event arrives after StartAsync completes.
+
     // Verify backend is responding before showing window
     var backendUrl = "http://localhost:8888";
     var isBackendReady = false;
-    
+
     try
     {
         using var httpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(5) };
@@ -738,7 +603,7 @@ if (HybridSupport.IsElectronActive)
     {
         app.Logger.LogWarning(ex, "Backend health check failed, will show offline page");
     }
-    
+
     var window = await Electron.WindowManager.CreateWindowAsync(new ElectronNET.API.Entities.BrowserWindowOptions
     {
         Width = 1400,
@@ -746,35 +611,41 @@ if (HybridSupport.IsElectronActive)
         MinWidth = 800,
         MinHeight = 600,
         Show = false,
-        AutoHideMenuBar = true
     });
-    window.RemoveMenu();
+
+    if (OperatingSystem.IsLinux() || OperatingSystem.IsWindows())
+    {
+        window.SetMenuBarVisibility(false);
+        window.RemoveMenu();
+    }
     window.OnReadyToShow += () => window.Show();
     window.SetTitle("Nine Property Management");
-    
-    // Load appropriate page based on backend availability
+
     if (!isBackendReady)
     {
         app.Logger.LogWarning("Loading offline page due to backend unavailability");
         window.LoadURL($"{backendUrl}/offline.html");
     }
-    
-    // Open DevTools in development mode for debugging
+
     if (app.Environment.IsDevelopment())
     {
         window.WebContents.OpenDevTools();
         app.Logger.LogInformation("DevTools opened for debugging");
     }
-    
-    // Gracefully shutdown when window is closed
+
+    // Re-register DevTools shortcut because RemoveMenu() strips default accelerators
+    Electron.GlobalShortcut.Register("CmdOrCtrl+Shift+I", () =>
+    {
+        window.WebContents.ToggleDevTools();
+    });
+
     window.OnClosed += () =>
     {
+        Electron.GlobalShortcut.UnregisterAll();
         app.Logger.LogInformation("Electron window closed, shutting down application");
         Electron.App.Quit();
     };
 }
-
-await app.WaitForShutdownAsync();
 
 // Local function to handle .restore_pending before service registration
 static void HandlePendingRestore(IConfiguration configuration)
@@ -793,50 +664,27 @@ static void HandlePendingRestore(IConfiguration configuration)
 
     string dbPath;
 
-    if (HybridSupport.IsElectronActive)
-    {
-        // Replicate ElectronPathService.GetDatabasePathSync() without needing DI.
-        var dbFileName = configuration["ApplicationSettings:DatabaseFileName"] ?? "app.db";
+    // Electron-only: always use the OS user-data directory
+    var dbFileName = configuration["ApplicationSettings:DatabaseFileName"] ?? "app.db";
 
-        string basePath;
-        if (OperatingSystem.IsWindows())
-            basePath = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Nine");
-        else if (OperatingSystem.IsMacOS())
-            basePath = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
-                "Library", "Application Support", "Nine");
-        else // Linux
-            basePath = Path.Combine(
-                Environment.GetEnvironmentVariable("XDG_CONFIG_HOME")
-                    ?? Path.Combine(
-                        Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".config"),
-                "Nine");
+    string basePath;
+    if (OperatingSystem.IsWindows())
+        basePath = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Nine");
+    else if (OperatingSystem.IsMacOS())
+        basePath = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+            "Library", "Application Support", "Nine");
+    else // Linux
+        basePath = Path.Combine(
+            Environment.GetEnvironmentVariable("XDG_CONFIG_HOME")
+                ?? Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".config"),
+            "Nine");
 
-        Directory.CreateDirectory(basePath);
-        dbPath = Path.Combine(basePath, dbFileName);
-        Console.WriteLine($"[Program.HandlePendingRestore] Electron mode — DB path: {dbPath}");
-    }
-    else
-    {
-        // Web / non-Electron: derive path from appsettings.json connection string.
-        var connectionString = configuration.GetConnectionString("DefaultConnection");
-        Console.WriteLine($"[Program.HandlePendingRestore] Web mode — connection string: {connectionString}");
-
-        if (string.IsNullOrEmpty(connectionString))
-        {
-            Console.WriteLine("[Program.HandlePendingRestore] No connection string found, skipping");
-            return;
-        }
-
-        var csBuilder = new Microsoft.Data.Sqlite.SqliteConnectionStringBuilder(connectionString);
-        dbPath = csBuilder.DataSource;
-
-        if (!Path.IsPathRooted(dbPath))
-            dbPath = Path.Combine(Directory.GetCurrentDirectory(), dbPath);
-
-        Console.WriteLine($"[Program.HandlePendingRestore] Web mode — DB path: {dbPath}");
-    }
+    Directory.CreateDirectory(basePath);
+    dbPath = Path.Combine(basePath, dbFileName);
+    Console.WriteLine($"[Program.HandlePendingRestore] DB path: {dbPath}");
 
     var stagedRestorePath = $"{dbPath}.restore_pending";
 

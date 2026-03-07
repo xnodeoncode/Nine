@@ -1,6 +1,3 @@
-using ElectronNET.API;
-using ElectronNET.API.Entities;
-using Microsoft.Extensions.Configuration;
 using Nine.Core.Interfaces;
 
 namespace Nine.Services;
@@ -19,7 +16,7 @@ public class ElectronPathService : IPathService
     }
 
     /// <inheritdoc/>
-    public bool IsActive => HybridSupport.IsElectronActive;
+    public bool IsActive => true; // App is Electron-only
 
     /// <inheritdoc/>
     public async Task<string> GetConnectionStringAsync(object configuration)
@@ -32,31 +29,16 @@ public class ElectronPathService : IPathService
     public async Task<string> GetDatabasePathAsync()
     {
         var dbFileName = _configuration["ApplicationSettings:DatabaseFileName"] ?? "app.db";
-        
-        if (HybridSupport.IsElectronActive)
+        var userDataPath = await GetUserDataPathAsync();
+        var dbPath = Path.Combine(userDataPath, dbFileName);
+
+        var directory = Path.GetDirectoryName(dbPath);
+        if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
         {
-            var userDataPath = await GetUserDataPathAsync();
-            var dbPath = Path.Combine(userDataPath, dbFileName);
-            
-            // Ensure the directory exists
-            var directory = Path.GetDirectoryName(dbPath);
-            if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
-            {
-                Directory.CreateDirectory(directory);
-            }
-            
-            return dbPath;
+            Directory.CreateDirectory(directory);
         }
-        else
-        {
-            // Fallback to local path if not in Electron mode
-            var dataDir = Path.Combine(Directory.GetCurrentDirectory(), "Data");
-            if (!Directory.Exists(dataDir))
-            {
-                Directory.CreateDirectory(dataDir);
-            }
-            return Path.Combine(dataDir, dbFileName);
-        }
+
+        return dbPath;
     }
 
     /// <summary>
@@ -65,91 +47,54 @@ public class ElectronPathService : IPathService
     public string GetDatabasePathSync()
     {
         var dbFileName = _configuration["ApplicationSettings:DatabaseFileName"] ?? "app.db";
-        
-        if (HybridSupport.IsElectronActive)
+        var userDataPath = GetUserDataPathSync();
+        var dbPath = Path.Combine(userDataPath, dbFileName);
+
+        var directory = Path.GetDirectoryName(dbPath);
+        if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
         {
-            // Use OS-specific user data path without requiring Electron to be initialized
-            var userDataPath = GetUserDataPathSync();
-            var dbPath = Path.Combine(userDataPath, dbFileName);
-            
-            // Ensure the directory exists
-            var directory = Path.GetDirectoryName(dbPath);
-            if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
-            {
-                Directory.CreateDirectory(directory);
-            }
-            
-            return dbPath;
+            Directory.CreateDirectory(directory);
         }
-        else
-        {
-            // Fallback to local path if not in Electron mode
-            var dataDir = Path.Combine(Directory.GetCurrentDirectory(), "Data");
-            if (!Directory.Exists(dataDir))
-            {
-                Directory.CreateDirectory(dataDir);
-            }
-            return Path.Combine(dataDir, dbFileName);
-        }
+
+        return dbPath;
     }
 
     /// <inheritdoc/>
-    public async Task<string> GetUserDataPathAsync()
+    public Task<string> GetUserDataPathAsync()
     {
-        if (HybridSupport.IsElectronActive)
-        {
-            // Use sync method to ensure consistent path resolution
-            // This matches the startup behavior and uses "Nine" as the app name
-            return GetUserDataPathSync();
-        }
-        else
-        {
-            // Fallback for non-Electron mode
-            return Path.Combine(Directory.GetCurrentDirectory(), "Data");
-        }
+        return Task.FromResult(GetUserDataPathSync());
     }
 
     /// <summary>
-    /// Gets the user data path synchronously.
+    /// Gets the OS-specific user data path for the Nine app.
     /// </summary>
     private string GetUserDataPathSync()
     {
-        if (HybridSupport.IsElectronActive)
+        string basePath;
+
+        if (OperatingSystem.IsWindows())
         {
-            // Determine OS-specific user data path without Electron API
-            string basePath;
-            var appName = "Nine";
-            
-            if (OperatingSystem.IsWindows())
-            {
-                basePath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            }
-            else if (OperatingSystem.IsMacOS())
-            {
-                basePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), 
-                    "Library", "Application Support");
-            }
-            else // Linux
-            {
-                basePath = Environment.GetEnvironmentVariable("XDG_CONFIG_HOME") 
-                    ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".config");
-            }
-            
-            var userDataPath = Path.Combine(basePath, appName);
-            
-            // Ensure directory exists
-            if (!Directory.Exists(userDataPath))
-            {
-                Directory.CreateDirectory(userDataPath);
-            }
-            
-            return userDataPath;
+            basePath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
         }
-        else
+        else if (OperatingSystem.IsMacOS())
         {
-            // Fallback for non-Electron mode
-            return Path.Combine(Directory.GetCurrentDirectory(), "Data");
+            basePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+                "Library", "Application Support");
         }
+        else // Linux
+        {
+            basePath = Environment.GetEnvironmentVariable("XDG_CONFIG_HOME")
+                ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".config");
+        }
+
+        var userDataPath = Path.Combine(basePath, "Nine");
+
+        if (!Directory.Exists(userDataPath))
+        {
+            Directory.CreateDirectory(userDataPath);
+        }
+
+        return userDataPath;
     }
 
 }

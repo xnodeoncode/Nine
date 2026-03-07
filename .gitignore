@@ -25,6 +25,9 @@ sp_credentials.json
 
 publish_profile.xml
 
+# Electron publish output — releases managed via GitHub Releases
+4-Nine/publish/
+
 
 # Python virtual environment created per-project
 .venv/

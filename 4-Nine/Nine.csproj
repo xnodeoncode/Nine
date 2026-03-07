@@ -2,6 +2,10 @@
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
+    <!-- Set per-OS to override ElectronNET.Core.props default of win-x64 -->
+    <RuntimeIdentifier Condition="$([MSBuild]::IsOSPlatform('Linux'))">linux-x64</RuntimeIdentifier>
+    <RuntimeIdentifier Condition="$([MSBuild]::IsOSPlatform('Windows'))">win-x64</RuntimeIdentifier>
+    <RuntimeIdentifier Condition="$([MSBuild]::IsOSPlatform('OSX'))">osx-x64</RuntimeIdentifier>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>aspnet-Nine-c69b6efe-bb20-41de-8cba-044207ebdce1</UserSecretsId>
@@ -13,6 +17,20 @@
     <FileVersion>1.0.0.0</FileVersion>
     <InformationalVersion>1.0.0</InformationalVersion>
   </PropertyGroup>
+
+  <PropertyGroup Label="ElectronNetCommon">
+    <ElectronVersion>30.4.0</ElectronVersion>
+    <ElectronBuilderVersion>26.0</ElectronBuilderVersion>
+    <ElectronSingleInstance>false</ElectronSingleInstance>
+    <ElectronSplashScreen>wwwroot/assets/splash.png</ElectronSplashScreen>
+    <ElectronIcon>Assets/icon.png</ElectronIcon>
+    <ElectronPackageId>co.nineapp.nine</ElectronPackageId>
+    <Title>Nine</Title>
+  </PropertyGroup>
+
+<ItemGroup>
+    <AssemblyMetadata Include="AspNetHttpPort" Value="8888" />
+</ItemGroup>
 
    <ItemGroup>
     <!-- Copy wwwroot assets to Assets folder for Electron -->
@@ -44,7 +62,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="ElectronNET.API" Version="23.6.2" />
+    <PackageReference Include="ElectronNET.Core" Version="0.4.1" />
+    <PackageReference Include="ElectronNET.Core.AspNet" Version="0.4.1" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="10.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.1">

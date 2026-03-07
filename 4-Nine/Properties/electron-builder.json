@@ -1,0 +1,46 @@
+{
+  "appId": "co.nineapp.nine",
+  "productName": "Nine",
+  "copyright": "Copyright © 2026",
+  "buildVersion": "1.0.0",
+  "compression": "normal",
+  "files": ["**/*"],
+  "mac": {
+    "target": "dmg",
+    "icon": "Assets/icon.icns",
+    "category": "public.app-category.business"
+  },
+  "win": {
+    "target": ["nsis", "portable"],
+    "icon": "Assets/icon.ico",
+    "artifactName": "${productName}-${version}-${arch}-Setup.${ext}"
+  },
+  "nsis": {
+    "oneClick": false,
+    "perMachine": false,
+    "allowToChangeInstallationDirectory": true,
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true,
+    "shortcutName": "Nine"
+  },
+  "portable": {
+    "artifactName": "${productName}-${version}-${arch}-Portable.${ext}"
+  },
+  "linux": {
+    "target": "AppImage",
+    "icon": "Assets/icon.png",
+    "category": "Office",
+    "artifactName": "${productName}-${version}-${arch}.${ext}",
+    "desktop": {
+      "entry": {
+        "X-AppImage-Payload-License": "MIT"
+      }
+    },
+    "extraFiles": [
+      {
+        "from": "Assets/co.nineapp.nine.appdata.xml",
+        "to": "usr/share/metainfo/co.nineapp.nine.appdata.xml"
+      }
+    ]
+  }
+}
