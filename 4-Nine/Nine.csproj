@@ -2,8 +2,10 @@
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
-    <!-- Must be set explicitly to override ElectronNET.Core.props default of win-x64 -->
-    <RuntimeIdentifier>linux-x64</RuntimeIdentifier>
+    <!-- Set per-OS to override ElectronNET.Core.props default of win-x64 -->
+    <RuntimeIdentifier Condition="$([MSBuild]::IsOSPlatform('Linux'))">linux-x64</RuntimeIdentifier>
+    <RuntimeIdentifier Condition="$([MSBuild]::IsOSPlatform('Windows'))">win-x64</RuntimeIdentifier>
+    <RuntimeIdentifier Condition="$([MSBuild]::IsOSPlatform('OSX'))">osx-x64</RuntimeIdentifier>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>aspnet-Nine-c69b6efe-bb20-41de-8cba-044207ebdce1</UserSecretsId>
