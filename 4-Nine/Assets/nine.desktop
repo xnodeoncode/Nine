@@ -1,8 +1,13 @@
+# This file serves as a reference template for the desktop entry fields
+# configured in electron-builder.json under linux.desktop.
+# electron-builder generates the actual embedded desktop file at build time;
+# the values here should remain in sync with that configuration.
+
 [Desktop Entry]
 Name=Nine
 Comment=Property management desktop application.
 Exec=Nine-1.0.0-x86_64.AppImage
-Icon=nine
+Icon=Nine
 Type=Application
 Categories=Office;Finance;
 Terminal=false

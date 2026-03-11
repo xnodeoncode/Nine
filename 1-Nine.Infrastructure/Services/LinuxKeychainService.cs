@@ -10,7 +10,7 @@ namespace Nine.Infrastructure.Services;
 /// </summary>
 public class LinuxKeychainService : IKeychainService
 {
-    private const string Schema = "org.aquiis.database";
+    private const string Schema = "co.nineapp.database";
     private const string KeyAttribute = "key-type";
     private readonly string _keyValue;
     

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
-  <id>com.nineapp.nine</id>
+  <id>co.nineapp.nine</id>
   <metadata_license>MIT</metadata_license>
   <project_license>MIT</project_license>
   <name>Nine</name>
@@ -29,7 +29,7 @@
     </p>
   </description>
   
-  <launchable type="desktop-id">com.nineapp.nine.desktop</launchable>
+  <launchable type="desktop-id">co.nineapp.nine.desktop</launchable>
   
   <screenshots>
     <screenshot type="default">
