@@ -3,7 +3,7 @@ namespace Nine.Shared.Services;
 public class ThemeService
 {
     private string _currentTheme = "light";
-    private string _currentBrandTheme = "bootstrap";
+    private string _currentBrandTheme = "obsidian";
     
     public event Action? OnThemeChanged;
     public event Action? OnBrandThemeChanged;
@@ -35,8 +35,8 @@ public class ThemeService
     // Valid brand themes - add new themes here when implementing them
     private readonly HashSet<string> _validBrandThemes = new()
     {
-        "bootstrap",
         "obsidian",
+        "bootstrap",
         "teal"
     };
 

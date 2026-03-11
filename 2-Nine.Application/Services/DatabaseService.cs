@@ -93,7 +93,7 @@ public class DatabaseService : IDatabaseService
     /// </summary>
     public async Task<Nine.Core.Entities.DatabaseSettings> GetDatabaseSettingsAsync()
     {
-        var settings = await _businessContext.DatabaseSettings.FirstOrDefaultAsync();
+        var settings = await _businessContext.DatabaseSettings.OrderBy(s => s.Id).FirstOrDefaultAsync();
 
         if (settings == null)
         {

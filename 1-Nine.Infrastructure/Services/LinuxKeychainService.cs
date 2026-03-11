@@ -102,7 +102,7 @@ public class LinuxKeychainService : IKeychainService
             process.WaitForExit(5000);
             
             Console.WriteLine($"[LinuxKeychainService] secret-tool exit code: {process.ExitCode}");
-            Console.WriteLine($"[LinuxKeychainService] secret-tool output: '{output}'");
+            Console.WriteLine($"[LinuxKeychainService] secret-tool output: [{(string.IsNullOrWhiteSpace(output) ? "empty" : "received")}]");
             if (!string.IsNullOrWhiteSpace(error))
             {
                 Console.WriteLine($"[LinuxKeychainService] secret-tool error: {error}");

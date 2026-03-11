@@ -588,6 +588,7 @@ namespace Nine.Application.Services.Workflows
         {
             return await ExecuteWorkflowAsync<int>(async () =>
             {
+                // Called from background service — no Blazor circuit, use "System" as the actor.
                 var userId = await _userContext.GetUserIdAsync() ?? "System";
                 
                 // Find active leases past their end date
@@ -615,7 +616,8 @@ namespace Nine.Application.Services.Workflows
                         oldStatus,
                         lease.Status,
                         "AutoExpire",
-                        "Lease end date passed without renewal");
+                        "Lease end date passed without renewal",
+                        organizationId: organizationId);
 
                     addresses += $"- {lease.Property?.Address} (Tenant: {lease.Tenant?.FullName})\n";
 

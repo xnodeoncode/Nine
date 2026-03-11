@@ -79,7 +79,7 @@ namespace Nine.Application.Services
                 timeUntilMonday,
                 TimeSpan.FromDays(7));
 
-            _logger.LogInformation("Scheduled Task Service started. Daily tasks will run at midnight, hourly tasks every hour, weekly tasks every Monday at 6 AM.");
+            _logger.LogInformation("Scheduled Task Service started. Daily tasks will on each application start-up or when explicityly triggered in Application");
 
             // Keep the service running
             while (!stoppingToken.IsCancellationRequested)
@@ -568,7 +568,7 @@ namespace Nine.Application.Services
                 {
                     try
                     {
-                        var result = await workflowService.ExpireLeaseOfferAsync(offer.Id);
+                        var result = await workflowService.ExpireLeaseOfferAsync(offer.Id, offer.OrganizationId);
                         
                         if (result.Success)
                         {

@@ -1059,12 +1059,13 @@ namespace Nine.Application.Services.Workflows
         /// Expires a lease offer (called by scheduled task).
         /// Similar to decline but automated.
         /// </summary>
-        public async Task<WorkflowResult> ExpireLeaseOfferAsync(Guid leaseOfferId)
+        public async Task<WorkflowResult> ExpireLeaseOfferAsync(Guid leaseOfferId, Guid? organizationId = null)
         {
             return await ExecuteWorkflowAsync(async () =>
             {
-                var orgId = await GetActiveOrganizationIdAsync();
+                var orgId = organizationId ?? await GetActiveOrganizationIdAsync();
                 var userId = await GetCurrentUserIdAsync();
+                if (string.IsNullOrEmpty(userId)) userId = "System";
 
                 var leaseOffer = await _context.LeaseOffers
                     .Include(lo => lo.RentalApplication)
@@ -1118,7 +1119,8 @@ namespace Nine.Application.Services.Workflows
                     "Pending",
                     "Expired",
                     "ExpireLeaseOffer",
-                    "Offer expired after 30 days");
+                    "Offer expired after 30 days",
+                    organizationId: orgId);
 
                 // send notification to leasing agents
                 await _notificationService.SendNotificationAsync(

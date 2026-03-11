@@ -23,12 +23,12 @@ public class WindowsKeychainService : IKeychainService
     public WindowsKeychainService(string appName = "Nine-Electron")
     {
         var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-        var aquiisDir = Path.Combine(appDataPath, "Nine");
-        Directory.CreateDirectory(aquiisDir);
+        var nineDir = Path.Combine(appDataPath, "Nine");
+        Directory.CreateDirectory(nineDir);
 
         // Sanitize appName for use as a filename component
         var safeAppName = new string(appName.Where(c => char.IsLetterOrDigit(c) || c == '-' || c == '_').ToArray());
-        _keyFilePath = Path.Combine(aquiisDir, $"aquiis_{safeAppName}.key");
+        _keyFilePath = Path.Combine(nineDir, $"aquiis_{safeAppName}.key");
 
         Console.WriteLine($"[WindowsKeychainService] Initialized with key file: {_keyFilePath}");
     }
@@ -73,7 +73,7 @@ public class WindowsKeychainService : IKeychainService
             var encryptedBytes = File.ReadAllBytes(_keyFilePath);
             var plainBytes = ProtectedData.Unprotect(encryptedBytes, null, DataProtectionScope.CurrentUser);
             var password = Encoding.UTF8.GetString(plainBytes);
-            Console.WriteLine($"[WindowsKeychainService] Password retrieved successfully using DPAPI (length: {password.Length})");
+            Console.WriteLine($"[WindowsKeychainService] Password retrieved successfully using DPAPI. Password status: {(string.IsNullOrEmpty(password) ? "empty" : "received")}");
             return password;
         }
         catch (CryptographicException ex)
