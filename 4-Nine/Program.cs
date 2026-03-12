@@ -309,10 +309,49 @@ using (var scope = app.Services.CreateScope())
                 }
                 else
                 {
-                    app.Logger.LogWarning(
-                        "Version upgrade: expected previous database {PreviousFile} not found at {PreviousPath}. " +
-                        "A new empty database will be created.",
-                        previousDbFileName, previousDbPath);
+                    // Direct predecessor not found — user may have skipped one or more versions.
+                    // Scan for any app_v*.db in the config directory and pick the highest version
+                    // that is older than this binary's target. System.Version is used instead of
+                    // string sort so that v10.0.0 correctly ranks above v9.0.0.
+                    var dbDir = Path.GetDirectoryName(dbPath)!;
+                    var targetVersion = Version.TryParse(
+                        Path.GetFileNameWithoutExtension(dbFileName).Replace("app_v", ""),
+                        out var tv) ? tv : null;
+
+                    var bestCandidate = Directory.Exists(dbDir)
+                        ? Directory.GetFiles(dbDir, "app_v*.db")
+                              .Where(f => f != dbPath)
+                              .Select(f => new
+                              {
+                                  Path = f,
+                                  Ver = Version.TryParse(
+                                      Path.GetFileNameWithoutExtension(f).Replace("app_v", ""),
+                                      out var v) ? v : null
+                              })
+                              .Where(x => x.Ver != null && (targetVersion == null || x.Ver < targetVersion))
+                              .OrderByDescending(x => x.Ver)
+                              .Select(x => x.Path)
+                              .FirstOrDefault()
+                        : null;
+
+                    if (bestCandidate != null)
+                    {
+                        app.Logger.LogInformation(
+                            "Version skip detected: copying {Found} → {NewFile} (expected {Missing} was absent)",
+                            Path.GetFileName(bestCandidate), dbFileName, previousDbFileName);
+                        Directory.CreateDirectory(dbDir);
+                        File.Copy(bestCandidate, dbPath);
+                        app.Logger.LogInformation(
+                            "Database file upgraded to {NewFileName}. EF migrations will apply schema changes.",
+                            dbFileName);
+                    }
+                    else
+                    {
+                        app.Logger.LogWarning(
+                            "Version upgrade: no previous database found at {PreviousPath} and no app_v*.db " +
+                            "candidates in {DbDir}. A new empty database will be created.",
+                            previousDbPath, dbDir);
+                    }
                 }
             }
 
@@ -505,9 +544,14 @@ using (var scope = app.Services.CreateScope())
     }
     else if (currentDbVersion != appSettings.SchemaVersion)
     {
-        // Schema version mismatch - log warning but allow startup
-        app.Logger.LogWarning("Schema version mismatch! Database: {DbVersion}, Application: {AppVersion}", 
+        // Schema version mismatch after a version upgrade — update the stored version to match.
+        // This is the normal post-copy state: the copied DB still records the old version but
+        // EF migrations have already brought the schema up to date.
+        app.Logger.LogInformation(
+            "Updating schema version from {DbVersion} to {AppVersion} (post-upgrade)",
             currentDbVersion, appSettings.SchemaVersion);
+        await schemaService.UpdateSchemaVersionAsync(appSettings.SchemaVersion, $"Version upgrade from {currentDbVersion}");
+        app.Logger.LogInformation("Schema version updated successfully");
     }
     else
     {

@@ -10,6 +10,8 @@
 
 Nine uses versioned SQLite database files (`app_vX.Y.0.db`) tied to the application's MAJOR.MINOR version. This document describes how the upgrade path works, the known failure mode for version-skipping users, the fix implemented in `app-database-upgrade`, and how to test all upgrade scenarios.
 
+**This fix ships in v1.1.0** alongside the `app_v1.1.0.db` database file. The normal upgrade path (v1.0.0 → v1.1.0) is covered by `PreviousDatabaseFileName`. The version-skip fallback scan is active in every release from v1.1.0 onward — it protects against any skip at any version boundary (v1.0.0 → v1.2.0, v1.1.0 → v1.3.0, v1.2.0 → v2.0.0, etc.).
+
 ---
 
 ## Database Versioning Policy
@@ -50,30 +52,36 @@ Nine uses versioned SQLite database files (`app_vX.Y.0.db`) tied to the applicat
 4. EF Core migrations apply the delta to `app_v1.1.0.db`
 5. App starts with all user data intact ✅
 
-### Version-skip upgrade (v1.0.0 → v2.0.0, skipping v1.1.0)
+### Version-skip upgrade (any version)
 
-`appsettings.json` in the v2.0.0 binary:
+This scenario can occur at any version boundary. The earliest possible real-world instance is a user on v1.0.0 who skips v1.1.0 and installs v1.2.0 directly. The same logic handles v1.1.0 → v1.3.0, v1.2.0 → v2.0.0, v1.0.0 → v10.0.0, or any other gap.
+
+Example: user on v1.0.0 installs v1.2.0 directly.
+
+`appsettings.json` in the v1.2.0 binary:
 
 ```json
-"DatabaseFileName": "app_v2.0.0.db",
+"DatabaseFileName": "app_v1.2.0.db",
 "PreviousDatabaseFileName": "app_v1.1.0.db"
 ```
 
-**Without the fix:**
+**Without the fix (pre-v1.1.0 behaviour):**
 
-1. Target `app_v2.0.0.db` — not found
+1. Target `app_v1.2.0.db` — not found
 2. `PreviousDatabaseFileName` = `app_v1.1.0.db` — **not found** (user skipped v1.1.0)
 3. Warning logged; no copy performed
-4. EF Core creates **blank** `app_v2.0.0.db` — **user data is lost** ❌
+4. EF Core creates **blank** `app_v1.2.0.db` — **user data is lost** ❌
 
-**With the fix (implemented in `app-database-upgrade` branch):**
+**With the fix (shipped in v1.1.0, present in every subsequent release):**
 
-1. Target `app_v2.0.0.db` — not found
+1. Target `app_v1.2.0.db` — not found
 2. `PreviousDatabaseFileName` = `app_v1.1.0.db` — not found
 3. **Fallback scan**: glob `app_v*.db` in the config directory, parse each filename as `System.Version`, pick the highest version that is **less than** the target
-4. Finds `app_v1.0.0.db`, copies it to `app_v2.0.0.db`
-5. EF Core migrations apply the **full delta** from v1.0.0 schema to v2.0.0 schema
+4. Finds `app_v1.0.0.db`, copies it to `app_v1.2.0.db`
+5. EF Core migrations apply the **full delta** from v1.0.0 schema to v1.2.0 schema
 6. App starts with all user data intact ✅
+
+The same logic handles multi-step skips (e.g. only `app_v1.0.0.db` present when installing v1.4.0) and double-digit versions (v9.x → v10.x) correctly via `System.Version` numeric comparison.
 
 ### Fresh install (no previous DB)
 
@@ -203,20 +211,22 @@ All scenarios require a test user data directory. On Linux this is `~/.config/Ni
 
 ### Scenario 3: Version Skip (Missing Predecessor)
 
+Simulates a user on v1.0.0 who skips v1.1.0 and installs v1.2.0 directly. This is the earliest possible real-world version-skip.
+
 **Setup:**
 
 1. Run Scenario 1 to create `app_v1.0.0.db` with real data
 2. Do **not** create `app_v1.1.0.db`
-3. Change `appsettings.json` to `DatabaseFileName: "app_v2.0.0.db"`, `PreviousDatabaseFileName: "app_v1.1.0.db"`
+3. Change `appsettings.json` to `DatabaseFileName: "app_v1.2.0.db"`, `PreviousDatabaseFileName: "app_v1.1.0.db"`
 
 **Run:** `dotnet run`
 
 **Expected:**
 
-- Log: `"Version skip detected: copying app_v1.0.0.db → app_v2.0.0.db (expected app_v1.1.0.db was absent)"`
-- `app_v2.0.0.db` created from `app_v1.0.0.db`
+- Log: `"Version skip detected: copying app_v1.0.0.db → app_v1.2.0.db (expected app_v1.1.0.db was absent)"`
+- `app_v1.2.0.db` created from `app_v1.0.0.db`
 - All data preserved
-- EF migrations applied (full delta from v1.0.0 schema to v2.0.0)
+- EF migrations applied (full delta from v1.0.0 schema to v1.2.0)
 - App starts normally
 
 **Pass criteria:** Data preserved despite skipped version.
@@ -267,14 +277,14 @@ All scenarios require a test user data directory. On Linux this is `~/.config/Ni
 **Setup:**
 
 1. Empty `~/.config/Nine/` (no DB files at all)
-2. Set `appsettings.json` to `DatabaseFileName: "app_v2.0.0.db"`, `PreviousDatabaseFileName: "app_v1.9.0.db"`
+2. Set `appsettings.json` to `DatabaseFileName: "app_v1.2.0.db"`, `PreviousDatabaseFileName: "app_v1.1.0.db"`
 
 **Run:** `dotnet run`
 
 **Expected:**
 
 - Log: warning that no previous database was found
-- EF creates a new blank `app_v2.0.0.db`
+- EF creates a new blank `app_v1.2.0.db`
 - App starts, seed data present
 
 **Pass criteria:** Clean degradation to fresh install behavior; no crash.
@@ -283,14 +293,33 @@ All scenarios require a test user data directory. On Linux this is `~/.config/Ni
 
 ## Merge Plan
 
+This fix ships as part of **v1.1.0**. The branch workflow:
+
 ```
-phase-0-baseline  (base, has Phase 18 + original upgrade block)
+phase-0-baseline  (base: Phase 18 + original one-step upgrade block)
     ↓ branch
-app-database-upgrade  (implements fix: version-skip scan + System.Version)
+app-database-upgrade  (this branch: version-skip scan + System.Version fix)
     ↓ test Scenarios 1-6
     ↓ merge back to phase-0-baseline
     ↓ merge to development
     ↓ PR to main
+    ↓ bump-version.sh → v1.1.0
+        sets DatabaseFileName: "app_v1.1.0.db"
+        sets PreviousDatabaseFileName: "app_v1.0.0.db"
 ```
 
-Once merged to `development`, run a full build and Scenarios 1 and 5 against the actual `~/.config/Nine/` directory (with a real v1.0.0 DB backup) before merging to `main`.
+**Version notes:**
+
+- `PreviousDatabaseFileName` covers the direct one-step upgrade (v1.0.0 → v1.1.0, v1.1.0 → v1.2.0, etc.)
+- The fallback scan covers **any skip at any version boundary** — v1.0.0 → v1.2.0, v1.1.0 → v1.3.0, v1.2.0 → v2.0.0, v1.0.0 → v10.0.0, etc.
+- This protection is present in every release from v1.1.0 onward; there is no version at which it "becomes" relevant
+- Run all 6 scenarios against `~/.config/Nine/` before merging to `main`
+
+```
+
+**Version notes:**
+
+- v1.1.0 `PreviousDatabaseFileName` = `app_v1.0.0.db` — covers the direct v1.0.0 → v1.1.0 upgrade path (no skip possible yet, only one prior version exists)
+- The fallback scan becomes the safety net for v1.2.0+ when a user could first skip a version
+- Once merged to `development`, run Scenarios 1 and 5 against the actual `~/.config/Nine/` directory (with a real v1.0.0 DB backup) before merging to `main`
+```
