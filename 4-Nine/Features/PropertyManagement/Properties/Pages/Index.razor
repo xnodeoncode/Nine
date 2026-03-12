@@ -74,6 +74,7 @@
     protected override async Task OnInitializedAsync()
     {
         Properties = await PropertyService.GetAllAsync();
+        Console.WriteLine($"Loaded {Properties.Count} properties from the service.");
         
         availableProperties = Properties.Where(p => p.IsAvailable).Count();
         occupiedProperties = Properties.Where(p => !p.IsAvailable).Count();

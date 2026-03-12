@@ -20,27 +20,27 @@
                         <p class="mb-3">
                             This database is encrypted. Enter the password to preview its contents.
                         </p>
-                        
+
                         @if (!string.IsNullOrEmpty(errorMessage))
                         {
                             <div class="alert alert-danger">
                                 <i class="bi bi-exclamation-triangle"></i> @errorMessage
                             </div>
                         }
-                        
+
                         <div class="mb-3">
                             <label for="passwordInput" class="form-label">Database Password</label>
-                            <input type="password" 
-                                   class="form-control" 
+                            <input type="password"
+                                   class="form-control"
                                    id="passwordInput"
-                                   @bind="enteredPassword" 
+                                   @bind="enteredPassword"
                                    @onkeypress="HandlePasswordKeyPress"
                                    placeholder="Enter password" />
                             <div class="form-text">
                                 <i class="bi bi-info-circle"></i> Password is used for this preview session only (not saved)
                             </div>
                         </div>
-                        
+
                         <div class="d-flex gap-2">
                             <button class="btn btn-primary" @onclick="UnlockDatabase" disabled="@isUnlocking">
                                 @if (isUnlocking)
@@ -65,19 +65,19 @@
             <div class="spinner-border text-primary" role="status">
                 <span class="visually-hidden">Loading...</span>
             </div>
-            <p class="mt-3">Loading database preview...</p>
+            <p class="mt-3">@loadingMessage</p>
         </div>
     }
     else if (isUnlocked && previewData != null)
     {
-        <!-- Database Preview Content -->
-        <div class="row mb-4">
+        <!-- Header -->
+        <div class="row mb-4 align-items-center">
             <div class="col">
                 <h1><i class="bi bi-eye"></i> Database Preview</h1>
-                <p class="text-muted">@DecodedFileName</p>
-                <div class="alert alert-info">
+                <p class="text-muted mb-1">@DecodedFileName</p>
+                <div class="alert alert-info py-2 mb-0">
                     <i class="bi bi-info-circle"></i>
-                    <strong>Read-Only Mode</strong> - This is a preview. No changes will be made to your active database.
+                    <strong>Read-Only Preview</strong> — No changes are made to your active database unless you use Import below.
                     @if (!string.IsNullOrEmpty(sessionPassword))
                     {
                         <span class="text-warning ms-2">
@@ -94,204 +94,569 @@
         </div>
 
         <!-- Summary Cards -->
-        <div class="row mb-4">
-            <div class="col-md-3">
-                <div class="card text-center">
-                    <div class="card-body">
-                        <i class="bi bi-building fs-1 text-primary"></i>
-                        <h3 class="mb-1">@previewData.PropertyCount</h3>
-                        <p class="text-muted mb-0">Properties</p>
+        <div class="row g-3 mb-4">
+            <div class="col-md-2 col-sm-4">
+                <div class="card text-center h-100">
+                    <div class="card-body py-3">
+                        <i class="bi bi-building fs-2 text-primary"></i>
+                        <h4 class="mb-0 mt-1">@previewData.PropertyCount</h4>
+                        <small class="text-muted">Properties</small>
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="card text-center">
-                    <div class="card-body">
-                        <i class="bi bi-people fs-1 text-success"></i>
-                        <h3 class="mb-1">@previewData.TenantCount</h3>
-                        <p class="text-muted mb-0">Tenants</p>
+            <div class="col-md-2 col-sm-4">
+                <div class="card text-center h-100">
+                    <div class="card-body py-3">
+                        <i class="bi bi-people fs-2 text-success"></i>
+                        <h4 class="mb-0 mt-1">@previewData.TenantCount</h4>
+                        <small class="text-muted">Tenants</small>
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="card text-center">
-                    <div class="card-body">
-                        <i class="bi bi-file-text fs-1 text-info"></i>
-                        <h3 class="mb-1">@previewData.LeaseCount</h3>
-                        <p class="text-muted mb-0">Leases</p>
+            <div class="col-md-2 col-sm-4">
+                <div class="card text-center h-100">
+                    <div class="card-body py-3">
+                        <i class="bi bi-file-text fs-2 text-info"></i>
+                        <h4 class="mb-0 mt-1">@previewData.LeaseCount</h4>
+                        <small class="text-muted">Leases</small>
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="card text-center">
-                    <div class="card-body">
-                        <i class="bi bi-receipt fs-1 text-warning"></i>
-                        <h3 class="mb-1">@previewData.InvoiceCount</h3>
-                        <p class="text-muted mb-0">Invoices</p>
+            <div class="col-md-2 col-sm-4">
+                <div class="card text-center h-100">
+                    <div class="card-body py-3">
+                        <i class="bi bi-receipt fs-2 text-warning"></i>
+                        <h4 class="mb-0 mt-1">@previewData.InvoiceCount</h4>
+                        <small class="text-muted">Invoices</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2 col-sm-4">
+                <div class="card text-center h-100">
+                    <div class="card-body py-3">
+                        <i class="bi bi-cash-coin fs-2 text-success"></i>
+                        <h4 class="mb-0 mt-1">@previewData.PaymentCount</h4>
+                        <small class="text-muted">Payments</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2 col-sm-4">
+                <div class="card text-center h-100">
+                    <div class="card-body py-3">
+                        <i class="bi bi-tools fs-2 text-danger"></i>
+                        <h4 class="mb-0 mt-1">@previewData.MaintenanceCount</h4>
+                        <small class="text-muted">Maintenance</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2 col-sm-4">
+                <div class="card text-center h-100">
+                    <div class="card-body py-3">
+                        <i class="bi bi-wrench fs-2 text-secondary"></i>
+                        <h4 class="mb-0 mt-1">@previewData.RepairCount</h4>
+                        <small class="text-muted">Repairs</small>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Data Tables Section -->
-        <div class="card">
+        <!-- Data Tables -->
+        <div class="card mb-4">
             <div class="card-header">
                 <ul class="nav nav-tabs card-header-tabs" role="tablist">
                     <li class="nav-item">
-                        <button class="nav-link @(activeTab == "properties" ? "active" : "")" 
-                                @onclick=@(() => SwitchTab("properties"))
-                                type="button">
+                        <button class="nav-link @(activeTab == "properties" ? "active" : "")"
+                                @onclick=@(() => SwitchTab("properties")) type="button">
                             <i class="bi bi-building"></i> Properties
+                            @if (previewData.PropertyCount > 100)
+                            {
+                                <span class="badge bg-secondary ms-1">100+</span>
+                            }
                         </button>
                     </li>
                     <li class="nav-item">
-                        <button class="nav-link @(activeTab == "tenants" ? "active" : "")" 
-                                @onclick=@(() => SwitchTab("tenants"))
-                                type="button">
+                        <button class="nav-link @(activeTab == "tenants" ? "active" : "")"
+                                @onclick=@(() => SwitchTab("tenants")) type="button">
                             <i class="bi bi-people"></i> Tenants
+                            @if (previewData.TenantCount > 100)
+                            {
+                                <span class="badge bg-secondary ms-1">100+</span>
+                            }
                         </button>
                     </li>
                     <li class="nav-item">
-                        <button class="nav-link @(activeTab == "leases" ? "active" : "")" 
-                                @onclick=@(() => SwitchTab("leases"))
-                                type="button">
+                        <button class="nav-link @(activeTab == "leases" ? "active" : "")"
+                                @onclick=@(() => SwitchTab("leases")) type="button">
                             <i class="bi bi-file-text"></i> Leases
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link @(activeTab == "invoices" ? "active" : "")"
+                                @onclick=@(() => SwitchTab("invoices")) type="button">
+                            <i class="bi bi-receipt"></i> Invoices
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link @(activeTab == "payments" ? "active" : "")"
+                                @onclick=@(() => SwitchTab("payments")) type="button">
+                            <i class="bi bi-cash-coin"></i> Payments
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link @(activeTab == "maintenance" ? "active" : "")"
+                                @onclick=@(() => SwitchTab("maintenance")) type="button">
+                            <i class="bi bi-tools"></i> Maintenance
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link @(activeTab == "repairs" ? "active" : "")"
+                                @onclick=@(() => SwitchTab("repairs")) type="button">
+                            <i class="bi bi-wrench"></i> Repairs
                         </button>
                     </li>
                 </ul>
             </div>
-            <div class="card-body">
-                <div class="tab-content">
-                    <!-- Properties Tab -->
-                    @if (activeTab == "properties")
+            <div class="card-body p-0">
+                <!-- Properties Tab -->
+                @if (activeTab == "properties")
+                {
+                    @if (previewData.Properties?.Any() == true)
                     {
-                    <div class="tab-pane fade show active" id="properties-tab">
-                        @if (previewData.Properties?.Any() == true)
-                        {
-                            <div class="table-responsive">
-                                <table class="table table-hover">
-                                    <thead>
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Address</th>
+                                        <th>City</th>
+                                        <th>State</th>
+                                        <th>Type</th>
+                                        <th>Status</th>
+                                        <th class="text-end">Monthly Rent</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var property in previewData.Properties)
+                                    {
                                         <tr>
-                                            <th>Address</th>
-                                            <th>City</th>
-                                            <th>State</th>
-                                            <th>Type</th>
-                                            <th>Status</th>
+                                            <td>@property.Address</td>
+                                            <td>@property.City</td>
+                                            <td>@property.State</td>
+                                            <td>@property.PropertyType</td>
+                                            <td><span class="badge bg-secondary">@property.Status</span></td>
+                                            <td class="text-end">@(property.MonthlyRent?.ToString("C") ?? "—")</td>
                                         </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach (var property in previewData.Properties)
-                                        {
-                                            <tr>
-                                                <td>@property.Address</td>
-                                                <td>@property.City</td>
-                                                <td>@property.State</td>
-                                                <td>@property.PropertyType</td>
-                                                <td>
-                                                    <span class="badge bg-secondary">@property.Status</span>
-                                                </td>
-                                            </tr>
-                                        }
-                                    </tbody>
-                                </table>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        @if (previewData.PropertyCount > 100)
+                        {
+                            <div class="p-3 text-muted small border-top">
+                                Showing first 100 of @previewData.PropertyCount properties. All records will be imported.
                             </div>
                         }
-                        else
-                        {
-                            <p class="text-muted text-center py-4">No properties found</p>
-                        }
-                    </div>
                     }
+                    else
+                    {
+                        <p class="text-muted text-center py-4 mb-0">No properties found</p>
+                    }
+                }
 
-                    <!-- Tenants Tab -->
-                    @if (activeTab == "tenants")
+                <!-- Tenants Tab -->
+                @if (activeTab == "tenants")
+                {
+                    @if (previewData.Tenants?.Any() == true)
                     {
-                    <div class="tab-pane fade show active" id="tenants-tab">
-                        @if (previewData.Tenants?.Any() == true)
-                        {
-                            <div class="table-responsive">
-                                <table class="table table-hover">
-                                    <thead>
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Phone</th>
+                                        <th>Added</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var tenant in previewData.Tenants)
+                                    {
                                         <tr>
-                                            <th>Name</th>
-                                            <th>Email</th>
-                                            <th>Phone</th>
-                                            <th>Created</th>
+                                            <td>@tenant.FullName</td>
+                                            <td>@tenant.Email</td>
+                                            <td>@tenant.Phone</td>
+                                            <td>@tenant.CreatedOn.ToString("d")</td>
                                         </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach (var tenant in previewData.Tenants)
-                                        {
-                                            <tr>
-                                                <td>@tenant.FullName</td>
-                                                <td>@tenant.Email</td>
-                                                <td>@tenant.Phone</td>
-                                                <td>@tenant.CreatedOn.ToString("d")</td>
-                                            </tr>
-                                        }
-                                    </tbody>
-                                </table>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        @if (previewData.TenantCount > 100)
+                        {
+                            <div class="p-3 text-muted small border-top">
+                                Showing first 100 of @previewData.TenantCount tenants. All records will be imported.
                             </div>
                         }
-                        else
-                        {
-                            <p class="text-muted text-center py-4">No tenants found</p>
-                        }
-                    </div>
                     }
+                    else
+                    {
+                        <p class="text-muted text-center py-4 mb-0">No tenants found</p>
+                    }
+                }
 
-                    <!-- Leases Tab -->
-                    @if (activeTab == "leases")
+                <!-- Leases Tab -->
+                @if (activeTab == "leases")
+                {
+                    @if (previewData.Leases?.Any() == true)
                     {
-                    <div class="tab-pane fade show active" id="leases-tab">
-                        @if (previewData.Leases?.Any() == true)
-                        {
-                            <div class="table-responsive">
-                                <table class="table table-hover">
-                                    <thead>
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Property</th>
+                                        <th>Tenant</th>
+                                        <th>Start Date</th>
+                                        <th>End Date</th>
+                                        <th class="text-end">Monthly Rent</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var lease in previewData.Leases)
+                                    {
                                         <tr>
-                                            <th>Property</th>
-                                            <th>Tenant</th>
-                                            <th>Start Date</th>
-                                            <th>End Date</th>
-                                            <th>Monthly Rent</th>
-                                            <th>Status</th>
+                                            <td>@lease.PropertyAddress</td>
+                                            <td>@lease.TenantName</td>
+                                            <td>@lease.StartDate.ToString("d")</td>
+                                            <td>@lease.EndDate.ToString("d")</td>
+                                            <td class="text-end">@lease.MonthlyRent.ToString("C")</td>
+                                            <td>
+                                                <span class="badge @GetLeaseStatusClass(lease.Status)">@lease.Status</span>
+                                            </td>
                                         </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach (var lease in previewData.Leases)
-                                        {
-                                            <tr>
-                                                <td>@lease.PropertyAddress</td>
-                                                <td>@lease.TenantName</td>
-                                                <td>@lease.StartDate.ToString("d")</td>
-                                                <td>@lease.EndDate.ToString("d")</td>
-                                                <td>@lease.MonthlyRent.ToString("C")</td>
-                                                <td>
-                                                    <span class="badge @GetLeaseStatusClass(lease.Status)">
-                                                        @lease.Status
-                                                    </span>
-                                                </td>
-                                            </tr>
-                                        }
-                                    </tbody>
-                                </table>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted text-center py-4 mb-0">No leases found</p>
+                    }
+                }
+
+                <!-- Invoices Tab -->
+                @if (activeTab == "invoices")
+                {
+                    @if (previewData.Invoices?.Any() == true)
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Invoice #</th>
+                                        <th>Property</th>
+                                        <th>Tenant</th>
+                                        <th>Due Date</th>
+                                        <th class="text-end">Amount</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var invoice in previewData.Invoices)
+                                    {
+                                        <tr>
+                                            <td><code>@invoice.InvoiceNumber</code></td>
+                                            <td>@invoice.PropertyAddress</td>
+                                            <td>@invoice.TenantName</td>
+                                            <td>@invoice.DueOn.ToString("d")</td>
+                                            <td class="text-end">@invoice.Amount.ToString("C")</td>
+                                            <td><span class="badge bg-secondary">@invoice.Status</span></td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        @if (previewData.InvoiceCount > 100)
+                        {
+                            <div class="p-3 text-muted small border-top">
+                                Showing first 100 of @previewData.InvoiceCount invoices. All records will be imported.
                             </div>
                         }
-                        else
-                        {
-                            <p class="text-muted text-center py-4">No leases found</p>
-                        }
-                    </div>
                     }
-                </div>
+                    else
+                    {
+                        <p class="text-muted text-center py-4 mb-0">No invoices found</p>
+                    }
+                }
+
+                <!-- Payments Tab -->
+                @if (activeTab == "payments")
+                {
+                    @if (previewData.Payments?.Any() == true)
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Payment #</th>
+                                        <th>Invoice #</th>
+                                        <th>Paid On</th>
+                                        <th class="text-end">Amount</th>
+                                        <th>Method</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var payment in previewData.Payments)
+                                    {
+                                        <tr>
+                                            <td><code>@payment.PaymentNumber</code></td>
+                                            <td><code>@payment.InvoiceNumber</code></td>
+                                            <td>@payment.PaidOn.ToString("d")</td>
+                                            <td class="text-end">@payment.Amount.ToString("C")</td>
+                                            <td>@payment.PaymentMethod</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        @if (previewData.PaymentCount > 100)
+                        {
+                            <div class="p-3 text-muted small border-top">
+                                Showing first 100 of @previewData.PaymentCount payments. All records will be imported.
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p class="text-muted text-center py-4 mb-0">No payments found</p>
+                    }
+                }
+
+                <!-- Maintenance Tab -->
+                @if (activeTab == "maintenance")
+                {
+                    @if (previewData.MaintenanceRequests?.Any() == true)
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Property</th>
+                                        <th>Type</th>
+                                        <th>Priority</th>
+                                        <th>Status</th>
+                                        <th>Requested</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var request in previewData.MaintenanceRequests)
+                                    {
+                                        <tr>
+                                            <td>@request.Title</td>
+                                            <td>@request.PropertyAddress</td>
+                                            <td>@request.RequestType</td>
+                                            <td>
+                                                <span class="badge @GetPriorityClass(request.Priority)">@request.Priority</span>
+                                            </td>
+                                            <td><span class="badge bg-secondary">@request.Status</span></td>
+                                            <td>@request.RequestedOn.ToString("d")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        @if (previewData.MaintenanceCount > 100)
+                        {
+                            <div class="p-3 text-muted small border-top">
+                                Showing first 100 of @previewData.MaintenanceCount requests. All records will be imported.
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p class="text-muted text-center py-4 mb-0">No maintenance requests found</p>
+                    }
+                }
+
+                <!-- Repairs Tab -->
+                @if (activeTab == "repairs")
+                {
+                    @if (previewData.Repairs?.Any() == true)
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover table-sm mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Description</th>
+                                        <th>Property</th>
+                                        <th>Type</th>
+                                        <th>Cost</th>
+                                        <th>Completed</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var repair in previewData.Repairs)
+                                    {
+                                        <tr>
+                                            <td>@repair.Description</td>
+                                            <td>@repair.PropertyAddress</td>
+                                            <td>@repair.RepairType</td>
+                                            <td>@repair.Cost.ToString("C")</td>
+                                            <td>@(repair.CompletedOn.HasValue ? repair.CompletedOn.Value.ToString("d") : "In Progress")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        @if (previewData.RepairCount > 100)
+                        {
+                            <div class="p-3 text-muted small border-top">
+                                Showing first 100 of @previewData.RepairCount repairs. All records will be imported.
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p class="text-muted text-center py-4 mb-0">No repairs found</p>
+                    }
+                }
             </div>
         </div>
 
-        <!-- Future: Import Section (Phase 4) -->
-        <div class="alert alert-secondary mt-4">
-            <i class="bi bi-info-circle"></i>
-            <strong>Coming Soon:</strong> Selective data import feature will allow you to import specific properties, tenants, or leases from this backup into your active database.
+        <!-- Import Section -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-box-arrow-in-down"></i> Import Data</h5>
+            </div>
+            <div class="card-body">
+                @if (importResult != null)
+                {
+                    @if (importResult.Success)
+                    {
+                        var alertClass = importResult.TotalImported > 0 ? "alert-success" : "alert-warning";
+                        var icon       = importResult.TotalImported > 0 ? "bi-check-circle-fill" : "bi-info-circle-fill";
+                        <div class="alert @alertClass">
+                            <h6><i class="bi @icon"></i> Import Complete</h6>
+                            <p class="mb-2">@importResult.Message</p>
+                            @if (importResult.TotalImported > 0)
+                            {
+                                <ul class="mb-0 small">
+                                    @if (importResult.PropertiesImported > 0)
+                                    {
+                                        <li>@importResult.PropertiesImported properties</li>
+                                    }
+                                    @if (importResult.TenantsImported > 0)
+                                    {
+                                        <li>@importResult.TenantsImported tenants</li>
+                                    }
+                                    @if (importResult.LeasesImported > 0)
+                                    {
+                                        <li>@importResult.LeasesImported leases</li>
+                                    }
+                                    @if (importResult.InvoicesImported > 0)
+                                    {
+                                        <li>@importResult.InvoicesImported invoices</li>
+                                    }
+                                    @if (importResult.PaymentsImported > 0)
+                                    {
+                                        <li>@importResult.PaymentsImported payments</li>
+                                    }
+                                    @if (importResult.MaintenanceRequestsImported > 0)
+                                    {
+                                        <li>@importResult.MaintenanceRequestsImported maintenance requests</li>
+                                    }
+                                    @if (importResult.RepairsImported > 0)
+                                    {
+                                        <li>@importResult.RepairsImported repairs</li>
+                                    }
+                                    @if (importResult.DocumentsImported > 0)
+                                    {
+                                        <li>@importResult.DocumentsImported documents</li>
+                                    }
+                                </ul>
+                            }
+                            else
+                            {
+                                <p class="mb-0 small">All records from this backup already exist in the active database (matched by ID). No new records were added.</p>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-danger">
+                            <h6><i class="bi bi-x-circle-fill"></i> Import Failed</h6>
+                            <p class="mb-0">@importResult.Message</p>
+                        </div>
+                    }
+                    @if (importResult.Errors.Count > 0)
+                    {
+                        <div class="alert alert-warning mt-2">
+                            <h6><i class="bi bi-exclamation-triangle-fill"></i> Warnings / Skipped Tables</h6>
+                            <ul class="mb-0 small">
+                                @foreach (var err in importResult.Errors)
+                                {
+                                    <li>@err</li>
+                                }
+                            </ul>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p class="text-muted mb-3">
+                        Import all data from this backup into your active database. Records are matched by ID — existing records are skipped to avoid duplicates.
+                    </p>
+                    <div class="alert alert-warning py-2">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <strong>Tip:</strong> Back up your current database first from
+                        <a href="/administration/settings/database" class="alert-link">Database Settings</a>.
+                    </div>
+                }
+                @if (!showImportConfirm && importResult == null)
+                {
+                    <button class="btn btn-primary" @onclick="() => showImportConfirm = true">
+                        <i class="bi bi-box-arrow-in-down"></i> Import All Data
+                    </button>
+                }
+                @if (showImportConfirm && importResult == null)
+                {
+                    <div class="d-flex gap-2 align-items-center flex-wrap">
+                        <span class="text-muted small">
+                            This will import @previewData.PropertyCount properties, @previewData.TenantCount tenants,
+                            @previewData.LeaseCount leases and more. Existing records are skipped.
+                        </span>
+                        <button class="btn btn-danger" @onclick="RunImport" disabled="@isImporting">
+                            @if (isImporting)
+                            {
+                                <span class="spinner-border spinner-border-sm me-1"></span>
+                                <span>Importing...</span>
+                            }
+                            else
+                            {
+                                <span><i class="bi bi-check-lg"></i> Confirm Import</span>
+                            }
+                        </button>
+                        <button class="btn btn-outline-secondary" @onclick="() => showImportConfirm = false" disabled="@isImporting">
+                            Cancel
+                        </button>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+    else if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="alert alert-danger">
+                    <h5><i class="bi bi-x-circle"></i> Error Loading Preview</h5>
+                    <p class="mb-0">@errorMessage</p>
+                </div>
+                <button class="btn btn-outline-secondary mt-2" @onclick="BackToSettings">
+                    <i class="bi bi-arrow-left"></i> Back to Database Settings
+                </button>
+            </div>
         </div>
     }
 </div>
@@ -301,46 +666,45 @@
     public string BackupFileName { get; set; } = string.Empty;
 
     private string DecodedFileName => Uri.UnescapeDataString(BackupFileName);
-    private string activeTab = "properties"; // Track active tab state
-    
+    private string activeTab = "properties";
+
     private bool needsPassword = false;
     private bool isUnlocking = false;
     private bool isLoading = false;
     private bool isUnlocked = false;
+    private bool isImporting = false;
+    private bool showImportConfirm = false;
     private string enteredPassword = string.Empty;
     private string? errorMessage;
-    private string? sessionPassword; // Temporary password not saved to keychain
-    
+    private string? sessionPassword;
+    private string loadingMessage = "Loading database preview...";
+
     private DatabasePreviewData? previewData;
+    private ImportResult? importResult;
 
     protected override async Task OnInitializedAsync()
     {
         isLoading = true;
-        
+
         try
         {
-            // Check if database is encrypted
             needsPassword = await PreviewService.IsDatabaseEncryptedAsync(DecodedFileName);
-            
+
             if (!needsPassword)
             {
-                // Load preview data immediately for unencrypted databases
                 await LoadPreviewData(password: null);
             }
             else
             {
-                // For encrypted databases, try keychain password first
                 var keychainPassword = await PreviewService.TryGetKeychainPasswordAsync();
                 if (!string.IsNullOrEmpty(keychainPassword))
                 {
                     var result = await PreviewService.VerifyPasswordAsync(DecodedFileName, keychainPassword);
                     if (result.Success)
                     {
-                        // Keychain password works
                         await LoadPreviewData(keychainPassword);
                         needsPassword = false;
                     }
-                    // else: Wrong password, show prompt
                 }
             }
         }
@@ -364,16 +728,14 @@
 
         isUnlocking = true;
         errorMessage = null;
-        
+
         try
         {
             var result = await PreviewService.VerifyPasswordAsync(DecodedFileName, enteredPassword);
-            
+
             if (result.Success)
             {
-                // Store as session password (never save to keychain for preview)
                 sessionPassword = enteredPassword;
-                
                 await LoadPreviewData(enteredPassword);
                 isUnlocked = true;
                 needsPassword = false;
@@ -396,7 +758,8 @@
     private async Task LoadPreviewData(string? password)
     {
         isLoading = true;
-        
+        loadingMessage = "Loading database preview...";
+
         try
         {
             previewData = await PreviewService.GetPreviewDataAsync(DecodedFileName, password);
@@ -412,6 +775,32 @@
         }
     }
 
+    private async Task RunImport()
+    {
+        isImporting = true;
+        isLoading = true;
+        loadingMessage = "Importing data — this may take a moment...";
+
+        try
+        {
+            importResult = await PreviewService.ImportFromPreviewAsync(DecodedFileName, sessionPassword);
+            showImportConfirm = false;
+        }
+        catch (Exception ex)
+        {
+            importResult = new ImportResult
+            {
+                Success = false,
+                Message = $"Unexpected error: {ex.Message}"
+            };
+        }
+        finally
+        {
+            isImporting = false;
+            isLoading = false;
+        }
+    }
+
     private void BackToSettings()
     {
         Navigation.NavigateTo("/administration/settings/database");
@@ -420,24 +809,27 @@
     private async Task HandlePasswordKeyPress(KeyboardEventArgs e)
     {
         if (e.Key == "Enter")
-        {
             await UnlockDatabase();
-        }
-    }
-
-    private string GetLeaseStatusClass(string status)
-    {
-        return status switch
-        {
-            "Active" => "bg-success",
-            "Expired" => "bg-danger",
-            "Terminated" => "bg-warning",
-            _ => "bg-secondary"
-        };
     }
 
     private void SwitchTab(string tab)
     {
         activeTab = tab;
     }
+
+    private static string GetLeaseStatusClass(string status) => status switch
+    {
+        "Active" => "bg-success",
+        "Expired" => "bg-danger",
+        "Terminated" => "bg-warning text-dark",
+        _ => "bg-secondary"
+    };
+
+    private static string GetPriorityClass(string priority) => priority switch
+    {
+        "Critical" or "Emergency" => "bg-danger",
+        "High" => "bg-warning text-dark",
+        "Medium" => "bg-info text-dark",
+        _ => "bg-secondary"
+    };
 }

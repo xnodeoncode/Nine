@@ -287,6 +287,35 @@ using (var scope = app.Services.CreateScope())
                 app.Logger.LogInformation("Database migration from Electron to Nine folder completed successfully");
             }
             
+            // ✅ v2.0.0+: Automatic migration when DatabaseFileName version changes (e.g., app_v1.0.0.db → app_v2.0.0.db)
+            // When bump-version.sh updates DatabaseFileName, PreviousDatabaseFileName holds the old name.
+            // Without this block the app would not find the new filename and create a blank database,
+            // losing all user data. This copies the old file to the new name so that EF's normal
+            // pending-migration path can then apply any schema changes on top of the real data.
+            var previousDbFileName = app.Configuration["ApplicationSettings:PreviousDatabaseFileName"];
+            if (!string.IsNullOrEmpty(previousDbFileName) && !File.Exists(dbPath))
+            {
+                var previousDbPath = Path.Combine(Path.GetDirectoryName(dbPath)!, previousDbFileName);
+                if (File.Exists(previousDbPath))
+                {
+                    app.Logger.LogInformation(
+                        "Version upgrade detected: copying {PreviousFile} → {NewFile}",
+                        previousDbFileName, dbFileName);
+                    Directory.CreateDirectory(Path.GetDirectoryName(dbPath)!);
+                    File.Copy(previousDbPath, dbPath);
+                    app.Logger.LogInformation(
+                        "Database file upgraded to {NewFileName}. EF migrations will apply schema changes.",
+                        dbFileName);
+                }
+                else
+                {
+                    app.Logger.LogWarning(
+                        "Version upgrade: expected previous database {PreviousFile} not found at {PreviousPath}. " +
+                        "A new empty database will be created.",
+                        previousDbFileName, previousDbPath);
+                }
+            }
+
             var stagedRestorePath = $"{dbPath}.restore_pending";
             bool restoredFromPending = false;
             

@@ -624,14 +624,17 @@ namespace Nine.Application.Services.Workflows
                     count++;
                 }
 
-                await _notificationService.NotifyAllUsersAsync(
-                    organizationId,
-                    "Expired Lease Notification",
-                    $"{count} lease(s) have been automatically expired as of today.\n\n{addresses}",
-                    NotificationConstants.Types.Info,
-                    NotificationConstants.Categories.Lease,
-                    null,
-                    ApplicationConstants.EntityTypes.Lease);
+                if (count > 0)
+                {
+                    await _notificationService.NotifyAllUsersAsync(
+                        organizationId,
+                        "Expired Lease Notification",
+                        $"{count} lease(s) have been automatically expired as of today.\n\n{addresses}",
+                        NotificationConstants.Types.Info,
+                        NotificationConstants.Categories.Lease,
+                        null,
+                        ApplicationConstants.EntityTypes.Lease);
+                }
 
                 return WorkflowResult<int>.Ok(count, $"{count} lease(s) expired");
             });
