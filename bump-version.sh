@@ -1,11 +1,21 @@
 #!/bin/bash
 
 # Nine Semantic Version Bumper
-# Usage: ./bump-version.sh [major|minor|patch]
+# Usage: ./bump-version.sh [major|minor|patch] [--bump-db]
+#
+# App version and database schema version are independent.
+# Pass --bump-db only when this release includes a schema change.
+# Without --bump-db the DatabaseFileName in appsettings.json is left unchanged.
 
 set -e
 
 VERSION_TYPE="${1:-patch}"
+BUMP_DB=false
+for arg in "$@"; do
+    if [ "$arg" == "--bump-db" ]; then
+        BUMP_DB=true
+    fi
+done
 CSPROJ_FILE="4-Nine/Nine.csproj"
 APPSETTINGS_FILE="4-Nine/appsettings.json"
 
@@ -37,7 +47,7 @@ case "$VERSION_TYPE" in
         MAJOR=$((MAJOR + 1))
         MINOR=0
         PATCH=0
-        echo -e "Bump Type: ${YELLOW}MAJOR${NC} (breaking changes, database migration required)"
+        echo -e "Bump Type: ${YELLOW}MAJOR${NC} (breaking changes)"
         ;;
     minor)
         MINOR=$((MINOR + 1))
@@ -80,8 +90,8 @@ sed -i "s|<InformationalVersion>$CURRENT_VERSION</InformationalVersion>|<Informa
 echo -e "${YELLOW}📝 Updating $APPSETTINGS_FILE...${NC}"
 sed -i "s|\"Version\": \"$CURRENT_VERSION\"|\"Version\": \"$NEW_VERSION\"|g" "$APPSETTINGS_FILE"
 
-# Update database settings if MAJOR or MINOR version changed
-if [ "$VERSION_TYPE" == "major" ] || [ "$VERSION_TYPE" == "minor" ]; then
+# Update database settings only when --bump-db is explicitly passed
+if [ "$BUMP_DB" == "true" ]; then
     echo -e "${YELLOW}📝 Updating database version to app_v${DB_VERSION}.db...${NC}"
     
     # Get current database filename
@@ -101,7 +111,12 @@ if [ "$VERSION_TYPE" == "major" ] || [ "$VERSION_TYPE" == "minor" ]; then
     echo -e "   - Previous DB: ${GREEN}$CURRENT_DB${NC}"
     echo -e "   - ${RED}You may need to create a migration or copy the old database${NC}"
 else
-    echo -e "${GREEN}✓ Database version unchanged (PATCH update)${NC}"
+    if [ "$VERSION_TYPE" == "patch" ]; then
+        echo -e "${GREEN}✓ Database version unchanged (PATCH update)${NC}"
+    else
+        echo -e "${GREEN}✓ Database version unchanged (no --bump-db flag)${NC}"
+        echo -e "   DatabaseFileName stays: ${GREEN}$(grep -oP '"DatabaseFileName": "\K[^"]+' "$APPSETTINGS_FILE")${NC}"
+    fi
 fi
 
 echo ""
