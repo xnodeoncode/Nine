@@ -502,6 +502,7 @@ namespace Nine.Application.Services
                         if (!hasOtherActiveLeases)
                         {
                             property.IsActive = true;
+                            property.Status = ApplicationConstants.PropertyStatuses.Available;
                         }
                     }
 

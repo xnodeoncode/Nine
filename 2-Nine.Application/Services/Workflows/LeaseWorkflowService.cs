@@ -607,8 +607,28 @@ namespace Nine.Application.Services.Workflows
                 {
                     var oldStatus = lease.Status;
                     lease.Status = ApplicationConstants.LeaseStatuses.Expired;
+                    lease.RenewalStatus = "Expired";
                     lease.LastModifiedBy = userId;
                     lease.LastModifiedOn = DateTime.UtcNow;
+
+                    // Update property status if no other active leases exist for it
+                    if (lease.Property != null)
+                    {
+                        var hasOtherActiveLeases = await _context.Leases
+                            .AnyAsync(l => l.PropertyId == lease.PropertyId
+                                && l.Id != lease.Id
+                                && !l.IsDeleted
+                                && (l.Status == ApplicationConstants.LeaseStatuses.Active
+                                    || l.Status == ApplicationConstants.LeaseStatuses.Pending));
+
+                        if (!hasOtherActiveLeases)
+                        {
+                            lease.Property.Status = ApplicationConstants.PropertyStatuses.Available;
+                            lease.Property.IsActive = true;
+                            lease.Property.LastModifiedBy = userId;
+                            lease.Property.LastModifiedOn = DateTime.UtcNow;
+                        }
+                    }
 
                     await LogTransitionAsync(
                         "Lease",

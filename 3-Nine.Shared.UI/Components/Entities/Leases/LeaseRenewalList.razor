@@ -135,15 +135,24 @@
             var today = DateTime.Today;
 
             leases30Days = Leases
-                .Where(l => l.EndDate <= today.AddDays(30))
+                .Where(l => l.Status != "Expired"
+                         && l.Status != "Terminated"
+                         && l.EndDate >= today
+                         && l.EndDate <= today.AddDays(30))
                 .ToList();
 
             leases60Days = Leases
-                .Where(l => l.EndDate <= today.AddDays(60))
+                .Where(l => l.Status != "Expired"
+                         && l.Status != "Terminated"
+                         && l.EndDate >= today
+                         && l.EndDate <= today.AddDays(60))
                 .ToList();
 
             leases90Days = Leases
-                .Where(l => l.EndDate <= today.AddDays(90))
+                .Where(l => l.Status != "Expired"
+                         && l.Status != "Terminated"
+                         && l.EndDate >= today
+                         && l.EndDate <= today.AddDays(90))
                 .ToList();
         }
         catch (Exception ex)
