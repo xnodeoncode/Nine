@@ -35,6 +35,12 @@ fi
 APPIMAGE_PATH="$(readlink -f "$APPIMAGE_PATH")"
 APPIMAGE_DIR="$(dirname "$APPIMAGE_PATH")"
 APPIMAGE_NAME="$(basename "$APPIMAGE_PATH")"
+# Get version from filename (assumes format Nine-1.0.0-x86_64.AppImage)
+# APPIMAGE_VERSION="$(echo "$APPIMAGE_NAME" | sed 's/Nine-\(.*\)-x86_64\.AppImage/\1/')"
+
+# Extract version from filename (robust parsing) using parameter expansion
+APPIMAGE_VERSION="${APPIMAGE_NAME#Nine-}"   # strip prefix
+APPIMAGE_VERSION="${APPIMAGE_VERSION%-x86_64.AppImage}"  # strip suffix
 
 echo -e "${GREEN}Nine Desktop Integration Installer${NC}"
 echo "========================================"
@@ -131,7 +137,7 @@ Type=Application
 Categories=Office;Finance;
 Terminal=false
 StartupWMClass=Nine Property Management
-X-AppImage-Version=1.0.0
+X-AppImage-Version=${APPIMAGE_VERSION}
 Keywords=property;management;landlord;rental;lease;tenant;invoice;
 EOF
 

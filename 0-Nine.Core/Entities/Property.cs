@@ -96,8 +96,8 @@ namespace Nine.Core.Entities
         public string Description { get; set; } = string.Empty;
 
         [JsonInclude]
-        [Display(Name = "Is Available?", Description = "Indicates if the property is currently available for lease")]
-        public bool IsAvailable { get; set; } = true;
+        [Display(Name = "Is Active?", Description = "Indicates if the property is active in the system")]
+        public bool IsActive { get; set; } = true;
 
         [JsonInclude]
         [StringLength(50)]

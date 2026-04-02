@@ -226,10 +226,12 @@ using (var scope = app.Services.CreateScope())
     var backupService = scope.ServiceProvider.GetRequiredService<DatabaseBackupService>();
     
     // Electron-only: database initialization and migrations
+    // Declared outside try so the SchemaNotSupportedException catch can access it
+    // to quarantine sibling app_v*.db files and break the restart loop.
+    var pathService = scope.ServiceProvider.GetRequiredService<IPathService>();
+    string dbPath = await pathService.GetDatabasePathAsync();
     try
     {
-            var pathService = scope.ServiceProvider.GetRequiredService<IPathService>();
-            var dbPath = await pathService.GetDatabasePathAsync();
 
             // var dbPath = Path.Combine(
             // Environment.GetEnvironmentVariable("XDG_CONFIG_HOME")
@@ -447,6 +449,11 @@ using (var scope = app.Services.CreateScope())
                     
                     try
                     {
+                        // Release all pooled connections before acquiring the exclusive migration lock.
+                        // GetPendingMigrationsCountAsync / CreatePreMigrationBackupAsync above leave
+                        // connections in the pool; those block EF's BEGIN EXCLUSIVE on SQLite.
+                        Microsoft.Data.Sqlite.SqliteConnection.ClearAllPools();
+
                         // Apply migrations using DatabaseService
                         await dbService.InitializeAsync();
                         
@@ -521,13 +528,91 @@ using (var scope = app.Services.CreateScope())
                     encryptionDetection.IsEncrypted);
             }
         }
+        catch (Nine.Core.Exceptions.DatabaseExceptions.SchemaNotSupportedException schemaEx)
+        {
+            app.Logger.LogError(schemaEx, "Database schema not supported - showing user-facing error page");
+            var unlockStateForSchema = scope.ServiceProvider.GetService<DatabaseUnlockState>();
+            if (unlockStateForSchema != null)
+            {
+                unlockStateForSchema.NeedsUnlock = true;
+                unlockStateForSchema.IsUnsupportedSchema = true;
+                unlockStateForSchema.UnsupportedSchemaBackupPath = schemaEx.BackupPath;
+            }
+
+            // Rename all app_v*.db files to unsupported_app_v*.db so that:
+            //   • The version-skip glob (app_v*.db) no longer matches them → loop broken
+            //   • They remain as .db files in the app directory → visible in Database Settings
+            //     "Previous Database Versions Found" so the user can preview and import data.
+            var dbDir = Path.GetDirectoryName(dbPath);
+            if (!string.IsNullOrEmpty(dbDir) && Directory.Exists(dbDir))
+            {
+                foreach (var candidate in Directory.GetFiles(dbDir, "app_v*.db"))
+                {
+                    // If this matches the current-target filename it was just created by the
+                    // version-skip copy path — it's a duplicate of the real unsupported source.
+                    // Delete it rather than surfacing a confusing second copy in the UI.
+                    if (Path.GetFullPath(candidate).Equals(Path.GetFullPath(dbPath), StringComparison.OrdinalIgnoreCase))
+                    {
+                        try
+                        {
+                            File.Delete(candidate);
+                            app.Logger.LogInformation("Deleted version-skip copy of unsupported DB: {File}", Path.GetFileName(candidate));
+                        }
+                        catch (Exception delEx)
+                        {
+                            app.Logger.LogWarning(delEx, "Could not delete version-skip copy {File}", candidate);
+                        }
+                        continue;
+                    }
+
+                    var renamed = Path.Combine(dbDir, "unsupported_" + Path.GetFileName(candidate));
+                    try
+                    {
+                        File.Move(candidate, renamed, overwrite: true);
+                        app.Logger.LogInformation("Renamed unsupported DB: {File} → {Dest}", Path.GetFileName(candidate), Path.GetFileName(renamed));
+                    }
+                    catch (Exception moveEx)
+                    {
+                        app.Logger.LogWarning(moveEx, "Could not rename {File} — restart loop may occur", candidate);
+                    }
+                }
+            }
+            // The safety backup created by BackupUnsupportedDatabaseAsync was made against
+            // the version-skip copy (app_v1.3.0.db), not the original unsupported source.
+            // Its name is therefore misleading (v1.3.0 is not unsupported) and it is
+            // redundant because the original is preserved as unsupported_app_v0.3.0.db.
+            // Delete it so it doesn't appear in the Backups list with a confusing name.
+            var staleBackup = schemaEx.BackupPath;
+            if (!string.IsNullOrEmpty(staleBackup) && File.Exists(staleBackup))
+            {
+                try
+                {
+                    File.Delete(staleBackup);
+                    app.Logger.LogInformation("Deleted stale version-skip backup: {File}", Path.GetFileName(staleBackup));
+                }
+                catch (Exception delEx)
+                {
+                    app.Logger.LogWarning(delEx, "Could not delete stale backup {File}", staleBackup);
+                }
+            }
+
+            // Don't rethrow — let the Blazor app serve the unsupported schema UI
+        }
         catch (Exception ex)
         {
             app.Logger.LogError(ex, "Failed to initialize database");
             throw;
         }
 
-    // Validate and update schema version
+    // Validate and update schema version — skip when schema is unsupported (DB is being
+    // set aside; the context is disposed after the restore rollback, so any query here
+    // would throw ObjectDisposedException and produce misleading log noise).
+    if (unlockState?.IsUnsupportedSchema == true)
+    {
+        app.Logger.LogInformation("Skipping schema version check — unsupported schema, user will start fresh.");
+    }
+    else
+    {
     var schemaService = scope.ServiceProvider.GetRequiredService<SchemaValidationService>();
     var appSettings = scope.ServiceProvider.GetRequiredService<IOptions<ApplicationSettings>>().Value;
     
@@ -557,6 +642,14 @@ using (var scope = app.Services.CreateScope())
     {
         app.Logger.LogInformation("Schema version validated: {Version}", currentDbVersion);
     }
+
+    } // End of schema version check block (skipped when IsUnsupportedSchema)
+
+    // Release all connections opened during startup (migration checks, schema version writes, etc.)
+    // before Blazor begins serving requests. Without this, the first post-upgrade login receives
+    // a pooled connection that is in a post-write state, resulting in a blank page on first render.
+    Microsoft.Data.Sqlite.SqliteConnection.ClearAllPools();
+
     } // End of else block for database initialization when not locked
 }
 

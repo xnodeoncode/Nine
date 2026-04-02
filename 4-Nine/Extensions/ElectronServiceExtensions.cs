@@ -41,18 +41,25 @@ public static class ElectronServiceExtensions
         // Get connection string using the path service (synchronous to avoid startup deadlock)
         var connectionString = GetElectronConnectionString(configuration);
 
-        // Check if database is encrypted and retrieve password if needed
-        var encryptionPassword = GetEncryptionPasswordIfNeeded(connectionString);
+        // Check if database is encrypted and retrieve password if needed.
+        // encryptedSiblingNoKey is true when a version-scan sibling is encrypted but the
+        // keychain has no entry — the target DB may not exist yet so IsDatabaseEncrypted
+        // would return false, but we must still show the unlock dialog.
+        var encryptionPassword = GetEncryptionPasswordIfNeeded(connectionString, out bool encryptedSiblingNoKey, out string? encryptedSiblingPath);
 
         // Pre-derive raw AES key from passphrase (once at startup) so each connection open
         // uses PRAGMA key = "x'hex'" and skips PBKDF2(256000), saving ~20–50 ms per connection.
         if (!string.IsNullOrEmpty(encryptionPassword))
             encryptionPassword = PrepareEncryptionKey(encryptionPassword, connectionString);
 
-        // Register unlock state before any DbContext registration
+        // Register unlock state before any DbContext registration.
+        // encryptedSiblingNoKey forces NeedsUnlock when the target DB doesn't exist yet but
+        // an encrypted sibling was found with no matching keychain entry.
         var unlockState = new DatabaseUnlockState
         {
-            NeedsUnlock = encryptionPassword == null && IsDatabaseEncrypted(connectionString),
+            NeedsUnlock = encryptedSiblingNoKey || (encryptionPassword == null && IsDatabaseEncrypted(connectionString)),
+            RequiresRestartAfterUnlock = encryptedSiblingNoKey,
+            EncryptedSiblingPath = encryptedSiblingPath,
             DatabasePath = ExtractDatabasePath(connectionString),
             ConnectionString = connectionString
         };
@@ -71,14 +78,14 @@ public static class ElectronServiceExtensions
             Console.WriteLine("[ElectronServiceExtensions] Database unlock required - services will be registered but database inaccessible until unlock");
         }
 
-        // CRITICAL: Create interceptor instance BEFORE any DbContext registration
-        // This single instance will be used by all DbContexts
-        SqlCipherConnectionInterceptor? interceptor = null;
+        // CRITICAL: Create interceptor instance BEFORE any DbContext registration.
+        // Always created — even for unencrypted DBs — because the interceptor also sets
+        // busy_timeout and journal_mode = WAL on every connection.
+        SqlCipherConnectionInterceptor interceptor = new SqlCipherConnectionInterceptor(encryptionPassword);
+
         if (!string.IsNullOrEmpty(encryptionPassword))
         {
-            interceptor = new SqlCipherConnectionInterceptor(encryptionPassword);
-
-            // Clear connection pools to ensure no connections bypass the interceptor
+            // Clear connection pools so no pre-registration connections bypass the interceptor
             SqliteConnection.ClearAllPools();
         }
 
@@ -89,10 +96,7 @@ public static class ElectronServiceExtensions
         services.AddDbContext<NineDbContext>((serviceProvider, options) =>
         {
             options.UseSqlite(connectionString);
-            if (interceptor != null)
-            {
-                options.AddInterceptors(interceptor);
-            }
+            options.AddInterceptors(interceptor);
         });
         
         // CRITICAL: Clear connection pools again after DbContext registration
@@ -144,17 +148,45 @@ public static class ElectronServiceExtensions
             // For localhost Electron app, allow non-HTTPS cookies
             options.Cookie.SecurePolicy = Microsoft.AspNetCore.Http.CookieSecurePolicy.SameAsRequest;
             options.Cookie.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.Lax;
+
+            // When the database is locked, the SecurityStampValidator would immediately query
+            // the DB to validate the persistent session cookie — crashing with Error 26 before
+            // the unlock page can render. Guard against this by rejecting the principal silently
+            // (signs out the cookie in-memory) so the user is redirected to the unlock page
+            // without any DB access.
+            options.Events.OnValidatePrincipal = async context =>
+            {
+                var lockState = context.HttpContext.RequestServices.GetRequiredService<DatabaseUnlockState>();
+                if (lockState.NeedsUnlock)
+                {
+                    context.RejectPrincipal();
+                    return;
+                }
+                await Microsoft.AspNetCore.Identity.SecurityStampValidator.ValidatePrincipalAsync(context);
+            };
         });
 
         return services;
     }
 
     /// <summary>
-    /// Detects if database is encrypted and retrieves password from keychain if needed
+    /// Detects if database is encrypted and retrieves password from keychain if needed.
     /// </summary>
-    /// <returns>Encryption password, or null if database is not encrypted</returns>
-    private static string? GetEncryptionPasswordIfNeeded(string connectionString)
+    /// <param name="connectionString">The EF Core connection string for the target database.</param>
+    /// <param name="encryptedSiblingNoKey">
+    /// Set to <c>true</c> when a version-scan sibling DB is encrypted but no keychain entry
+    /// exists. Callers must treat this as NeedsUnlock=true even if the target DB doesn't exist.
+    /// </param>
+    /// <param name="encryptedSiblingPath">
+    /// The file path of the encrypted sibling DB when <paramref name="encryptedSiblingNoKey"/> is true.
+    /// Callers must verify the user's password against this path, NOT the target connection string,
+    /// to avoid SQLite silently creating an empty DB at the target path during verification.
+    /// </param>
+    /// <returns>Encryption password, or <c>null</c> if the database is not encrypted or the key is unavailable.</returns>
+    private static string? GetEncryptionPasswordIfNeeded(string connectionString, out bool encryptedSiblingNoKey, out string? encryptedSiblingPath)
     {
+        encryptedSiblingNoKey = false;
+        encryptedSiblingPath = null;
         try
         {
             // Extract database path from connection string
@@ -163,7 +195,47 @@ public static class ElectronServiceExtensions
 
             if (!File.Exists(dbPath))
             {
-                // Database doesn't exist yet, not encrypted
+                // Target DB doesn't exist yet — but a version upgrade may be about to copy an
+                // encrypted sibling (app_v*.db) to this path. If any existing DB in the same
+                // directory is encrypted, we must register the interceptor now so that EF
+                // migrations can open the newly-copied file after the upgrade copy runs.
+                var dbDir = Path.GetDirectoryName(dbPath);
+                if (!string.IsNullOrEmpty(dbDir) && Directory.Exists(dbDir))
+                {
+                    foreach (var candidate in Directory.GetFiles(dbDir, "app_v*.db"))
+                    {
+                        try
+                        {
+                            using var testConn = new SqliteConnection($"Data Source={candidate}");
+                            testConn.Open();
+                            using var testCmd = testConn.CreateCommand();
+                            testCmd.CommandText = "SELECT COUNT(*) FROM sqlite_master;";
+                            testCmd.ExecuteScalar();
+                            // Opened fine — not encrypted, keep scanning
+                        }
+                        catch (SqliteException ex) when (ex.SqliteErrorCode == 26)
+                        {
+                            // Found an encrypted sibling — get the key so the interceptor is ready
+                            Console.WriteLine($"Found encrypted sibling database {Path.GetFileName(candidate)} — retrieving key for upgrade path");
+                            var keychain = OperatingSystem.IsWindows()
+                                ? (IKeychainService)new WindowsKeychainService("Nine-Electron")
+                                : new LinuxKeychainService("Nine-Electron");
+                            var password = keychain.RetrieveKey();
+                            if (!string.IsNullOrEmpty(password))
+                            {
+                                SqliteConnection.ClearAllPools();
+                                return password;
+                            }
+                            // Key not in keychain — signal caller to set NeedsUnlock=true even
+                            // though the target DB doesn't exist yet (it will be copied later).
+                            // Record the sibling path so the unlock page can verify against it
+                            // rather than the target path (which SQLite would create empty).
+                            encryptedSiblingNoKey = true;
+                            encryptedSiblingPath = candidate;
+                            return null;
+                        }
+                    }
+                }
                 return null;
             }
 

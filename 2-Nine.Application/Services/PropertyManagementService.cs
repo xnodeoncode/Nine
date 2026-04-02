@@ -588,7 +588,7 @@ namespace Nine.Application.Services
 
             await _dbContext.Leases.AddAsync(lease);
 
-            property.IsAvailable = false;
+            property.IsActive = false;
             property.LastModifiedOn = DateTime.UtcNow;
             property.LastModifiedBy = _userId;
 

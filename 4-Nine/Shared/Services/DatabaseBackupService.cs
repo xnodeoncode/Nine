@@ -328,34 +328,13 @@ namespace Nine.Shared.Services
         /// </summary>
         public async Task<string> GetDatabasePathAsync()
         {
-            if (HybridSupport.IsElectronActive)
-            {
-                return await _pathService.GetDatabasePathAsync();
-            }
-            else
-            {
-                var connectionString = _configuration.GetConnectionString("DefaultConnection");
-                if (string.IsNullOrEmpty(connectionString))
-                {
-                    throw new InvalidOperationException("Connection string 'DefaultConnection' not found");
-                }
-                
-                // Parse SQLite connection string - supports both "Data Source=" and "DataSource="
-                var dbPath = connectionString
-                    .Replace("Data Source=", "")
-                    .Replace("DataSource=", "")
-                    .Split(';')[0]
-                    .Trim();
-                
-                // Make absolute path if relative
-                if (!Path.IsPathRooted(dbPath))
-                {
-                    dbPath = Path.Combine(Directory.GetCurrentDirectory(), dbPath);
-                }
-                
-                _logger.LogInformation("Database path resolved to: {DbPath}", dbPath);
-                return dbPath;
-            }
+            // Always delegate to IPathService — it is registered as ElectronPathService for desktop
+            // and WebPathService for web, so it already encapsulates the platform difference.
+            // Using HybridSupport.IsElectronActive here is unreliable at startup because Electron
+            // may not have connected yet, causing the fallback to resolve an incorrect path.
+            var dbPath = await _pathService.GetDatabasePathAsync();
+            _logger.LogInformation("Database path resolved to: {DbPath}", dbPath);
+            return dbPath;
         }
 
         private async Task CleanupOldBackupsAsync(string backupDir, int keepCount)

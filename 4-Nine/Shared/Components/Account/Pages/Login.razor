@@ -39,7 +39,18 @@
                     </label>
                 </div>
                 <div>
-                    <button type="submit" class="w-100 btn btn-lg btn-primary" disabled="@isSubmitting">
+                    @if(isSubmitting)
+                    {
+                        <div class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></div>
+                        <span>Logging in...</span>
+                    }
+                    else
+                    {
+                        <button type="submit" class="w-100 btn btn-lg btn-primary">
+                            Log in
+                        </button>
+                    }
+                    @* <button type="submit" class="w-100 btn btn-lg btn-primary" disabled="@isSubmitting">
                         @if (isSubmitting)
                         {
                             <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
@@ -49,7 +60,8 @@
                         {
                             <span>Log in</span>
                         }
-                    </button>
+                    </button> *@
+                
                 </div>
                 <div>
                     <p>
@@ -146,6 +158,18 @@
             {
                 errorMessage = "Error: Invalid login attempt.";
             }
+        }
+        catch (Microsoft.AspNetCore.Components.NavigationException)
+        {
+            // NavigationException is thrown intentionally by Blazor's NavigationManager.NavigateTo().
+            // Re-throw so the framework can complete the redirect.
+            throw;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "An error occurred while logging in. ex: {Message} : {InnerExceptionMessage}", ex.Message, ex.InnerException?.Message);
+            errorMessage = $"An unexpected error occurred. Please try again later. {ex.Message} : {ex.InnerException?.Message}";
+            isSubmitting = false;
         }
         finally
         {

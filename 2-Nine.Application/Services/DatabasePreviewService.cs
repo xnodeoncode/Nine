@@ -254,6 +254,16 @@ public class DatabasePreviewService
     private static readonly HashSet<string> DocumentRequiredCols    = new(StringComparer.OrdinalIgnoreCase)
         { "Id", "OrganizationId", "FileName", "FileData" };
 
+    /// <summary>
+    /// Maps backup column names to their renamed equivalents in the current active schema.
+    /// Add an entry here whenever a column is renamed between eras.
+    /// Key = backup (old) name, Value = active (new) name.
+    /// </summary>
+    private static readonly Dictionary<string, string> ColumnAliases = new(StringComparer.OrdinalIgnoreCase)
+    {
+        { "IsAvailable", "IsActive" }  // Properties.IsAvailable renamed to IsActive in RenameIsAvailableToIsActive
+    };
+
     // -------------------------------------------------------------------------
     // Schema helpers
     // -------------------------------------------------------------------------
@@ -681,8 +691,14 @@ public class DatabasePreviewService
     }
 
     /// <summary>
-    /// Copies rows from backupConn into activeConn for the given table, using the
-    /// intersection of columns that exist in both schemas.
+    /// Copies rows from backupConn into activeConn for the given table.
+    /// Applies <see cref="ColumnAliases"/> so renamed columns (e.g.
+    /// <c>IsAvailable</c> → <c>IsActive</c>) are correctly mapped.
+    /// Only columns resolvable in both schemas are copied; columns present only
+    /// in the active schema are omitted from the INSERT (SQLite will apply the
+    /// column DEFAULT, or the row is skipped via INSERT OR IGNORE if a NOT NULL
+    /// constraint cannot be satisfied without a default).
+    /// Required columns trigger a warning but never block the import.
     /// OrganizationId is always substituted with the active org.
     /// Returns the number of rows actually inserted.
     /// </summary>
@@ -700,47 +716,54 @@ public class DatabasePreviewService
             var backupCols = await GetTableColumnsAsync(backupConn, tableName);
             var activeCols = await GetTableColumnsAsync(activeConn, tableName);
 
-            // Validate required columns exist in backup
-            var missing = requiredCols
-                .Where(c => !backupCols.Contains(c))
+            // Warn about required columns absent from the backup (checking aliases too)
+            // but never skip the table — import whatever is available.
+            var missingRequired = requiredCols
+                .Where(rc =>
+                    !backupCols.Contains(rc) &&
+                    !ColumnAliases.Any(kv =>
+                        kv.Value.Equals(rc, StringComparison.OrdinalIgnoreCase) &&
+                        backupCols.Contains(kv.Key)))
                 .ToList();
-            if (missing.Count > 0)
-            {
-                errors.Add($"{tableName}: skipped — required columns missing: {string.Join(", ", missing)}");
-                return 0;
-            }
+            if (missingRequired.Count > 0)
+                errors.Add($"{tableName}: warning — required columns not found in backup: {string.Join(", ", missingRequired)}");
 
-            // Columns always overridden — never read from backup, always set to active-context values
+            // Columns always overridden — never read from backup
             var overrideCols = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
                 { "OrganizationId", "CreatedBy", "LastModifiedBy" };
 
-            // Intersection: columns present in both backup and active schemas,
-            // excluding all override cols (handled separately as literal overrides)
-            var sharedCols = backupCols
-                .Intersect(activeCols, StringComparer.OrdinalIgnoreCase)
-                .Where(c => !overrideCols.Contains(c))
-                .OrderBy(c => c, StringComparer.OrdinalIgnoreCase)
-                .ToList();
+            // Build backup→active column mapping, applying ColumnAliases for renamed columns.
+            // Only include cols that resolve to a name present in the active schema.
+            var colMapping = new List<(string BackupCol, string ActiveCol)>();
+            foreach (var bc in backupCols)
+            {
+                if (bc.Equals("Id", StringComparison.OrdinalIgnoreCase)) continue;
+                if (overrideCols.Contains(bc)) continue;
+                var ac = ColumnAliases.TryGetValue(bc, out var aliased) ? aliased : bc;
+                if (activeCols.Contains(ac) && !overrideCols.Contains(ac))
+                    colMapping.Add((bc, ac));
+            }
+            colMapping = colMapping.OrderBy(x => x.ActiveCol, StringComparer.OrdinalIgnoreCase).ToList();
 
-            // Columns to read from backup: Id first, then all other shared cols
-            var nonIdCols = sharedCols
-                .Where(c => !c.Equals("Id", StringComparison.OrdinalIgnoreCase))
-                .ToList();
-            var readCols = new[] { "Id" }.Concat(nonIdCols).ToArray();
+            var readBackupCols  = colMapping.Select(x => x.BackupCol).ToArray();
+            var insertActiveCols = colMapping.Select(x => x.ActiveCol).ToArray();
 
-            // Columns to insert: Id, then overrides present in active schema, then the rest
+            // Columns to insert: Id first, then context overrides, then data cols
             var insertOverrides = new List<string> { "OrganizationId" };
-            if (activeCols.Contains("CreatedBy"))     insertOverrides.Add("CreatedBy");
+            if (activeCols.Contains("CreatedBy"))      insertOverrides.Add("CreatedBy");
             if (activeCols.Contains("LastModifiedBy")) insertOverrides.Add("LastModifiedBy");
 
-            var insertCols = new[] { "Id" }.Concat(insertOverrides).Concat(nonIdCols).ToArray();
-            var colList    = string.Join(", ", insertCols.Select(c => $"[{c}]"));
-            var paramList  = string.Join(", ", insertCols.Select(c =>
+            var allInsertCols = new[] { "Id" }.Concat(insertOverrides).Concat(insertActiveCols).ToArray();
+            var colList   = string.Join(", ", allInsertCols.Select(c => $"[{c}]"));
+            var paramList = string.Join(", ", allInsertCols.Select(c =>
                 c.Equals("OrganizationId",  StringComparison.OrdinalIgnoreCase) ? "@orgId" :
                 c.Equals("CreatedBy",       StringComparison.OrdinalIgnoreCase) ? "@currentUser" :
                 c.Equals("LastModifiedBy",  StringComparison.OrdinalIgnoreCase) ? "@currentUser" :
+                c.Equals("Id",              StringComparison.OrdinalIgnoreCase) ? "@c_Id" :
                 $"@c_{c}"));
 
+            // SELECT uses backup col names; readCols[0]=Id, readCols[1..]=backup data cols
+            var readCols      = new[] { "Id" }.Concat(readBackupCols).ToArray();
             var selectColList = string.Join(", ", readCols.Select(c => $"[{c}]"));
             var delFilter     = backupCols.Contains("IsDeleted") ? " WHERE IsDeleted = 0" : "";
 
@@ -762,23 +785,30 @@ public class DatabasePreviewService
             if (rows.Count == 0)
                 return 0;
 
-            // Build parameterized INSERT and reuse the command for each row
+            // Build parameterized INSERT — parameters: @c_Id and @c_{activeColName}
             using var writeCmd = activeConn.CreateCommand();
             writeCmd.CommandText = $"INSERT OR IGNORE INTO [{tableName}] ({colList}) VALUES ({paramList})";
             writeCmd.Parameters.AddWithValue("@orgId", orgId);
             writeCmd.Parameters.AddWithValue("@currentUser", currentUserId);
-            foreach (var col in readCols)
-                writeCmd.Parameters.Add(new SqliteParameter($"@c_{col}", DBNull.Value));
+            writeCmd.Parameters.Add(new SqliteParameter("@c_Id", DBNull.Value));
+            foreach (var ac in insertActiveCols)
+                writeCmd.Parameters.Add(new SqliteParameter($"@c_{ac}", DBNull.Value));
 
             int count = 0;
             foreach (var row in rows)
             {
-                for (int i = 0; i < readCols.Length; i++)
+                var idVal = row[0];
+                if (idVal is string s0 && Guid.TryParse(s0, out var g0))
+                    idVal = g0.ToString("D").ToUpperInvariant();
+                writeCmd.Parameters["@c_Id"].Value = idVal ?? DBNull.Value;
+
+                // row[1..] maps to insertActiveCols by index
+                for (int i = 0; i < insertActiveCols.Length; i++)
                 {
-                    var val = row[i];
+                    var val = row[i + 1];
                     if (val is string s && Guid.TryParse(s, out var g))
                         val = g.ToString("D").ToUpperInvariant();
-                    writeCmd.Parameters[$"@c_{readCols[i]}"].Value = val ?? DBNull.Value;
+                    writeCmd.Parameters[$"@c_{insertActiveCols[i]}"].Value = val ?? DBNull.Value;
                 }
                 count += await writeCmd.ExecuteNonQueryAsync();
             }

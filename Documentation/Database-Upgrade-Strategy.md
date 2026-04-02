@@ -31,6 +31,9 @@ Nine uses versioned SQLite database files (`app_vX.Y.0.db`) tied to the applicat
 - `PreviousDatabaseFileName` is set by `bump-version.sh` to the previous file name
 - A compiled binary is **version-locked**: it only looks for the filename baked into its `appsettings.json`
 
+> **App version and schema version are not always in sync.**  
+> A user running v2.0.5 has app version `2.0.5` but database schema version `2.0.0`. The schema version is anchored to the MAJOR.MINOR milestone at which the schema last changed, not the current app version. PATCH releases carry the same `DatabaseFileName` as their MINOR base — the entire upgrade block is skipped on startup because the target DB file already exists.
+
 ---
 
 ## Upgrade Path: How It Works
@@ -288,6 +291,58 @@ Simulates a user on v1.0.0 who skips v1.1.0 and installs v1.2.0 directly. This i
 - App starts, seed data present
 
 **Pass criteria:** Clean degradation to fresh install behavior; no crash.
+
+---
+
+## Known Incompatibility: Pre-Squash Databases (Pre-v1.0.0)
+
+### Background
+
+Between v0.3.0 and v1.0.0, the EF Core migration history was **squashed**. The many individual incremental migrations were replaced by a single consolidated `InitialCreate` migration that creates the full schema in one step. This means the upgrade path described above **only works for databases created at v1.0.0 or later**.
+
+### What Happens When a Pre-v1.0.0 Database Is Used
+
+Despite the version-skip glob scan finding and copying the old file correctly, the migration step fails:
+
+1. Version-skip glob finds `app_v0.3.0.db` — copied to target ✅
+2. EF inspects `__EFMigrationsHistory` in the copied DB — no `InitialCreate` entry found
+3. EF treats `InitialCreate` as **pending** and tries to run it
+4. Every `CREATE TABLE` statement fails: `SQLite Error 1: 'table "AspNetRoles" already exists'`
+5. App crashes at startup ❌
+
+This is correct and expected behaviour. The pre-squash database already has all the tables (built by old individual migrations), but its history table doesn't contain the `InitialCreate` entry that the post-squash code expects.
+
+### Supported Upgrade Boundary
+
+| Source DB Version   | Target Version | Auto-Upgrade?                                 |
+| ------------------- | -------------- | --------------------------------------------- |
+| v1.0.0 or later     | Any v1.x.x+    | ✅ Supported                                  |
+| v0.x.x (pre-v1.0.0) | Any v1.x.x+    | ❌ Not supported (pre-squash incompatibility) |
+
+**The auto-upgrade path is guaranteed only for v1.0.0+ (post-squash) source databases.**
+
+### Test Result
+
+Verified in manual test (`test1.2.log`): running `Nine-1.1.0-x86_64.AppImage` against `app_v0.3.0.db` produces:
+
+```
+Version skip detected: copying app_v0.3.0.db → app_v1.1.0.db (expected app_v1.0.0.db was absent)
+SQLite Error 1: 'table "AspNetRoles" already exists'
+```
+
+The copy logic is correct; only the migration fails.
+
+### Recovery Strategy (Backlog)
+
+Currently a pre-v1.0.0 database causes a crash with no user-friendly recovery path. Planned improvement:
+
+1. Detect the incompatible schema error during `MigrateAsync()`
+2. Present the user with a choice:
+   - **Start fresh** — create a new blank database (all legacy data lost, app becomes usable immediately)
+   - **Abort** — exit cleanly, leaving the old database file intact
+3. Future: provide a data-import tool to extract records from the old schema and import them into the new one
+
+_This recovery path is a backlog item and is not part of the v1.1.0 release._
 
 ---
 

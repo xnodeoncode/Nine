@@ -183,7 +183,7 @@
             var allProperties = await PropertyService.GetAllAsync();
             properties = allProperties.Where(p => !p.IsDeleted).ToList();
             totalProperties = properties.Count;
-            availableProperties = properties.Count(p => p.IsAvailable);
+            availableProperties = properties.Count(p => p.IsActive);
     
             var allTenants = await TenantService.GetAllAsync();
             tenants = allTenants.Where(t => !t.IsDeleted).ToList();
@@ -195,7 +195,7 @@
 
             // Load available properties and pending leases
             availablePropertiesList = properties
-                .Where(p => p.OrganizationId == organizationId && p.IsAvailable)
+                .Where(p => p.OrganizationId == organizationId && p.IsActive)
                 .OrderByDescending(p => p.CreatedOn)
                 .Take(5)
                 .ToList();

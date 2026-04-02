@@ -300,7 +300,7 @@
                 var dbContextFactory = Navigation.ToAbsoluteUri("/").ToString(); // Get service
                 // For now, we'll need to inject PropertyManagementService
                 var allProperties = await PropertyService.GetAllAsync();
-                properties = allProperties.Where(p => p.IsAvailable).ToList();
+                properties = allProperties.Where(p => p.IsActive).ToList();
             }
             else
             {

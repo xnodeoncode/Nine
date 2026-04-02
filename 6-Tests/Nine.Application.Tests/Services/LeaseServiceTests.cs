@@ -86,7 +86,7 @@ namespace Nine.Application.Tests
                 City = "Test City",
                 State = "TS",
                 ZipCode = "12345",
-                IsAvailable = true,
+                IsActive = true,
                 CreatedBy = _testUserId,
                 CreatedOn = DateTime.UtcNow
             };
@@ -302,7 +302,7 @@ namespace Nine.Application.Tests
 
             // Assert
             var property = await _context.Properties.FindAsync(_testPropertyId);
-            Assert.False(property!.IsAvailable);
+            Assert.False(property!.IsActive);
         }
 
         [Fact]
@@ -327,7 +327,7 @@ namespace Nine.Application.Tests
 
             // Assert
             var property = await _context.Properties.FindAsync(_testPropertyId);
-            Assert.True(property!.IsAvailable);
+            Assert.True(property!.IsActive);
         }
 
         [Fact]
@@ -353,7 +353,7 @@ namespace Nine.Application.Tests
 
             // Assert
             var property = await _context.Properties.FindAsync(_testPropertyId);
-            Assert.True(property!.IsAvailable);
+            Assert.True(property!.IsActive);
         }
 
         #endregion
@@ -453,7 +453,7 @@ namespace Nine.Application.Tests
                 City = "Test City",
                 State = "TS",
                 ZipCode = "12345",
-                IsAvailable = true,
+                IsActive = true,
                 CreatedBy = _testUserId,
                 CreatedOn = DateTime.UtcNow
             };
@@ -510,7 +510,7 @@ namespace Nine.Application.Tests
                 City = "Test City",
                 State = "TS",
                 ZipCode = "12345",
-                IsAvailable = true,
+                IsActive = true,
                 CreatedBy = _testUserId,
                 CreatedOn = DateTime.UtcNow
             };
@@ -595,7 +595,7 @@ namespace Nine.Application.Tests
                 City = "Test City",
                 State = "TS",
                 ZipCode = "12345",
-                IsAvailable = true,
+                IsActive = true,
                 CreatedBy = _testUserId,
                 CreatedOn = DateTime.UtcNow
             };
@@ -710,7 +710,7 @@ namespace Nine.Application.Tests
             // Assert
             Assert.Equal(ApplicationConstants.LeaseStatuses.Active, updated.Status);
             var property = await _context.Properties.FindAsync(_testPropertyId);
-            Assert.False(property!.IsAvailable);
+            Assert.False(property!.IsActive);
         }
 
         [Fact]
@@ -736,7 +736,7 @@ namespace Nine.Application.Tests
 
             // Assert
             var property = await _context.Properties.FindAsync(_testPropertyId);
-            Assert.True(property!.IsAvailable);
+            Assert.True(property!.IsActive);
         }
 
         #endregion
@@ -775,7 +775,7 @@ namespace Nine.Application.Tests
                 City = "Other City",
                 State = "OT",
                 ZipCode = "99999",
-                IsAvailable = true,
+                IsActive = true,
                 CreatedBy = otherUserId,
                 CreatedOn = DateTime.UtcNow
             };
@@ -864,7 +864,7 @@ namespace Nine.Application.Tests
                 City = "Other City",
                 State = "OT",
                 ZipCode = "88888",
-                IsAvailable = true,
+                IsActive = true,
                 CreatedBy = otherUserId,
                 CreatedOn = DateTime.UtcNow
             };

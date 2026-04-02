@@ -61,6 +61,19 @@ public class SqlCipherConnectionInterceptor : DbConnectionInterceptor
             }
         }
 
+        // Always set busy_timeout and WAL mode regardless of encryption.
+        // busy_timeout: converts indefinite lock-wait hangs into a 5-second timeout error.
+        // journal_mode = WAL: allows concurrent readers during writes; must be a persistent DB
+        //   setting so it is set on every connection open (idempotent — SQLite ignores it if
+        //   already WAL).  Must run AFTER PRAGMA key for encrypted databases.
+        using (var walCmd = connection.CreateCommand())
+        {
+            walCmd.CommandText = "PRAGMA busy_timeout = 5000;";
+            walCmd.ExecuteNonQuery();
+            walCmd.CommandText = "PRAGMA journal_mode = WAL;";
+            walCmd.ExecuteNonQuery();
+        }
+
         base.ConnectionOpened(connection, eventData);
     }
 
@@ -99,6 +112,15 @@ public class SqlCipherConnectionInterceptor : DbConnectionInterceptor
                 cmd.CommandText = "PRAGMA cipher_kdf_algorithm = PBKDF2_HMAC_SHA512;";
                 await cmd.ExecuteNonQueryAsync(cancellationToken);
             }
+        }
+
+        // Always set busy_timeout and WAL mode regardless of encryption (see sync overload above).
+        using (var walCmd = connection.CreateCommand())
+        {
+            walCmd.CommandText = "PRAGMA busy_timeout = 5000;";
+            await walCmd.ExecuteNonQueryAsync(cancellationToken);
+            walCmd.CommandText = "PRAGMA journal_mode = WAL;";
+            await walCmd.ExecuteNonQueryAsync(cancellationToken);
         }
 
         await base.ConnectionOpenedAsync(connection, eventData, cancellationToken);
