@@ -440,8 +440,10 @@
             hubConnection.Closed += async error =>
             {
                 Logger.LogError($"SignalR connection closed. Error: {error?.Message}");
+                if (_disposed) return;
                 await Task.Delay(5000);
-                await StartConnectionAsync();
+                if (!_disposed)
+                    await StartConnectionAsync();
             };
 
             await StartConnectionAsync();
@@ -468,8 +470,11 @@
         }
     }
 
+    private bool _disposed = false;
+
     public async ValueTask DisposeAsync()
     {
+        _disposed = true;
         if (hubConnection is not null)
         {
             await hubConnection.DisposeAsync();

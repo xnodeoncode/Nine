@@ -1,4 +1,5 @@
 using Nine.Application.Models.DTOs;
+using Nine.Core.Constants;
 using Nine.Core.Interfaces;
 using Nine.Core.Interfaces.Services;
 using Nine.Infrastructure.Data;
@@ -219,6 +220,41 @@ public class DatabasePreviewService
         }
     }
 
+    /// <summary>
+    /// Deletes a database file from disk. Works for both backup files and other database files.
+    /// Refuses to delete the currently active database.
+    /// </summary>
+    public async Task<DatabaseOperationResult> DeleteDatabaseFileAsync(string filePath)
+    {
+        try
+        {
+            var safeFileName = Path.GetFileName(filePath);
+            if (!File.Exists(filePath))
+                return DatabaseOperationResult.FailureResult($"File not found: {safeFileName}");
+
+            // Safety: never delete the active database
+            var activeConnString = _activeContext.Database.GetConnectionString() ?? "";
+            var activeDbPathRaw = activeConnString
+                .Replace("DataSource=", "", StringComparison.OrdinalIgnoreCase)
+                .Replace("Data Source=", "", StringComparison.OrdinalIgnoreCase)
+                .Split(';')[0]
+                .Trim();
+            var activeDbPath = Path.GetFullPath(activeDbPathRaw);
+
+            if (string.Equals(Path.GetFullPath(filePath), activeDbPath, StringComparison.OrdinalIgnoreCase))
+                return DatabaseOperationResult.FailureResult("Cannot delete the active database.");
+
+            File.Delete(filePath);
+            _logger.LogInformation("Deleted database file {FileName}", safeFileName);
+            return DatabaseOperationResult.SuccessResult($"{safeFileName} deleted.");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error deleting database file");
+            return DatabaseOperationResult.FailureResult($"Error: {ex.Message}");
+        }
+    }
+
     // -------------------------------------------------------------------------
     // Schema compatibility - required columns per entity
     // -------------------------------------------------------------------------
@@ -253,6 +289,27 @@ public class DatabasePreviewService
 
     private static readonly HashSet<string> DocumentRequiredCols    = new(StringComparer.OrdinalIgnoreCase)
         { "Id", "OrganizationId", "FileName", "FileData" };
+
+    private static readonly HashSet<string> CalendarEventRequiredCols = new(StringComparer.OrdinalIgnoreCase)
+        { "Id", "OrganizationId", "Title", "StartOn", "EventType", "Status" };
+
+    private static readonly HashSet<string> InspectionRequiredCols  = new(StringComparer.OrdinalIgnoreCase)
+        { "Id", "OrganizationId", "PropertyId", "CompletedOn", "InspectionType" };
+
+    private static readonly HashSet<string> ChecklistRequiredCols   = new(StringComparer.OrdinalIgnoreCase)
+        { "Id", "OrganizationId", "Name", "ChecklistType", "Status", "ChecklistTemplateId" };
+
+    private static readonly HashSet<string> ChecklistItemRequiredCols = new(StringComparer.OrdinalIgnoreCase)
+        { "Id", "OrganizationId", "ChecklistId", "ItemText", "ItemOrder" };
+
+    private static readonly HashSet<string> SecurityDepositRequiredCols = new(StringComparer.OrdinalIgnoreCase)
+        { "Id", "OrganizationId", "LeaseId", "TenantId", "Amount", "DateReceived", "PaymentMethod", "Status" };
+
+    private static readonly HashSet<string> NoteRequiredCols        = new(StringComparer.OrdinalIgnoreCase)
+        { "Id", "OrganizationId", "Content", "EntityType", "EntityId" };
+
+    private static readonly HashSet<string> NotificationRequiredCols = new(StringComparer.OrdinalIgnoreCase)
+        { "Id", "OrganizationId", "Title", "Message", "Type", "Category", "RecipientUserId", "SentOn" };
 
     /// <summary>
     /// Maps backup column names to their renamed equivalents in the current active schema.
@@ -353,17 +410,31 @@ public class DatabasePreviewService
         var mntCols   = await GetTableColumnsAsync(conn, "MaintenanceRequests");
         var repCols   = await GetTableColumnsAsync(conn, "Repairs");
         var docCols   = await GetTableColumnsAsync(conn, "Documents");
+        var calCols   = await GetTableColumnsAsync(conn, "CalendarEvents");
+        var insCols   = await GetTableColumnsAsync(conn, "Inspections");
+        var clCols    = await GetTableColumnsAsync(conn, "Checklists");
+        var cliCols   = await GetTableColumnsAsync(conn, "ChecklistItems");
+        var sdCols    = await GetTableColumnsAsync(conn, "SecurityDeposits");
+        var noteCols  = await GetTableColumnsAsync(conn, "Notes");
+        var notiCols  = await GetTableColumnsAsync(conn, "Notifications");
 
         var data = new DatabasePreviewData
         {
-            PropertyCount    = await CountTableAsync(conn, "Properties",          propCols),
-            TenantCount      = await CountTableAsync(conn, "Tenants",             tenCols),
-            LeaseCount       = await CountTableAsync(conn, "Leases",              leaseCols),
-            InvoiceCount     = await CountTableAsync(conn, "Invoices",            invCols),
-            PaymentCount     = await CountTableAsync(conn, "Payments",            payCols),
-            MaintenanceCount = await CountTableAsync(conn, "MaintenanceRequests", mntCols),
-            RepairCount      = await CountTableAsync(conn, "Repairs",             repCols),
-            DocumentCount    = await CountTableAsync(conn, "Documents",           docCols),
+            PropertyCount        = await CountTableAsync(conn, "Properties",          propCols),
+            TenantCount          = await CountTableAsync(conn, "Tenants",             tenCols),
+            LeaseCount           = await CountTableAsync(conn, "Leases",              leaseCols),
+            InvoiceCount         = await CountTableAsync(conn, "Invoices",            invCols),
+            PaymentCount         = await CountTableAsync(conn, "Payments",            payCols),
+            MaintenanceCount     = await CountTableAsync(conn, "MaintenanceRequests", mntCols),
+            RepairCount          = await CountTableAsync(conn, "Repairs",             repCols),
+            DocumentCount        = await CountTableAsync(conn, "Documents",           docCols),
+            CalendarEventCount   = await CountTableAsync(conn, "CalendarEvents",      calCols),
+            InspectionCount      = await CountTableAsync(conn, "Inspections",         insCols),
+            ChecklistCount       = await CountTableAsync(conn, "Checklists",          clCols),
+            ChecklistItemCount   = await CountTableAsync(conn, "ChecklistItems",      cliCols),
+            SecurityDepositCount = await CountTableAsync(conn, "SecurityDeposits",    sdCols),
+            NoteCount            = await CountTableAsync(conn, "Notes",               noteCols),
+            NotificationCount    = await CountTableAsync(conn, "Notifications",       notiCols),
         };
 
         if (propCols.IsSupersetOf(PropertyRequiredCols))
@@ -387,11 +458,34 @@ public class DatabasePreviewService
         if (repCols.IsSupersetOf(RepairRequiredCols))
             data.Repairs = await ReadRepairsPreviewAsync(conn, repCols);
 
+        if (calCols.IsSupersetOf(CalendarEventRequiredCols))
+            data.CalendarEvents = await ReadCalendarEventsPreviewAsync(conn, calCols);
+
+        if (insCols.IsSupersetOf(InspectionRequiredCols))
+            data.Inspections = await ReadInspectionsPreviewAsync(conn, insCols);
+
+        if (clCols.IsSupersetOf(ChecklistRequiredCols))
+            data.Checklists = await ReadChecklistsPreviewAsync(conn, clCols);
+
+        if (cliCols.IsSupersetOf(ChecklistItemRequiredCols))
+            data.ChecklistItems = await ReadChecklistItemsPreviewAsync(conn, cliCols);
+
+        if (sdCols.IsSupersetOf(SecurityDepositRequiredCols))
+            data.SecurityDeposits = await ReadSecurityDepositsPreviewAsync(conn, sdCols);
+
+        if (noteCols.IsSupersetOf(NoteRequiredCols))
+            data.Notes = await ReadNotesPreviewAsync(conn, noteCols);
+
+        if (notiCols.IsSupersetOf(NotificationRequiredCols))
+            data.Notifications = await ReadNotificationsPreviewAsync(conn, notiCols);
+
         _logger.LogInformation(
-            "Preview loaded from {File}: {P} properties, {T} tenants, {L} leases, {I} invoices, {Pay} payments, {M} maintenance, {R} repairs",
+            "Preview loaded from {File}: {P} props, {T} tenants, {L} leases, {I} invoices, {Pay} payments, {M} maintenance, {R} repairs, {Cal} calendar, {Ins} inspections, {Cl} checklists, {Sd} deposits, {N} notes, {Not} notifications",
             backupFileName,
             data.PropertyCount, data.TenantCount, data.LeaseCount,
-            data.InvoiceCount, data.PaymentCount, data.MaintenanceCount, data.RepairCount);
+            data.InvoiceCount, data.PaymentCount, data.MaintenanceCount, data.RepairCount,
+            data.CalendarEventCount, data.InspectionCount, data.ChecklistCount,
+            data.SecurityDepositCount, data.NoteCount, data.NotificationCount);
 
         return data;
     }
@@ -597,6 +691,164 @@ public class DatabasePreviewService
         return list;
     }
 
+    private static async Task<List<CalendarEventPreview>> ReadCalendarEventsPreviewAsync(
+        SqliteConnection conn, HashSet<string> cols)
+    {
+        var list = new List<CalendarEventPreview>();
+        var del  = cols.Contains("IsDeleted") ? " WHERE IsDeleted = 0" : "";
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = $"SELECT Id, Title, StartOn, EventType, Status FROM [CalendarEvents]{del} ORDER BY StartOn DESC LIMIT 100";
+        using var r = await cmd.ExecuteReaderAsync();
+        while (await r.ReadAsync())
+            list.Add(new CalendarEventPreview
+            {
+                Id        = ReadGuid(r, 0),
+                Title     = ReadStr(r, 1),
+                StartOn   = ReadDateTime(r, 2),
+                EventType = ReadStr(r, 3),
+                Status    = ReadStr(r, 4)
+            });
+        return list;
+    }
+
+    private static async Task<List<InspectionPreview>> ReadInspectionsPreviewAsync(
+        SqliteConnection conn, HashSet<string> cols)
+    {
+        var list   = new List<InspectionPreview>();
+        var del    = cols.Contains("IsDeleted")   ? " WHERE i.IsDeleted = 0" : "";
+        var inspBy = cols.Contains("InspectedBy") ? ", i.InspectedBy" : "";
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = $@"
+            SELECT i.Id, i.CompletedOn, i.InspectionType{inspBy},
+                   COALESCE(p.Address, 'Unknown') AS PropertyAddress
+            FROM [Inspections] i
+            LEFT JOIN [Properties] p ON i.PropertyId = p.Id
+            {del}
+            ORDER BY i.CompletedOn DESC LIMIT 100";
+        using var r = await cmd.ExecuteReaderAsync();
+        while (await r.ReadAsync())
+        {
+            int idx = 3;
+            list.Add(new InspectionPreview
+            {
+                Id              = ReadGuid(r, 0),
+                CompletedOn     = ReadDateTime(r, 1),
+                InspectionType  = ReadStr(r, 2),
+                InspectedBy     = cols.Contains("InspectedBy") ? ReadStr(r, idx++) : null,
+                PropertyAddress = ReadStr(r, idx)
+            });
+        }
+        return list;
+    }
+
+    private static async Task<List<ChecklistPreview>> ReadChecklistsPreviewAsync(
+        SqliteConnection conn, HashSet<string> cols)
+    {
+        var list = new List<ChecklistPreview>();
+        var del  = cols.Contains("IsDeleted") ? " WHERE IsDeleted = 0" : "";
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = $"SELECT Id, Name, ChecklistType, Status FROM [Checklists]{del} ORDER BY Name LIMIT 100";
+        using var r = await cmd.ExecuteReaderAsync();
+        while (await r.ReadAsync())
+            list.Add(new ChecklistPreview
+            {
+                Id            = ReadGuid(r, 0),
+                Name          = ReadStr(r, 1),
+                ChecklistType = ReadStr(r, 2),
+                Status        = ReadStr(r, 3)
+            });
+        return list;
+    }
+
+    private static async Task<List<ChecklistItemPreview>> ReadChecklistItemsPreviewAsync(
+        SqliteConnection conn, HashSet<string> cols)
+    {
+        var list = new List<ChecklistItemPreview>();
+        var del  = cols.Contains("IsDeleted") ? " WHERE IsDeleted = 0" : "";
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = $"SELECT Id, ChecklistId, ItemText, ItemOrder FROM [ChecklistItems]{del} ORDER BY ItemOrder LIMIT 100";
+        using var r = await cmd.ExecuteReaderAsync();
+        while (await r.ReadAsync())
+            list.Add(new ChecklistItemPreview
+            {
+                Id          = ReadGuid(r, 0),
+                ChecklistId = ReadGuid(r, 1),
+                ItemText    = ReadStr(r, 2),
+                ItemOrder   = r.IsDBNull(3) ? 0 : r.GetInt32(3)
+            });
+        return list;
+    }
+
+    private static async Task<List<SecurityDepositPreview>> ReadSecurityDepositsPreviewAsync(
+        SqliteConnection conn, HashSet<string> cols)
+    {
+        var list = new List<SecurityDepositPreview>();
+        var del  = cols.Contains("IsDeleted") ? " WHERE sd.IsDeleted = 0" : "";
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = $@"
+            SELECT sd.Id, sd.Amount, sd.DateReceived, sd.PaymentMethod, sd.Status,
+                   COALESCE(t.FirstName || ' ' || t.LastName, 'Unknown') AS TenantName
+            FROM [SecurityDeposits] sd
+            LEFT JOIN [Tenants] t ON sd.TenantId = t.Id
+            {del}
+            ORDER BY sd.DateReceived DESC LIMIT 100";
+        using var r = await cmd.ExecuteReaderAsync();
+        while (await r.ReadAsync())
+            list.Add(new SecurityDepositPreview
+            {
+                Id            = ReadGuid(r, 0),
+                Amount        = ReadDecimal(r, 1),
+                DateReceived  = ReadDateTime(r, 2),
+                PaymentMethod = ReadStr(r, 3),
+                Status        = ReadStr(r, 4),
+                TenantName    = ReadStr(r, 5)
+            });
+        return list;
+    }
+
+    private static async Task<List<NotePreview>> ReadNotesPreviewAsync(
+        SqliteConnection conn, HashSet<string> cols)
+    {
+        var list    = new List<NotePreview>();
+        var del     = cols.Contains("IsDeleted") ? " WHERE IsDeleted = 0" : "";
+        var created = cols.Contains("CreatedOn") ? ", CreatedOn" : "";
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = $"SELECT Id, EntityType, SUBSTR(Content, 1, 120){created} FROM [Notes]{del} ORDER BY Id DESC LIMIT 100";
+        using var r = await cmd.ExecuteReaderAsync();
+        while (await r.ReadAsync())
+        {
+            int idx = 3;
+            list.Add(new NotePreview
+            {
+                Id         = ReadGuid(r, 0),
+                EntityType = ReadStr(r, 1),
+                Content    = ReadStr(r, 2),
+                CreatedOn  = cols.Contains("CreatedOn") ? (DateTime?)ReadDateTime(r, idx) : null
+            });
+        }
+        return list;
+    }
+
+    private static async Task<List<NotificationPreview>> ReadNotificationsPreviewAsync(
+        SqliteConnection conn, HashSet<string> cols)
+    {
+        var list = new List<NotificationPreview>();
+        var del  = cols.Contains("IsDeleted") ? " WHERE IsDeleted = 0" : "";
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = $"SELECT Id, Title, Type, Category, SentOn FROM [Notifications]{del} ORDER BY SentOn DESC LIMIT 100";
+        using var r = await cmd.ExecuteReaderAsync();
+        while (await r.ReadAsync())
+            list.Add(new NotificationPreview
+            {
+                Id       = ReadGuid(r, 0),
+                Title    = ReadStr(r, 1),
+                Type     = ReadStr(r, 2),
+                Category = ReadStr(r, 3),
+                SentOn   = ReadDateTime(r, 4)
+            });
+        return list;
+    }
+
     // -------------------------------------------------------------------------
     // Import — two separate connections (backup=read, active=write)
     // -------------------------------------------------------------------------
@@ -658,7 +910,14 @@ public class DatabasePreviewService
                 result.PaymentsImported            = await ImportTableAsync(backupConn, activeConn, "Payments",            PaymentRequiredCols,     orgId, userId, result.Errors);
                 result.MaintenanceRequestsImported = await ImportTableAsync(backupConn, activeConn, "MaintenanceRequests", MaintenanceRequiredCols, orgId, userId, result.Errors);
                 result.RepairsImported             = await ImportTableAsync(backupConn, activeConn, "Repairs",             RepairRequiredCols,      orgId, userId, result.Errors);
-                result.DocumentsImported           = await ImportTableAsync(backupConn, activeConn, "Documents",           DocumentRequiredCols,    orgId, userId, result.Errors);
+                result.DocumentsImported           = await ImportTableAsync(backupConn, activeConn, "Documents",           DocumentRequiredCols,       orgId, userId, result.Errors);
+                result.CalendarEventsImported      = await ImportTableAsync(backupConn, activeConn, "CalendarEvents",      CalendarEventRequiredCols,  orgId, userId, result.Errors);
+                result.InspectionsImported         = await ImportTableAsync(backupConn, activeConn, "Inspections",         InspectionRequiredCols,     orgId, userId, result.Errors);
+                result.ChecklistsImported          = await ImportTableAsync(backupConn, activeConn, "Checklists",          ChecklistRequiredCols,      orgId, userId, result.Errors);
+                result.ChecklistItemsImported      = await ImportTableAsync(backupConn, activeConn, "ChecklistItems",      ChecklistItemRequiredCols,  orgId, userId, result.Errors);
+                result.SecurityDepositsImported    = await ImportTableAsync(backupConn, activeConn, "SecurityDeposits",    SecurityDepositRequiredCols, orgId, userId, result.Errors);
+                result.NotesImported               = await ImportTableAsync(backupConn, activeConn, "Notes",               NoteRequiredCols,           orgId, userId, result.Errors);
+                result.NotificationsImported       = await ImportNotificationsAsync(backupConn, activeConn, NotificationRequiredCols, orgId, userId, result.Errors);
 
                 tx.Commit();
             }
@@ -702,6 +961,141 @@ public class DatabasePreviewService
     /// OrganizationId is always substituted with the active org.
     /// Returns the number of rows actually inserted.
     /// </summary>
+
+    /// <summary>
+    /// Imports Notifications by fanning each source row out to every real user
+    /// (all AspNetUsers except the system user) so all users receive the notification.
+    /// Each fan-out row gets a freshly generated Id to avoid PK collisions.
+    /// </summary>
+    private static async Task<int> ImportNotificationsAsync(
+        SqliteConnection backupConn,
+        SqliteConnection activeConn,
+        HashSet<string> requiredCols,
+        string orgId,
+        string currentUserId,
+        List<string> errors)
+    {
+        try
+        {
+            // Collect all real user IDs from the active database
+            var realUserIds = new List<string>();
+            using (var userCmd = activeConn.CreateCommand())
+            {
+                userCmd.CommandText = $"SELECT Id FROM AspNetUsers WHERE Id != '{ApplicationConstants.SystemUser.Id}'";
+                using var userReader = await userCmd.ExecuteReaderAsync();
+                while (await userReader.ReadAsync())
+                    realUserIds.Add(userReader.GetString(0));
+            }
+
+            if (realUserIds.Count == 0)
+            {
+                errors.Add("Notifications: no real users found in active database — skipping.");
+                return 0;
+            }
+
+            var backupCols = await GetTableColumnsAsync(backupConn, "Notifications");
+            var activeCols = await GetTableColumnsAsync(activeConn, "Notifications");
+
+            var missingRequired = requiredCols
+                .Where(rc =>
+                    !backupCols.Contains(rc) &&
+                    !ColumnAliases.Any(kv =>
+                        kv.Value.Equals(rc, StringComparison.OrdinalIgnoreCase) &&
+                        backupCols.Contains(kv.Key)))
+                .ToList();
+            if (missingRequired.Count > 0)
+                errors.Add($"Notifications: warning — required columns not found in backup: {string.Join(", ", missingRequired)}");
+
+            // Always-overridden cols (RecipientUserId handled separately per fan-out row)
+            var overrideCols = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+                { "Id", "OrganizationId", "CreatedBy", "LastModifiedBy", "RecipientUserId" };
+
+            var colMapping = new List<(string BackupCol, string ActiveCol)>();
+            foreach (var bc in backupCols)
+            {
+                if (overrideCols.Contains(bc)) continue;
+                var ac = ColumnAliases.TryGetValue(bc, out var aliased) ? aliased : bc;
+                if (activeCols.Contains(ac) && !overrideCols.Contains(ac))
+                    colMapping.Add((bc, ac));
+            }
+            colMapping = colMapping.OrderBy(x => x.ActiveCol, StringComparer.OrdinalIgnoreCase).ToList();
+
+            var readCols        = colMapping.Select(x => x.BackupCol).ToArray();
+            var insertDataCols  = colMapping.Select(x => x.ActiveCol).ToArray();
+            var selectColList   = string.Join(", ", readCols.Select(c => $"[{c}]"));
+            var delFilter       = backupCols.Contains("IsDeleted") ? " WHERE IsDeleted = 0" : "";
+
+            // Read source rows
+            var rows = new List<object?[]>();
+            using (var readCmd = backupConn.CreateCommand())
+            {
+                readCmd.CommandText = selectColList.Length > 0
+                    ? $"SELECT {selectColList} FROM [Notifications]{delFilter}"
+                    : $"SELECT 1 FROM [Notifications]{delFilter}";
+                using var reader = await readCmd.ExecuteReaderAsync();
+                while (await reader.ReadAsync())
+                {
+                    var row = new object?[readCols.Length];
+                    for (int i = 0; i < readCols.Length; i++)
+                        row[i] = reader.IsDBNull(i) ? null : reader.GetValue(i);
+                    rows.Add(row);
+                }
+            }
+
+            if (rows.Count == 0) return 0;
+
+            // Build INSERT: Id, RecipientUserId, OrganizationId, CreatedBy, LastModifiedBy, then data cols
+            var allInsertCols = new[] { "Id", "RecipientUserId", "OrganizationId", "CreatedBy", "LastModifiedBy" }
+                .Concat(insertDataCols)
+                .Where(c => activeCols.Contains(c))
+                .ToArray();
+            var colList   = string.Join(", ", allInsertCols.Select(c => $"[{c}]"));
+            var paramList = string.Join(", ", allInsertCols.Select(c =>
+                c.Equals("Id",              StringComparison.OrdinalIgnoreCase) ? "@newId" :
+                c.Equals("RecipientUserId", StringComparison.OrdinalIgnoreCase) ? "@recipientId" :
+                c.Equals("OrganizationId",  StringComparison.OrdinalIgnoreCase) ? "@orgId" :
+                c.Equals("CreatedBy",       StringComparison.OrdinalIgnoreCase) ? "@currentUser" :
+                c.Equals("LastModifiedBy",  StringComparison.OrdinalIgnoreCase) ? "@currentUser" :
+                $"@c_{c}"));
+
+            using var writeCmd = activeConn.CreateCommand();
+            writeCmd.CommandText = $"INSERT OR IGNORE INTO [Notifications] ({colList}) VALUES ({paramList})";
+            writeCmd.Parameters.Add(new SqliteParameter("@newId",      DBNull.Value));
+            writeCmd.Parameters.Add(new SqliteParameter("@recipientId",DBNull.Value));
+            writeCmd.Parameters.AddWithValue("@orgId",       orgId);
+            writeCmd.Parameters.AddWithValue("@currentUser", currentUserId);
+            foreach (var ac in insertDataCols)
+                writeCmd.Parameters.Add(new SqliteParameter($"@c_{ac}", DBNull.Value));
+
+            int count = 0;
+            foreach (var row in rows)
+            {
+                // Set data column values once (shared across all user fan-outs)
+                for (int i = 0; i < insertDataCols.Length; i++)
+                {
+                    var val = row[i];
+                    if (val is string s && Guid.TryParse(s, out var g))
+                        val = g.ToString("D").ToUpperInvariant();
+                    writeCmd.Parameters[$"@c_{insertDataCols[i]}"].Value = val ?? DBNull.Value;
+                }
+
+                // Fan out: insert one row per real user
+                foreach (var uid in realUserIds)
+                {
+                    writeCmd.Parameters["@newId"].Value       = Guid.NewGuid().ToString("D").ToUpperInvariant();
+                    writeCmd.Parameters["@recipientId"].Value = uid;
+                    count += await writeCmd.ExecuteNonQueryAsync();
+                }
+            }
+
+            return count;
+        }
+        catch (Exception ex)
+        {
+            errors.Add($"Notifications: {ex.Message}");
+            return 0;
+        }
+    }
     private static async Task<int> ImportTableAsync(
         SqliteConnection backupConn,
         SqliteConnection activeConn,

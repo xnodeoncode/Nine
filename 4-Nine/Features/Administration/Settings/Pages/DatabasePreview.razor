@@ -160,6 +160,73 @@
             </div>
         </div>
 
+        <!-- Additional entity counts -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-2 col-sm-4">
+                <div class="card text-center h-100">
+                    <div class="card-body py-3">
+                        <i class="bi bi-calendar-event fs-2 text-info"></i>
+                        <h4 class="mb-0 mt-1">@previewData.CalendarEventCount</h4>
+                        <small class="text-muted">Calendar Events</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2 col-sm-4">
+                <div class="card text-center h-100">
+                    <div class="card-body py-3">
+                        <i class="bi bi-clipboard-check fs-2 text-success"></i>
+                        <h4 class="mb-0 mt-1">@previewData.InspectionCount</h4>
+                        <small class="text-muted">Inspections</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2 col-sm-4">
+                <div class="card text-center h-100">
+                    <div class="card-body py-3">
+                        <i class="bi bi-list-check fs-2 text-primary"></i>
+                        <h4 class="mb-0 mt-1">@previewData.ChecklistCount</h4>
+                        <small class="text-muted">Checklists</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2 col-sm-4">
+                <div class="card text-center h-100">
+                    <div class="card-body py-3">
+                        <i class="bi bi-check2-square fs-2 text-secondary"></i>
+                        <h4 class="mb-0 mt-1">@previewData.ChecklistItemCount</h4>
+                        <small class="text-muted">Checklist Items</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2 col-sm-4">
+                <div class="card text-center h-100">
+                    <div class="card-body py-3">
+                        <i class="bi bi-safe fs-2 text-warning"></i>
+                        <h4 class="mb-0 mt-1">@previewData.SecurityDepositCount</h4>
+                        <small class="text-muted">Security Deposits</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2 col-sm-4">
+                <div class="card text-center h-100">
+                    <div class="card-body py-3">
+                        <i class="bi bi-sticky fs-2 text-info"></i>
+                        <h4 class="mb-0 mt-1">@previewData.NoteCount</h4>
+                        <small class="text-muted">Notes</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2 col-sm-4">
+                <div class="card text-center h-100">
+                    <div class="card-body py-3">
+                        <i class="bi bi-bell fs-2 text-danger"></i>
+                        <h4 class="mb-0 mt-1">@previewData.NotificationCount</h4>
+                        <small class="text-muted">Notifications</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Data Tables -->
         <div class="card mb-4">
             <div class="card-header">
@@ -212,6 +279,48 @@
                         <button class="nav-link @(activeTab == "repairs" ? "active" : "")"
                                 @onclick=@(() => SwitchTab("repairs")) type="button">
                             <i class="bi bi-wrench"></i> Repairs
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link @(activeTab == "calendarevents" ? "active" : "")"
+                                @onclick=@(() => SwitchTab("calendarevents")) type="button">
+                            <i class="bi bi-calendar-event"></i> Calendar Events
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link @(activeTab == "inspections" ? "active" : "")"
+                                @onclick=@(() => SwitchTab("inspections")) type="button">
+                            <i class="bi bi-clipboard-check"></i> Inspections
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link @(activeTab == "checklists" ? "active" : "")"
+                                @onclick=@(() => SwitchTab("checklists")) type="button">
+                            <i class="bi bi-list-check"></i> Checklists
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link @(activeTab == "checklistitems" ? "active" : "")"
+                                @onclick=@(() => SwitchTab("checklistitems")) type="button">
+                            <i class="bi bi-check2-square"></i> Checklist Items
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link @(activeTab == "securitydeposits" ? "active" : "")"
+                                @onclick=@(() => SwitchTab("securitydeposits")) type="button">
+                            <i class="bi bi-safe"></i> Security Deposits
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link @(activeTab == "notes" ? "active" : "")"
+                                @onclick=@(() => SwitchTab("notes")) type="button">
+                            <i class="bi bi-sticky"></i> Notes
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link @(activeTab == "notifications" ? "active" : "")"
+                                @onclick=@(() => SwitchTab("notifications")) type="button">
+                            <i class="bi bi-bell"></i> Notifications
                         </button>
                     </li>
                 </ul>
@@ -521,6 +630,287 @@
                         <p class="text-muted text-center py-4 mb-0">No repairs found</p>
                     }
                 }
+
+                <!-- Calendar Events Tab -->
+                @if (activeTab == "calendarevents")
+                {
+                    @if (previewData.CalendarEvents?.Any() == true)
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Type</th>
+                                        <th>Status</th>
+                                        <th>Starts On</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var ev in previewData.CalendarEvents)
+                                    {
+                                        <tr>
+                                            <td>@ev.Title</td>
+                                            <td>@ev.EventType</td>
+                                            <td><span class="badge bg-secondary">@ev.Status</span></td>
+                                            <td>@ev.StartOn.ToString("g")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        @if (previewData.CalendarEventCount > 100)
+                        {
+                            <div class="p-3 text-muted small border-top">
+                                Showing first 100 of @previewData.CalendarEventCount events. All records will be imported.
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p class="text-muted text-center py-4 mb-0">No calendar events found</p>
+                    }
+                }
+
+                <!-- Inspections Tab -->
+                @if (activeTab == "inspections")
+                {
+                    @if (previewData.Inspections?.Any() == true)
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Property</th>
+                                        <th>Type</th>
+                                        <th>Inspected By</th>
+                                        <th>Completed On</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var ins in previewData.Inspections)
+                                    {
+                                        <tr>
+                                            <td>@ins.PropertyAddress</td>
+                                            <td>@ins.InspectionType</td>
+                                            <td>@(ins.InspectedBy ?? "—")</td>
+                                            <td>@ins.CompletedOn.ToString("d")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        @if (previewData.InspectionCount > 100)
+                        {
+                            <div class="p-3 text-muted small border-top">
+                                Showing first 100 of @previewData.InspectionCount inspections. All records will be imported.
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p class="text-muted text-center py-4 mb-0">No inspections found</p>
+                    }
+                }
+
+                <!-- Checklists Tab -->
+                @if (activeTab == "checklists")
+                {
+                    @if (previewData.Checklists?.Any() == true)
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Type</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var cl in previewData.Checklists)
+                                    {
+                                        <tr>
+                                            <td>@cl.Name</td>
+                                            <td>@cl.ChecklistType</td>
+                                            <td><span class="badge bg-secondary">@cl.Status</span></td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        @if (previewData.ChecklistCount > 100)
+                        {
+                            <div class="p-3 text-muted small border-top">
+                                Showing first 100 of @previewData.ChecklistCount checklists. All records will be imported.
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p class="text-muted text-center py-4 mb-0">No checklists found</p>
+                    }
+                }
+
+                <!-- Checklist Items Tab -->
+                @if (activeTab == "checklistitems")
+                {
+                    @if (previewData.ChecklistItems?.Any() == true)
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Item</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in previewData.ChecklistItems)
+                                    {
+                                        <tr>
+                                            <td>@item.ItemOrder</td>
+                                            <td>@item.ItemText</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        @if (previewData.ChecklistItemCount > 100)
+                        {
+                            <div class="p-3 text-muted small border-top">
+                                Showing first 100 of @previewData.ChecklistItemCount items. All records will be imported.
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p class="text-muted text-center py-4 mb-0">No checklist items found</p>
+                    }
+                }
+
+                <!-- Security Deposits Tab -->
+                @if (activeTab == "securitydeposits")
+                {
+                    @if (previewData.SecurityDeposits?.Any() == true)
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Tenant</th>
+                                        <th class="text-end">Amount</th>
+                                        <th>Method</th>
+                                        <th>Status</th>
+                                        <th>Received</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var sd in previewData.SecurityDeposits)
+                                    {
+                                        <tr>
+                                            <td>@sd.TenantName</td>
+                                            <td class="text-end">@sd.Amount.ToString("C")</td>
+                                            <td>@sd.PaymentMethod</td>
+                                            <td><span class="badge bg-secondary">@sd.Status</span></td>
+                                            <td>@sd.DateReceived.ToString("d")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        @if (previewData.SecurityDepositCount > 100)
+                        {
+                            <div class="p-3 text-muted small border-top">
+                                Showing first 100 of @previewData.SecurityDepositCount deposits. All records will be imported.
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p class="text-muted text-center py-4 mb-0">No security deposits found</p>
+                    }
+                }
+
+                <!-- Notes Tab -->
+                @if (activeTab == "notes")
+                {
+                    @if (previewData.Notes?.Any() == true)
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Entity Type</th>
+                                        <th>Content</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var note in previewData.Notes)
+                                    {
+                                        <tr>
+                                            <td><span class="badge bg-secondary">@note.EntityType</span></td>
+                                            <td>@note.Content@(note.Content.Length >= 120 ? "…" : "")</td>
+                                            <td>@(note.CreatedOn.HasValue ? note.CreatedOn.Value.ToString("d") : "—")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        @if (previewData.NoteCount > 100)
+                        {
+                            <div class="p-3 text-muted small border-top">
+                                Showing first 100 of @previewData.NoteCount notes. All records will be imported.
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p class="text-muted text-center py-4 mb-0">No notes found</p>
+                    }
+                }
+
+                <!-- Notifications Tab -->
+                @if (activeTab == "notifications")
+                {
+                    @if (previewData.Notifications?.Any() == true)
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Type</th>
+                                        <th>Category</th>
+                                        <th>Sent On</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var noti in previewData.Notifications)
+                                    {
+                                        <tr>
+                                            <td>@noti.Title</td>
+                                            <td><span class="badge bg-secondary">@noti.Type</span></td>
+                                            <td>@noti.Category</td>
+                                            <td>@noti.SentOn.ToString("g")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        @if (previewData.NotificationCount > 100)
+                        {
+                            <div class="p-3 text-muted small border-top">
+                                Showing first 100 of @previewData.NotificationCount notifications. All records will be imported.
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p class="text-muted text-center py-4 mb-0">No notifications found</p>
+                    }
+                }
             </div>
         </div>
 
@@ -573,6 +963,34 @@
                                     @if (importResult.DocumentsImported > 0)
                                     {
                                         <li>@importResult.DocumentsImported documents</li>
+                                    }
+                                    @if (importResult.CalendarEventsImported > 0)
+                                    {
+                                        <li>@importResult.CalendarEventsImported calendar events</li>
+                                    }
+                                    @if (importResult.InspectionsImported > 0)
+                                    {
+                                        <li>@importResult.InspectionsImported inspections</li>
+                                    }
+                                    @if (importResult.ChecklistsImported > 0)
+                                    {
+                                        <li>@importResult.ChecklistsImported checklists</li>
+                                    }
+                                    @if (importResult.ChecklistItemsImported > 0)
+                                    {
+                                        <li>@importResult.ChecklistItemsImported checklist items</li>
+                                    }
+                                    @if (importResult.SecurityDepositsImported > 0)
+                                    {
+                                        <li>@importResult.SecurityDepositsImported security deposits</li>
+                                    }
+                                    @if (importResult.NotesImported > 0)
+                                    {
+                                        <li>@importResult.NotesImported notes</li>
+                                    }
+                                    @if (importResult.NotificationsImported > 0)
+                                    {
+                                        <li>@importResult.NotificationsImported notifications</li>
                                     }
                                 </ul>
                             }

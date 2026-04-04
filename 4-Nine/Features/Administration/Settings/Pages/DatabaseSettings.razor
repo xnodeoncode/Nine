@@ -386,10 +386,15 @@
                                                         @onclick="() => PreviewOtherDatabase(db)">
                                                     <i class="bi bi-eye"></i> Preview
                                                 </button>
-                                                <button class="btn btn-sm btn-warning"
+                                                <button class="btn btn-sm btn-warning me-2"
                                                         @onclick="() => AddOtherDbToBackups(db)"
                                                         disabled="@isLoadingBackups">
                                                     <i class="bi bi-folder-plus"></i> Add to Backups
+                                                </button>
+                                                <button class="btn btn-sm btn-danger"
+                                                        @onclick="() => DeleteOtherDatabase(db)"
+                                                        disabled="@isDeleting">
+                                                    <i class="bi bi-trash"></i> Delete
                                                 </button>
                                             </td>
                                         </tr>
@@ -706,18 +711,15 @@
         
         try
         {
-            // Delete the backup file
-            if (File.Exists(backup.FilePath))
+            var result = await PreviewService.DeleteDatabaseFileAsync(backup.FilePath);
+            if (result.Success)
             {
-                File.Delete(backup.FilePath);
                 successMessage = $"Backup '{backup.FileName}' deleted successfully.";
-                
-                // Refresh the backup list
                 await LoadBackups();
             }
             else
             {
-                errorMessage = $"Backup file not found: {backup.FileName}";
+                errorMessage = result.Message;
             }
         }
         catch (Exception ex)
@@ -760,6 +762,40 @@
         finally
         {
             isLoadingBackups = false;
+        }
+    }
+
+    private async Task DeleteOtherDatabase(OtherDatabaseFile db)
+    {
+        var confirmed = await JSRuntime.InvokeAsync<bool>("confirm",
+            $"Are you sure you want to delete '{db.FileName}'?\n\nThis cannot be undone.");
+
+        if (!confirmed) return;
+
+        isDeleting = true;
+        errorMessage = null;
+        successMessage = null;
+
+        try
+        {
+            var result = await PreviewService.DeleteDatabaseFileAsync(db.FilePath);
+            if (result.Success)
+            {
+                successMessage = $"'{db.FileName}' deleted successfully.";
+                otherDatabases = await PreviewService.GetOtherDatabaseFilesAsync();
+            }
+            else
+            {
+                errorMessage = result.Message;
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error deleting file: {ex.Message}";
+        }
+        finally
+        {
+            isDeleting = false;
         }
     }
 
