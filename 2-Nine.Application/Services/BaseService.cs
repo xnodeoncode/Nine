@@ -133,7 +133,10 @@ namespace Nine.Application.Services
                 var userId = await _userContext.GetUserIdAsync();
                 if (string.IsNullOrEmpty(userId))
                 {
-                    throw new UnauthorizedAccessException("User is not authenticated.");
+                    if (entity.CreatedBy == ApplicationConstants.SystemUser.Id)
+                        userId = entity.CreatedBy; // Allow system-created records to specify "System" as creator
+                    else
+                        throw new UnauthorizedAccessException("User is not authenticated.");
                 }
 
                 var organizationId = await _userContext.GetActiveOrganizationIdAsync();
@@ -188,7 +191,10 @@ namespace Nine.Application.Services
                 var userId = await _userContext.GetUserIdAsync();
                 if (string.IsNullOrEmpty(userId))
                 {
-                    throw new UnauthorizedAccessException("User is not authenticated.");
+                    if (entity.LastModifiedBy == ApplicationConstants.SystemUser.Id)
+                        userId = ApplicationConstants.SystemUser.Id;
+                    else
+                        throw new UnauthorizedAccessException("User is not authenticated.");
                 }
 
                 var organizationId = await _userContext.GetActiveOrganizationIdAsync();

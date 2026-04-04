@@ -59,7 +59,7 @@
                             <button class="btn btn-outline-primary" @onclick="EditProperty">
                                 <i class="bi bi-pencil"></i> Edit Property
                             </button>
-                            @if (property.IsAvailable)
+                            @if (property.IsActive)
                             {
                                 <button class="btn btn-outline-success" @onclick="CreateLease">
                                     <i class="bi bi-file-plus"></i> New Lease

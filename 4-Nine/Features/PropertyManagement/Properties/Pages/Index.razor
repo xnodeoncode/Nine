@@ -74,10 +74,11 @@
     protected override async Task OnInitializedAsync()
     {
         Properties = await PropertyService.GetAllAsync();
+        Console.WriteLine($"Loaded {Properties.Count} properties from the service.");
         
-        availableProperties = Properties.Where(p => p.IsAvailable).Count();
-        occupiedProperties = Properties.Where(p => !p.IsAvailable).Count();
-        totalMonthlyRent = Properties.Where(p => !p.IsAvailable).Sum(p => p.MonthlyRent);
+        availableProperties = Properties.Where(p => p.IsActive).Count();
+        occupiedProperties = Properties.Where(p => !p.IsActive).Count();
+        totalMonthlyRent = Properties.Where(p => !p.IsActive).Sum(p => p.MonthlyRent);
         
         ApplySort();
     }

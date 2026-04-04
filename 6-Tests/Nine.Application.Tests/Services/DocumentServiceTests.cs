@@ -87,7 +87,7 @@ namespace Nine.Application.Tests
                 City = "Test City",
                 State = "TS",
                 ZipCode = "12345",
-                IsAvailable = true,
+                IsActive = true,
                 CreatedBy = _testUserId,
                 CreatedOn = DateTime.UtcNow
             };
@@ -702,7 +702,7 @@ namespace Nine.Application.Tests
                 City = "Other City",
                 State = "OT",
                 ZipCode = "99999",
-                IsAvailable = true,
+                IsActive = true,
                 CreatedBy = otherUserId,
                 CreatedOn = DateTime.UtcNow
             };
@@ -778,7 +778,7 @@ namespace Nine.Application.Tests
                 City = "Other City",
                 State = "OT",
                 ZipCode = "88888",
-                IsAvailable = true,
+                IsActive = true,
                 CreatedBy = otherUserId,
                 CreatedOn = DateTime.UtcNow
             };

@@ -22,9 +22,9 @@ This matrix tracks version compatibility across Nine releases, enabling you to:
 
 ## Nine Version History
 
-| Release Date | App Version | Database Schema | .NET SDK | ElectronNET | Bootstrap | QuestPDF  | Migration Required | Breaking Changes | Status             | Download                                                             |
-| ------------ | ----------- | --------------- | -------- | ----------- | --------- | --------- | ------------------ | ---------------- | ------------------ | -------------------------------------------------------------------- |
-| TBD          | **1.2.0**   | v1.2.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | Yes (v1.1.0→1.2.0) | TBD              | **In Development** | -                                                                    |
+| Release Date | App Version | Database Schema | .NET SDK | ElectronNET | Bootstrap | QuestPDF  | Migration Required | Breaking Changes | Status             | Download                                                           |
+| ------------ | ----------- | --------------- | -------- | ----------- | --------- | --------- | ------------------ | ---------------- | ------------------ | ------------------------------------------------------------------ |
+| TBD          | **1.2.0**   | v1.2.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | Yes (v1.1.0→1.2.0) | TBD              | **In Development** | -                                                                  |
 | 2026-03-01   | 1.1.2       | v1.1.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | No                 | No               | **Current**        | [Release](https://github.com/xnodeoncode/nine/releases/tag/v1.1.2) |
 | 2026-02-28   | 1.1.1       | v1.1.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | No                 | No               | Previous           | [Release](https://github.com/xnodeoncode/nine/releases/tag/v1.1.1) |
 | 2026-02-18   | 1.1.0       | v1.1.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | Yes (v1.0.0→1.1.0) | New tables/cols  | Superseded         | [Release](https://github.com/xnodeoncode/nine/releases/tag/v1.1.0) |
@@ -70,7 +70,7 @@ This matrix tracks version compatibility across Nine releases, enabling you to:
 | ------------------- | --------------------- | --------------- | ---------------------------------------------- |
 | **SQLite**          | 3.46.0                | Database engine | Via Microsoft.Data.Sqlite                      |
 | **EF Core**         | 10.0.1                | ORM             | Breaking changes uncommon in minor versions    |
-| **Database Schema** | v1.0.0 (Nine)  | Data structure  | Tracks with app version MAJOR.MINOR milestones |
+| **Database Schema** | v1.0.0 (Nine)         | Data structure  | Tracks with app version MAJOR.MINOR milestones |
 |                     | v0.0.0 (Professional) | Data structure  | Pre-v1.0.0 rapid iteration phase               |
 
 ### UI & Front-end
@@ -122,13 +122,26 @@ This matrix tracks version compatibility across Nine releases, enabling you to:
   - Database filename: `app_v0.0.0.db`
 
 - **Future versions**:
-  - **MAJOR** (vX.0.0): Breaking schema changes requiring migration
-    - Database filename updates to `app_vX.0.0.db`
-    - Automatic backup created before migration
-  - **MINOR** (v1.X.0): New tables/columns, backward compatible
-    - Database filename may update to `app_v1.X.0.db` if schema changes
-  - **PATCH** (v1.0.X): No schema changes
-    - Database filename remains unchanged
+  - **PATCH** (v1.0.X): Additive-only schema changes — same DB file
+  - **MINOR** (v1.X.0): Destructive or non-nullable changes — new DB file
+  - **MAJOR** (vX.0.0): Breaking changes requiring manual data migration — new DB file + backup enforced
+
+#### Schema Change Classification
+
+| Change Type                                          | Version | DB File Changes | EF Compatible | Notes                                                                                             |
+| ---------------------------------------------------- | ------- | --------------- | ------------- | ------------------------------------------------------------------------------------------------- |
+| Add nullable column                                  | PATCH   | No              | ✅ Yes        | Existing rows get NULL automatically                                                              |
+| Add new table                                        | PATCH   | No              | ✅ Yes        | No impact on existing data                                                                        |
+| Add new index                                        | PATCH   | No              | ✅ Yes        | No impact on existing data                                                                        |
+| Remove column (unused/obsolete)                      | MINOR   | Yes             | ✅ Yes        | EF generates `DropColumn`; data lost                                                              |
+| Remove table                                         | MINOR   | Yes             | ✅ Yes        | EF generates `DropTable`; data lost                                                               |
+| Add non-nullable column with default/backfill        | MINOR   | Yes             | ✅ Yes        | EF adds column + default; migration review required                                               |
+| Rename column or table                               | MAJOR   | Yes             | ⚠️ Partial    | EF generates drop+add (data loss); must hand-edit migration to use `RenameColumn` / `RenameTable` |
+| Change column type (compatible, e.g. int → bigint)   | MAJOR   | Yes             | ✅ Yes        | EF generates `AlterColumn`; verify data integrity                                                 |
+| Change column type (incompatible, e.g. string → int) | MAJOR   | Yes             | ❌ No         | EF cannot convert data; manual migration script needed                                            |
+| Restructure relationship or foreign key              | MAJOR   | Yes             | ⚠️ Partial    | May require data migration depending on cardinality                                               |
+
+> **Rollback note:** PATCH releases share the same DB file across all patch versions. Rolling back from v1.0.3 → v1.0.1 leaves any patch-added columns in place. SQLite ignores unknown columns on reads and leaves them NULL on writes — safe but unsupported.
 
 ---
 
@@ -148,7 +161,7 @@ This matrix tracks version compatibility across Nine releases, enabling you to:
 | ------------ | ---------- | -------------- | ---------------- | ------------------------------------------------ |
 | v1.0.1       | v1.1.0     | Automatic      | Schema v1.1.0    | New DatabaseSettings table, IsSampleData columns |
 | v1.0.0       | v1.0.1     | None           | No               | Drop-in replacement                              |
-| v0.3.0       | v0.3.1     | Automatic      | Database path    | Same migration as Nine                    |
+| v0.3.0       | v0.3.1     | Automatic      | Database path    | Same migration as Nine                           |
 | v1.x.x       | v2.0.0     | Automatic      | Schema changes   | Future: Major version, backup enforced           |
 
 ---
@@ -213,7 +226,7 @@ This matrix tracks version compatibility across Nine releases, enabling you to:
 
 | Limitation             | All Versions           | Reason                       |
 | ---------------------- | ---------------------- | ---------------------------- |
-| **Maximum Properties** | 9 (Nine)        | Simple Start tier constraint |
+| **Maximum Properties** | 9 (Nine)               | Simple Start tier constraint |
 | **Maximum Users**      | 3 (1 system + 3 login) | Simplified access control    |
 | **Organizations**      | 1                      | Desktop application scope    |
 | **File Upload Size**   | 10 MB per file         | Performance management       |

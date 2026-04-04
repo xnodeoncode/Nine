@@ -114,11 +114,20 @@ namespace Nine.Shared.Services
 
         /// <summary>
         /// Checks if a user is authenticated.
+        /// Returns false when called from a non-Blazor context such as background services.
         /// </summary>
         public async Task<bool> IsAuthenticatedAsync()
         {
-            var authState = await _authenticationStateProvider.GetAuthenticationStateAsync();
-            return authState.User.Identity?.IsAuthenticated ?? false;
+            try
+            {
+                var authState = await _authenticationStateProvider.GetAuthenticationStateAsync();
+                return authState.User.Identity?.IsAuthenticated ?? false;
+            }
+            catch (InvalidOperationException)
+            {
+                // Called outside a Blazor circuit (e.g., background/scheduled services).
+                return false;
+            }
         }
 
         /// <summary>
@@ -339,7 +348,19 @@ namespace Nine.Shared.Services
             if (_isInitialized)
                 return;
 
-            var authState = await _authenticationStateProvider.GetAuthenticationStateAsync();
+            AuthenticationState? authState;
+            try
+            {
+                authState = await _authenticationStateProvider.GetAuthenticationStateAsync();
+            }
+            catch (InvalidOperationException)
+            {
+                // Called outside a Blazor circuit (e.g., background/scheduled services).
+                // Treat as unauthenticated — userId and organizationId will be null.
+                _isInitialized = true;
+                return;
+            }
+
             var user = authState.User;
 
             if (user.Identity?.IsAuthenticated == true)

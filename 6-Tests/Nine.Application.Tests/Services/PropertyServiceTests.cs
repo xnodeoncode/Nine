@@ -438,7 +438,7 @@ namespace Nine.Application.Tests
                 State = "TS",
                 ZipCode = "12345",
                 PropertyType = "House",
-                IsAvailable = true,
+                IsActive = true,
                 CreatedBy = _testUserId,
                 CreatedOn = DateTime.UtcNow
             };
@@ -452,7 +452,7 @@ namespace Nine.Application.Tests
                 State = "TS",
                 ZipCode = "12345",
                 PropertyType = "House",
-                IsAvailable = true,
+                IsActive = true,
                 CreatedBy = _testUserId,
                 CreatedOn = DateTime.UtcNow
             };
@@ -511,7 +511,7 @@ namespace Nine.Application.Tests
                 State = "TS",
                 ZipCode = "12345",
                 PropertyType = "House",
-                IsAvailable = false, // Not available
+                IsActive = false, // Not available
                 CreatedBy = _testUserId,
                 CreatedOn = DateTime.UtcNow
             };
@@ -552,7 +552,7 @@ namespace Nine.Application.Tests
                 State = "TS",
                 ZipCode = "12345",
                 PropertyType = "House",
-                IsAvailable = true,
+                IsActive = true,
                 CreatedBy = _testUserId,
                 CreatedOn = DateTime.UtcNow
             }).ToArray();

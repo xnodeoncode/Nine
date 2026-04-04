@@ -242,7 +242,7 @@ else
             {
                 if (leaseModel.Status == "Active")
                 {
-                    lease.Property.IsAvailable = false;
+                    lease.Property.IsActive = false;
                 }
                 else if (oldStatus == "Active" && leaseModel.Status != "Active")
                 {
@@ -252,7 +252,7 @@ else
                     
                     if (!otherActiveLeases)
                     {
-                        lease.Property.IsAvailable = true;
+                        lease.Property.IsActive = true;
                     }
                 }
             }
@@ -306,7 +306,7 @@ else
 
                     if (!otherActiveLeasesExist)
                     {
-                        lease.Property.IsAvailable = true;
+                        lease.Property.IsActive = true;
                     }
                 }
     

@@ -207,7 +207,7 @@ namespace Nine.Application.Services
 
                 return await _context.Properties
                     .Where(p => !p.IsDeleted && 
-                               p.IsAvailable && 
+                               p.IsActive && 
                                p.OrganizationId == organizationId)
                     .Where(p => !_context.Leases.Any(l =>
                         l.PropertyId == p.Id &&

@@ -213,7 +213,7 @@
         List<Property>? allProperties = await PropertyService.GetAllAsync();
 
         availableProperties = allProperties
-            .Where(p => p.IsAvailable)
+            .Where(p => p.IsActive)
             .ToList() ?? new List<Property>();
 
         // Load user's tenants
@@ -304,7 +304,7 @@
             // Mark property as unavailable if lease is active
             if (leaseModel.Status == ApplicationConstants.LeaseStatuses.Active)
             {
-                property.IsAvailable = false;
+                property.IsActive = false;
             }
 
             await PropertyService.UpdateAsync(property);

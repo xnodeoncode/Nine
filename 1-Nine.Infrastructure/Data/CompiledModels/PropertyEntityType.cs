@@ -87,11 +87,11 @@ namespace Nine.Infrastructure.Data.CompiledModels
                 fieldInfo: typeof(Property).GetField("<Description>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 maxLength: 1000);
 
-            var isAvailable = runtimeEntityType.AddProperty(
-                "IsAvailable",
+            var isActive = runtimeEntityType.AddProperty(
+                "IsActive",
                 typeof(bool),
-                propertyInfo: typeof(Property).GetProperty("IsAvailable", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(Property).GetField("<IsAvailable>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyInfo: typeof(Property).GetProperty("IsActive", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(Property).GetField("<IsActive>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: false);
 
             var isDeleted = runtimeEntityType.AddProperty(

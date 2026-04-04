@@ -8,12 +8,12 @@
 
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid d-flex align-items-center justify-content-center">
-        <a class="navbar-brand" href=""><img src="/assets/nine-logo-inverted.svg" width="90" alt="Nine." /></a>
-        @* <div class="d-flex gap-2">
+        <a class="navbar-brand" href=""><img src="@LogoSrc" width="90" alt="Nine." /></a>
+        <div class="d-flex gap-2">
             <button class="btn btn-link p-0" @onclick="ToggleTheme" title="Toggle theme">
                 <i class="bi @GetThemeIcon()" style="font-size: 1.4rem;"></i>
             </button>
-        </div> *@
+        </div>
     </div>
 </div>
 
@@ -170,6 +170,11 @@
     private string? currentUrl;
     private string currentTheme = "light";
     private bool showBrandThemeDropdown = false;
+
+    // Obsidian always uses the inverted logo. Bootstrap and Teal use inverted in dark mode only.
+    private string LogoSrc => (ThemeService.CurrentBrandTheme == "obsidian" || ThemeService.CurrentTheme == "dark")
+        ? "/assets/nine-logo-inverted.svg"
+        : "/assets/nine-logo.svg";
 
     private string OrganizationId = string.Empty;
 

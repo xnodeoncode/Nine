@@ -18,6 +18,8 @@
 @inject IHostApplicationLifetime AppLifetime
 @inject IDatabaseService DatabaseService
 @inject DatabaseEncryptionService EncryptionService
+@inject DatabasePreviewService PreviewService
+@using Nine.Application.Models.DTOs
 @inject PasswordDerivationService PasswordDerivation
 @inject UserContextService UserContext
 @attribute [OrganizationAuthorize("Owner", "Administrator")]
@@ -347,6 +349,65 @@
             </div>
         </div>
     </div>
+
+    <!-- Other Database Files (previous app versions) -->
+    @if (otherDatabases.Any())
+    {
+        <div class="row mt-4">
+            <div class="col">
+                <div class="card border-warning">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="mb-0"><i class="bi bi-database-exclamation"></i> Previous Database Versions Found</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted mb-3">
+                            The following database files were found in your data directory. These are typically from a previous version of Nine.
+                            You can preview them or add them to the backup list to import their data.
+                        </p>
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>File Name</th>
+                                        <th>Last Modified</th>
+                                        <th>Size</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var db in otherDatabases)
+                                    {
+                                        <tr>
+                                            <td><i class="bi bi-database"></i> @db.FileName</td>
+                                            <td>@db.LastModified.ToString("g")</td>
+                                            <td>@db.FileSizeFormatted</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-info me-2"
+                                                        @onclick="() => PreviewOtherDatabase(db)">
+                                                    <i class="bi bi-eye"></i> Preview
+                                                </button>
+                                                <button class="btn btn-sm btn-warning me-2"
+                                                        @onclick="() => AddOtherDbToBackups(db)"
+                                                        disabled="@isLoadingBackups">
+                                                    <i class="bi bi-folder-plus"></i> Add to Backups
+                                                </button>
+                                                <button class="btn btn-sm btn-danger"
+                                                        @onclick="() => DeleteOtherDatabase(db)"
+                                                        disabled="@isDeleting">
+                                                    <i class="bi bi-trash"></i> Delete
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
         <!-- Info Box -->
         <div class="row mt-4">
             <div class="col">
@@ -371,6 +432,7 @@
 
 @code {
     private List<BackupInfo> backups = new();
+    private List<OtherDatabaseFile> otherDatabases = new();
     private string? successMessage;
     private string? errorMessage;
     private bool isLoadingBackups = false;
@@ -519,6 +581,7 @@
         try
         {
             backups = await BackupService.GetAvailableBackupsAsync();
+            otherDatabases = await PreviewService.GetOtherDatabaseFilesAsync();
         }
         catch (Exception ex)
         {
@@ -648,18 +711,15 @@
         
         try
         {
-            // Delete the backup file
-            if (File.Exists(backup.FilePath))
+            var result = await PreviewService.DeleteDatabaseFileAsync(backup.FilePath);
+            if (result.Success)
             {
-                File.Delete(backup.FilePath);
                 successMessage = $"Backup '{backup.FileName}' deleted successfully.";
-                
-                // Refresh the backup list
                 await LoadBackups();
             }
             else
             {
-                errorMessage = $"Backup file not found: {backup.FileName}";
+                errorMessage = result.Message;
             }
         }
         catch (Exception ex)
@@ -674,9 +734,69 @@
 
     private void PreviewDatabase(BackupInfo backup)
     {
-        // Encode filename for URL
         var encodedFileName = Uri.EscapeDataString(backup.FileName);
         Navigation.NavigateTo($"/administration/database/preview/{encodedFileName}");
+    }
+
+    private void PreviewOtherDatabase(OtherDatabaseFile db)
+    {
+        var encodedFileName = Uri.EscapeDataString(db.FileName);
+        Navigation.NavigateTo($"/administration/database/preview/{encodedFileName}");
+    }
+
+    private async Task AddOtherDbToBackups(OtherDatabaseFile db)
+    {
+        isLoadingBackups = true;
+        try
+        {
+            var result = await PreviewService.AddToBackupsAsync(db.FilePath);
+            if (result.Success)
+                await LoadBackups();
+            else
+                errorMessage = result.Message;
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Failed to add database: {ex.Message}";
+        }
+        finally
+        {
+            isLoadingBackups = false;
+        }
+    }
+
+    private async Task DeleteOtherDatabase(OtherDatabaseFile db)
+    {
+        var confirmed = await JSRuntime.InvokeAsync<bool>("confirm",
+            $"Are you sure you want to delete '{db.FileName}'?\n\nThis cannot be undone.");
+
+        if (!confirmed) return;
+
+        isDeleting = true;
+        errorMessage = null;
+        successMessage = null;
+
+        try
+        {
+            var result = await PreviewService.DeleteDatabaseFileAsync(db.FilePath);
+            if (result.Success)
+            {
+                successMessage = $"'{db.FileName}' deleted successfully.";
+                otherDatabases = await PreviewService.GetOtherDatabaseFilesAsync();
+            }
+            else
+            {
+                errorMessage = result.Message;
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error deleting file: {ex.Message}";
+        }
+        finally
+        {
+            isDeleting = false;
+        }
     }
 
     private async Task AttemptAutoRecovery()

@@ -226,10 +226,12 @@ using (var scope = app.Services.CreateScope())
     var backupService = scope.ServiceProvider.GetRequiredService<DatabaseBackupService>();
     
     // Electron-only: database initialization and migrations
+    // Declared outside try so the SchemaNotSupportedException catch can access it
+    // to quarantine sibling app_v*.db files and break the restart loop.
+    var pathService = scope.ServiceProvider.GetRequiredService<IPathService>();
+    string dbPath = await pathService.GetDatabasePathAsync();
     try
     {
-            var pathService = scope.ServiceProvider.GetRequiredService<IPathService>();
-            var dbPath = await pathService.GetDatabasePathAsync();
 
             // var dbPath = Path.Combine(
             // Environment.GetEnvironmentVariable("XDG_CONFIG_HOME")
@@ -287,6 +289,74 @@ using (var scope = app.Services.CreateScope())
                 app.Logger.LogInformation("Database migration from Electron to Nine folder completed successfully");
             }
             
+            // ✅ v2.0.0+: Automatic migration when DatabaseFileName version changes (e.g., app_v1.0.0.db → app_v2.0.0.db)
+            // When bump-version.sh updates DatabaseFileName, PreviousDatabaseFileName holds the old name.
+            // Without this block the app would not find the new filename and create a blank database,
+            // losing all user data. This copies the old file to the new name so that EF's normal
+            // pending-migration path can then apply any schema changes on top of the real data.
+            var previousDbFileName = app.Configuration["ApplicationSettings:PreviousDatabaseFileName"];
+            if (!string.IsNullOrEmpty(previousDbFileName) && !File.Exists(dbPath))
+            {
+                var previousDbPath = Path.Combine(Path.GetDirectoryName(dbPath)!, previousDbFileName);
+                if (File.Exists(previousDbPath))
+                {
+                    app.Logger.LogInformation(
+                        "Version upgrade detected: copying {PreviousFile} → {NewFile}",
+                        previousDbFileName, dbFileName);
+                    Directory.CreateDirectory(Path.GetDirectoryName(dbPath)!);
+                    File.Copy(previousDbPath, dbPath);
+                    app.Logger.LogInformation(
+                        "Database file upgraded to {NewFileName}. EF migrations will apply schema changes.",
+                        dbFileName);
+                }
+                else
+                {
+                    // Direct predecessor not found — user may have skipped one or more versions.
+                    // Scan for any app_v*.db in the config directory and pick the highest version
+                    // that is older than this binary's target. System.Version is used instead of
+                    // string sort so that v10.0.0 correctly ranks above v9.0.0.
+                    var dbDir = Path.GetDirectoryName(dbPath)!;
+                    var targetVersion = Version.TryParse(
+                        Path.GetFileNameWithoutExtension(dbFileName).Replace("app_v", ""),
+                        out var tv) ? tv : null;
+
+                    var bestCandidate = Directory.Exists(dbDir)
+                        ? Directory.GetFiles(dbDir, "app_v*.db")
+                              .Where(f => f != dbPath)
+                              .Select(f => new
+                              {
+                                  Path = f,
+                                  Ver = Version.TryParse(
+                                      Path.GetFileNameWithoutExtension(f).Replace("app_v", ""),
+                                      out var v) ? v : null
+                              })
+                              .Where(x => x.Ver != null && (targetVersion == null || x.Ver < targetVersion))
+                              .OrderByDescending(x => x.Ver)
+                              .Select(x => x.Path)
+                              .FirstOrDefault()
+                        : null;
+
+                    if (bestCandidate != null)
+                    {
+                        app.Logger.LogInformation(
+                            "Version skip detected: copying {Found} → {NewFile} (expected {Missing} was absent)",
+                            Path.GetFileName(bestCandidate), dbFileName, previousDbFileName);
+                        Directory.CreateDirectory(dbDir);
+                        File.Copy(bestCandidate, dbPath);
+                        app.Logger.LogInformation(
+                            "Database file upgraded to {NewFileName}. EF migrations will apply schema changes.",
+                            dbFileName);
+                    }
+                    else
+                    {
+                        app.Logger.LogWarning(
+                            "Version upgrade: no previous database found at {PreviousPath} and no app_v*.db " +
+                            "candidates in {DbDir}. A new empty database will be created.",
+                            previousDbPath, dbDir);
+                    }
+                }
+            }
+
             var stagedRestorePath = $"{dbPath}.restore_pending";
             bool restoredFromPending = false;
             
@@ -379,6 +449,11 @@ using (var scope = app.Services.CreateScope())
                     
                     try
                     {
+                        // Release all pooled connections before acquiring the exclusive migration lock.
+                        // GetPendingMigrationsCountAsync / CreatePreMigrationBackupAsync above leave
+                        // connections in the pool; those block EF's BEGIN EXCLUSIVE on SQLite.
+                        Microsoft.Data.Sqlite.SqliteConnection.ClearAllPools();
+
                         // Apply migrations using DatabaseService
                         await dbService.InitializeAsync();
                         
@@ -453,13 +528,91 @@ using (var scope = app.Services.CreateScope())
                     encryptionDetection.IsEncrypted);
             }
         }
+        catch (Nine.Core.Exceptions.DatabaseExceptions.SchemaNotSupportedException schemaEx)
+        {
+            app.Logger.LogError(schemaEx, "Database schema not supported - showing user-facing error page");
+            var unlockStateForSchema = scope.ServiceProvider.GetService<DatabaseUnlockState>();
+            if (unlockStateForSchema != null)
+            {
+                unlockStateForSchema.NeedsUnlock = true;
+                unlockStateForSchema.IsUnsupportedSchema = true;
+                unlockStateForSchema.UnsupportedSchemaBackupPath = schemaEx.BackupPath;
+            }
+
+            // Rename all app_v*.db files to unsupported_app_v*.db so that:
+            //   • The version-skip glob (app_v*.db) no longer matches them → loop broken
+            //   • They remain as .db files in the app directory → visible in Database Settings
+            //     "Previous Database Versions Found" so the user can preview and import data.
+            var dbDir = Path.GetDirectoryName(dbPath);
+            if (!string.IsNullOrEmpty(dbDir) && Directory.Exists(dbDir))
+            {
+                foreach (var candidate in Directory.GetFiles(dbDir, "app_v*.db"))
+                {
+                    // If this matches the current-target filename it was just created by the
+                    // version-skip copy path — it's a duplicate of the real unsupported source.
+                    // Delete it rather than surfacing a confusing second copy in the UI.
+                    if (Path.GetFullPath(candidate).Equals(Path.GetFullPath(dbPath), StringComparison.OrdinalIgnoreCase))
+                    {
+                        try
+                        {
+                            File.Delete(candidate);
+                            app.Logger.LogInformation("Deleted version-skip copy of unsupported DB: {File}", Path.GetFileName(candidate));
+                        }
+                        catch (Exception delEx)
+                        {
+                            app.Logger.LogWarning(delEx, "Could not delete version-skip copy {File}", candidate);
+                        }
+                        continue;
+                    }
+
+                    var renamed = Path.Combine(dbDir, "unsupported_" + Path.GetFileName(candidate));
+                    try
+                    {
+                        File.Move(candidate, renamed, overwrite: true);
+                        app.Logger.LogInformation("Renamed unsupported DB: {File} → {Dest}", Path.GetFileName(candidate), Path.GetFileName(renamed));
+                    }
+                    catch (Exception moveEx)
+                    {
+                        app.Logger.LogWarning(moveEx, "Could not rename {File} — restart loop may occur", candidate);
+                    }
+                }
+            }
+            // The safety backup created by BackupUnsupportedDatabaseAsync was made against
+            // the version-skip copy (app_v1.3.0.db), not the original unsupported source.
+            // Its name is therefore misleading (v1.3.0 is not unsupported) and it is
+            // redundant because the original is preserved as unsupported_app_v0.3.0.db.
+            // Delete it so it doesn't appear in the Backups list with a confusing name.
+            var staleBackup = schemaEx.BackupPath;
+            if (!string.IsNullOrEmpty(staleBackup) && File.Exists(staleBackup))
+            {
+                try
+                {
+                    File.Delete(staleBackup);
+                    app.Logger.LogInformation("Deleted stale version-skip backup: {File}", Path.GetFileName(staleBackup));
+                }
+                catch (Exception delEx)
+                {
+                    app.Logger.LogWarning(delEx, "Could not delete stale backup {File}", staleBackup);
+                }
+            }
+
+            // Don't rethrow — let the Blazor app serve the unsupported schema UI
+        }
         catch (Exception ex)
         {
             app.Logger.LogError(ex, "Failed to initialize database");
             throw;
         }
 
-    // Validate and update schema version
+    // Validate and update schema version — skip when schema is unsupported (DB is being
+    // set aside; the context is disposed after the restore rollback, so any query here
+    // would throw ObjectDisposedException and produce misleading log noise).
+    if (unlockState?.IsUnsupportedSchema == true)
+    {
+        app.Logger.LogInformation("Skipping schema version check — unsupported schema, user will start fresh.");
+    }
+    else
+    {
     var schemaService = scope.ServiceProvider.GetRequiredService<SchemaValidationService>();
     var appSettings = scope.ServiceProvider.GetRequiredService<IOptions<ApplicationSettings>>().Value;
     
@@ -476,14 +629,27 @@ using (var scope = app.Services.CreateScope())
     }
     else if (currentDbVersion != appSettings.SchemaVersion)
     {
-        // Schema version mismatch - log warning but allow startup
-        app.Logger.LogWarning("Schema version mismatch! Database: {DbVersion}, Application: {AppVersion}", 
+        // Schema version mismatch after a version upgrade — update the stored version to match.
+        // This is the normal post-copy state: the copied DB still records the old version but
+        // EF migrations have already brought the schema up to date.
+        app.Logger.LogInformation(
+            "Updating schema version from {DbVersion} to {AppVersion} (post-upgrade)",
             currentDbVersion, appSettings.SchemaVersion);
+        await schemaService.UpdateSchemaVersionAsync(appSettings.SchemaVersion, $"Version upgrade from {currentDbVersion}");
+        app.Logger.LogInformation("Schema version updated successfully");
     }
     else
     {
         app.Logger.LogInformation("Schema version validated: {Version}", currentDbVersion);
     }
+
+    } // End of schema version check block (skipped when IsUnsupportedSchema)
+
+    // Release all connections opened during startup (migration checks, schema version writes, etc.)
+    // before Blazor begins serving requests. Without this, the first post-upgrade login receives
+    // a pooled connection that is in a post-write state, resulting in a blank page on first render.
+    Microsoft.Data.Sqlite.SqliteConnection.ClearAllPools();
+
     } // End of else block for database initialization when not locked
 }
 

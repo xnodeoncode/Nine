@@ -147,6 +147,9 @@ public class LeaseNotificationService
                     lease.Tenant?.FullName ?? "Unknown",
                     lease.EndDate.ToString("MMM dd, yyyy"));
 
+                lease.LastModifiedOn = DateTime.UtcNow;
+                lease.LastModifiedBy = ApplicationConstants.SystemUser.Id; // Automated task
+
                 addresses += lease.Property?.Address + "\n";
             }
 

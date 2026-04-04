@@ -588,6 +588,7 @@ namespace Nine.Application.Services.Workflows
         {
             return await ExecuteWorkflowAsync<int>(async () =>
             {
+                // Called from background service — no Blazor circuit, use "System" as the actor.
                 var userId = await _userContext.GetUserIdAsync() ?? "System";
                 
                 // Find active leases past their end date
@@ -606,8 +607,28 @@ namespace Nine.Application.Services.Workflows
                 {
                     var oldStatus = lease.Status;
                     lease.Status = ApplicationConstants.LeaseStatuses.Expired;
+                    lease.RenewalStatus = "Expired";
                     lease.LastModifiedBy = userId;
                     lease.LastModifiedOn = DateTime.UtcNow;
+
+                    // Update property status if no other active leases exist for it
+                    if (lease.Property != null)
+                    {
+                        var hasOtherActiveLeases = await _context.Leases
+                            .AnyAsync(l => l.PropertyId == lease.PropertyId
+                                && l.Id != lease.Id
+                                && !l.IsDeleted
+                                && (l.Status == ApplicationConstants.LeaseStatuses.Active
+                                    || l.Status == ApplicationConstants.LeaseStatuses.Pending));
+
+                        if (!hasOtherActiveLeases)
+                        {
+                            lease.Property.Status = ApplicationConstants.PropertyStatuses.Available;
+                            lease.Property.IsActive = true;
+                            lease.Property.LastModifiedBy = userId;
+                            lease.Property.LastModifiedOn = DateTime.UtcNow;
+                        }
+                    }
 
                     await LogTransitionAsync(
                         "Lease",
@@ -615,21 +636,25 @@ namespace Nine.Application.Services.Workflows
                         oldStatus,
                         lease.Status,
                         "AutoExpire",
-                        "Lease end date passed without renewal");
+                        "Lease end date passed without renewal",
+                        organizationId: organizationId);
 
                     addresses += $"- {lease.Property?.Address} (Tenant: {lease.Tenant?.FullName})\n";
 
                     count++;
                 }
 
-                await _notificationService.NotifyAllUsersAsync(
-                    organizationId,
-                    "Expired Lease Notification",
-                    $"{count} lease(s) have been automatically expired as of today.\n\n{addresses}",
-                    NotificationConstants.Types.Info,
-                    NotificationConstants.Categories.Lease,
-                    null,
-                    ApplicationConstants.EntityTypes.Lease);
+                if (count > 0)
+                {
+                    await _notificationService.NotifyAllUsersAsync(
+                        organizationId,
+                        "Expired Lease Notification",
+                        $"{count} lease(s) have been automatically expired as of today.\n\n{addresses}",
+                        NotificationConstants.Types.Info,
+                        NotificationConstants.Categories.Lease,
+                        null,
+                        ApplicationConstants.EntityTypes.Lease);
+                }
 
                 return WorkflowResult<int>.Ok(count, $"{count} lease(s) expired");
             });

@@ -33,6 +33,14 @@
     "artifactName": "${productName}-${version}-${arch}.${ext}",
     "desktop": {
       "entry": {
+        "Name": "Nine",
+        "Comment": "Property management desktop application.",
+        "Icon": "Nine",
+        "Type": "Application",
+        "Categories": "Office;Finance;",
+        "Terminal": "false",
+        "StartupWMClass": "Nine",
+        "Keywords": "property;management;landlord;rental;lease;tenant;invoice;",
         "X-AppImage-Payload-License": "MIT"
       }
     },

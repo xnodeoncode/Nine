@@ -475,7 +475,7 @@
             if (lease.Property != null)
             {
                 lease.Property.Status = ApplicationConstants.PropertyStatuses.Occupied;
-                lease.Property.IsAvailable = false;
+                lease.Property.IsActive = false;
                 
                 await PropertyService.UpdateAsync(lease.Property);
             }
@@ -542,7 +542,7 @@
                 lease.Property.Status = otherPendingApps 
                     ? ApplicationConstants.PropertyStatuses.ApplicationPending 
                     : ApplicationConstants.PropertyStatuses.Available;
-                lease.Property.IsAvailable = !otherPendingApps;
+                lease.Property.IsActive = !otherPendingApps;
                 
                 await PropertyService.UpdateAsync(lease.Property);
             }

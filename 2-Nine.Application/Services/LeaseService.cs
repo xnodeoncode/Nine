@@ -111,7 +111,7 @@ namespace Nine.Application.Services
                 if (property != null)
                 {
                     property.Status = ApplicationConstants.PropertyStatuses.Occupied;
-                    property.IsAvailable = false;
+                    property.IsActive = false;
                     property.LastModifiedOn = DateTime.UtcNow;
                     property.LastModifiedBy = await _userContext.GetUserIdAsync();
                     _context.Properties.Update(property);
@@ -142,7 +142,7 @@ namespace Nine.Application.Services
                 if (property != null)
                 {
                     property.Status = ApplicationConstants.PropertyStatuses.Occupied;
-                    property.IsAvailable = false;
+                    property.IsActive = false;
                     property.LastModifiedOn = DateTime.UtcNow;
                     property.LastModifiedBy = await _userContext.GetUserIdAsync();
                     _context.Properties.Update(property);
@@ -179,7 +179,7 @@ namespace Nine.Application.Services
 
                     if (!hasOtherActiveLeases)
                     {
-                        property.IsAvailable = true;
+                        property.IsActive = true;
                         property.LastModifiedOn = DateTime.UtcNow;
                         property.LastModifiedBy = await _userContext.GetUserIdAsync();
                         _context.Properties.Update(property);
@@ -486,7 +486,7 @@ namespace Nine.Application.Services
                 {
                     if (newStatus == ApplicationConstants.LeaseStatuses.Active)
                     {
-                        property.IsAvailable = false;
+                        property.IsActive = false;
                     }
                     else if (newStatus == ApplicationConstants.LeaseStatuses.Terminated 
                         || newStatus == ApplicationConstants.LeaseStatuses.Expired)
@@ -501,7 +501,8 @@ namespace Nine.Application.Services
 
                         if (!hasOtherActiveLeases)
                         {
-                            property.IsAvailable = true;
+                            property.IsActive = true;
+                            property.Status = ApplicationConstants.PropertyStatuses.Available;
                         }
                     }
 

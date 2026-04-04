@@ -47,7 +47,7 @@ window.themeManager = {
   },
 
   getBrandTheme: function () {
-    const brandTheme = localStorage.getItem("brandTheme") || "bootstrap";
+    const brandTheme = localStorage.getItem("brandTheme") || "obsidian";
     return brandTheme;
   },
 };
@@ -55,7 +55,7 @@ window.themeManager = {
 // Initialize theme IMMEDIATELY (before DOMContentLoaded) to prevent flash
 if (typeof localStorage !== "undefined") {
   const savedTheme = localStorage.getItem("theme") || "light";
-  const savedBrandTheme = localStorage.getItem("brandTheme") || "bootstrap";
+  const savedBrandTheme = localStorage.getItem("brandTheme") || "obsidian";
   console.log("Initial theme load:", savedTheme, "Brand:", savedBrandTheme);
   document.documentElement.setAttribute("data-bs-theme", savedTheme);
   document.documentElement.setAttribute("data-brand-theme", savedBrandTheme);
@@ -98,7 +98,7 @@ if (typeof localStorage !== "undefined") {
     }
 
     if (!currentBrandTheme) {
-      currentBrandTheme = localStorage.getItem("brandTheme") || "bootstrap";
+      currentBrandTheme = localStorage.getItem("brandTheme") || "obsidian";
       document.documentElement.setAttribute(
         "data-brand-theme",
         currentBrandTheme,
@@ -131,7 +131,7 @@ if (typeof localStorage !== "undefined") {
       const currentBrandTheme =
         document.documentElement.getAttribute("data-brand-theme") ||
         localStorage.getItem("brandTheme") ||
-        "bootstrap";
+        "obsidian";
 
       document.documentElement.setAttribute("data-bs-theme", currentTheme);
       document.documentElement.setAttribute(

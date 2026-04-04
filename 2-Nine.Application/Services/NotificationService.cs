@@ -40,12 +40,29 @@ public class NotificationService : BaseService<Notification>
         string type,
         string category,
         Guid? relatedEntityId = null,
-        string? relatedEntityType = null)
+        string? relatedEntityType = null,
+        Guid? organizationId = null,
+        string? senderUserId = null)
     {
-        var organizationId = await _userContext.GetActiveOrganizationIdAsync();
+        organizationId ??= await _userContext.GetActiveOrganizationIdAsync();
 
         // Get user preferences
-        var preferences = await GetNotificationPreferencesAsync(recipientUserId);
+        var preferences = await GetNotificationPreferencesAsync(recipientUserId, organizationId);
+
+        // Resolve the sender: explicit caller-provided ID (e.g. SystemUser for background jobs),
+        // otherwise require an authenticated user.
+        string resolvedSenderUserId;
+        if (!string.IsNullOrEmpty(senderUserId))
+        {
+            resolvedSenderUserId = senderUserId;
+        }
+        else
+        {
+            var authenticatedUserId = await _userContext.GetUserIdAsync();
+            if (string.IsNullOrEmpty(authenticatedUserId))
+                throw new UnauthorizedAccessException("User is not authenticated.");
+            resolvedSenderUserId = authenticatedUserId;
+        }
 
         var notification = new Notification
         {
@@ -62,7 +79,8 @@ public class NotificationService : BaseService<Notification>
             IsRead = false,
             SendInApp = preferences.EnableInAppNotifications,
             SendEmail = preferences.EnableEmailNotifications && ShouldSendEmail(category, preferences),
-            SendSMS = preferences.EnableSMSNotifications && ShouldSendSMS(category, preferences)
+            SendSMS = preferences.EnableSMSNotifications && ShouldSendSMS(category, preferences),
+            CreatedBy = resolvedSenderUserId
         };
 
         // Save in-app notification
@@ -107,6 +125,7 @@ public class NotificationService : BaseService<Notification>
             }
         }
 
+        notification.LastModifiedBy = resolvedSenderUserId;
         await UpdateAsync(notification);
 
         // Broadcast new notification via SignalR
@@ -141,7 +160,9 @@ public class NotificationService : BaseService<Notification>
                 type,
                 category,
                 relatedEntityId,
-                relatedEntityType);
+                relatedEntityType,
+                organizationId,
+                senderUserId: ApplicationConstants.SystemUser.Id);
         }
 
         return lastNotification!;
@@ -281,9 +302,9 @@ public class NotificationService : BaseService<Notification>
     /// <summary>
     /// Get or create notification preferences for user
     /// </summary>
-    private async Task<NotificationPreferences> GetNotificationPreferencesAsync(string userId)
+    private async Task<NotificationPreferences> GetNotificationPreferencesAsync(string userId, Guid? organizationId = null)
     {
-        var organizationId = await _userContext.GetActiveOrganizationIdAsync();
+        organizationId ??= await _userContext.GetActiveOrganizationIdAsync();
 
         var preferences = await _context.NotificationPreferences
             .FirstOrDefaultAsync(p => p.OrganizationId == organizationId

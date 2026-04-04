@@ -50,7 +50,7 @@ public class PropertyFormModel
     [StringLength(50, ErrorMessage = "Status cannot exceed 50 characters")]
     public string Status { get; set; } = ApplicationConstants.PropertyStatuses.Available;
 
-    public bool IsAvailable { get; set; } = true;
+    public bool IsActive { get; set; } = true;
 
     public bool IsSampleData { get; set; } = false;
 }

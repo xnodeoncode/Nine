@@ -119,6 +119,8 @@ namespace Nine.Application.Services.Workflows
 
         /// <summary>
         /// Logs a workflow state transition to the audit log.
+        /// Pass <paramref name="organizationId"/> when calling from background services where the
+        /// user context has no Blazor circuit (e.g., ScheduledTaskService).
         /// </summary>
         protected async Task LogTransitionAsync(
             string entityType,
@@ -127,10 +129,11 @@ namespace Nine.Application.Services.Workflows
             string toStatus,
             string action,
             string? reason = null,
-            Dictionary<string, object>? metadata = null)
+            Dictionary<string, object>? metadata = null,
+            Guid? organizationId = null)
         {
             var userId = await _userContext.GetUserIdAsync() ?? string.Empty;
-            var activeOrgId = await _userContext.GetActiveOrganizationIdAsync();
+            var activeOrgId = organizationId ?? await _userContext.GetActiveOrganizationIdAsync();
             
             var auditLog = new WorkflowAuditLog
             {
@@ -141,12 +144,12 @@ namespace Nine.Application.Services.Workflows
                 ToStatus = toStatus,
                 Action = action,
                 Reason = reason,
-                PerformedBy = userId,
+                PerformedBy = string.IsNullOrEmpty(userId) ? "System" : userId,
                 PerformedOn = DateTime.UtcNow,
                 OrganizationId = activeOrgId.HasValue ? activeOrgId.Value : Guid.Empty,
                 Metadata = metadata != null ? JsonSerializer.Serialize(metadata) : null,
                 CreatedOn = DateTime.UtcNow,
-                CreatedBy = userId
+                CreatedBy = string.IsNullOrEmpty(userId) ? "System" : userId
             };
 
             _context.WorkflowAuditLogs.Add(auditLog);

@@ -85,7 +85,7 @@ namespace Nine.Application.Tests
                 Bedrooms = 3,
                 Bathrooms = 2,
                 SquareFeet = 1500,
-                IsAvailable = true,
+                IsActive = true,
                 CreatedBy = _testUser.Id,
                 CreatedOn = DateTime.UtcNow
             };
@@ -385,7 +385,7 @@ namespace Nine.Application.Tests
                 Bedrooms = 2,
                 Bathrooms = 1,
                 SquareFeet = 900,
-                IsAvailable = true,
+                IsActive = true,
                 CreatedBy = _testUser.Id,
                 CreatedOn = DateTime.UtcNow
             };
@@ -986,7 +986,7 @@ namespace Nine.Application.Tests
                 Bedrooms = 2,
                 Bathrooms = 1,
                 SquareFeet = 1000,
-                IsAvailable = true,
+                IsActive = true,
                 CreatedBy = _testUser.Id,
                 CreatedOn = DateTime.UtcNow
             };
@@ -1113,7 +1113,7 @@ namespace Nine.Application.Tests
                 Bedrooms = 2,
                 Bathrooms = 1,
                 SquareFeet = 900,
-                IsAvailable = true,
+                IsActive = true,
                 CreatedBy = _testUser.Id,
                 CreatedOn = DateTime.UtcNow
             };
@@ -1185,7 +1185,7 @@ namespace Nine.Application.Tests
                 Bedrooms = 2,
                 Bathrooms = 1,
                 SquareFeet = 900,
-                IsAvailable = true,
+                IsActive = true,
                 CreatedBy = _testUser.Id,
                 CreatedOn = DateTime.UtcNow
             };
