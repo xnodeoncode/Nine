@@ -149,9 +149,10 @@ public class DatabaseEncryptionService
     /// </summary>
     /// <param name="encryptedPath">Path to encrypted database</param>
     /// <param name="password">User's master password</param>
+    /// <param name="removeKeychainEntry">Whether to remove the keychain entry after decryption. Set false when decrypting for backup export.</param>
     /// <returns>(Success, DecryptedPath, ErrorMessage)</returns>
     public async Task<(bool Success, string? DecryptedPath, string? ErrorMessage)> 
-        DecryptDatabaseAsync(string encryptedPath, string password)
+        DecryptDatabaseAsync(string encryptedPath, string password, bool removeKeychainEntry = true)
     {
         try
         {
@@ -256,8 +257,9 @@ public class DatabaseEncryptionService
             SqliteConnection.ClearAllPools();
             await Task.Delay(200);
 
-            // Remove password from keychain
-            _keychain.RemoveKey();
+            // Remove password from keychain only when permanently disabling encryption
+            if (removeKeychainEntry)
+                _keychain.RemoveKey();
             
             _logger.LogInformation("Database decryption completed successfully");
             return (true, decryptedPath, null);

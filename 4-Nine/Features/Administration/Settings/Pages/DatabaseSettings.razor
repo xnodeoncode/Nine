@@ -1259,7 +1259,9 @@
         {
             var password = await passwordModal.ShowAsync(
                 "Export Unencrypted Backup",
-                "Enter your master password to export unencrypted backup:",
+                "⚠️ SECURITY WARNING: This creates an unencrypted copy of your database. " +
+                "Anyone with access to the file can read all your data. " +
+                "Enter your master password to continue.",
                 requireConfirmation: false);
 
             if (string.IsNullOrWhiteSpace(password))
@@ -1268,21 +1270,8 @@
                 return;
             }
 
-            var confirmed = await JSRuntime.InvokeAsync<bool>("confirm",
-                "⚠️ SECURITY WARNING ⚠️\n\n" +
-                "This will create an UNENCRYPTED backup of your database.\n" +
-                "Anyone with access to this file can read all your data.\n\n" +
-                "Only use this if you need to transfer data to another system.\n\n" +
-                "Continue?");
-
-            if (!confirmed)
-            {
-                errorMessage = "Export cancelled.";
-                return;
-            }
-
             var dbPath = await PathService.GetDatabasePathAsync();
-            var (success, decryptedTempPath, decryptError) = await EncryptionService.DecryptDatabaseAsync(dbPath, password);
+            var (success, decryptedTempPath, decryptError) = await EncryptionService.DecryptDatabaseAsync(dbPath, password, removeKeychainEntry: false);
 
             if (!success || decryptedTempPath == null)
             {
