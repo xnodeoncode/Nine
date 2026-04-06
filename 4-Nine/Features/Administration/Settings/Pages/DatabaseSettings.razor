@@ -1194,38 +1194,50 @@
     {
         isChangingPassword = true;
         errorMessage = null;
-        
+        successMessage = null;
+
         try
         {
             var currentPassword = await passwordModal.ShowAsync(
                 "Current Password",
                 "Enter your current master password:",
                 requireConfirmation: false);
-            
+
             if (string.IsNullOrWhiteSpace(currentPassword))
             {
                 errorMessage = "Password change cancelled.";
                 return;
             }
-            
+
             var newPassword = await passwordModal.ShowAsync(
                 "New Master Password",
                 "Enter new master password (minimum 12 characters):",
                 requireConfirmation: true);
-            
+
             if (string.IsNullOrWhiteSpace(newPassword))
             {
                 errorMessage = "Password change cancelled.";
                 return;
             }
-            
-            // TODO: Implement password change
-            // 1. Verify current password
-            // 2. Re-encrypt database with new password-derived key
-            // 3. Update OS keychain with new key
-            // 4. Restart application
-            
-            errorMessage = "⚠️ Password change feature not yet implemented (Phase 2).";
+
+            var dbPath = await PathService.GetDatabasePathAsync();
+            var (success, error) = await EncryptionService.ChangePasswordAsync(dbPath, currentPassword, newPassword);
+
+            if (!success)
+            {
+                errorMessage = $"⚠️ {error}";
+                return;
+            }
+
+            successMessage = "✅ Master password changed successfully. The application must restart to apply the new password.";
+            StateHasChanged();
+            await Task.Delay(2000);
+
+            if (HybridSupport.IsElectronActive)
+            {
+                Electron.App.Relaunch();
+                Electron.App.Exit(0);
+            }
         }
         catch (Exception ex)
         {

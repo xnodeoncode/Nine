@@ -351,4 +351,96 @@ public class DatabaseEncryptionService
     /// Check if keychain service is available
     /// </summary>
     public bool IsKeychainAvailable() => _keychain.IsAvailable();
+
+    /// <summary>
+    /// Change the encryption password of an already-encrypted database using PRAGMA rekey.
+    /// Verifies the current password before applying the change, then updates the OS keychain.
+    /// </summary>
+    /// <param name="dbPath">Absolute path to the encrypted database file</param>
+    /// <param name="currentPassword">Current master password</param>
+    /// <param name="newPassword">New master password (minimum 12 characters)</param>
+    /// <returns>(Success, ErrorMessage)</returns>
+    public async Task<(bool Success, string? ErrorMessage)> ChangePasswordAsync(
+        string dbPath, string currentPassword, string newPassword)
+    {
+        try
+        {
+            _logger.LogInformation("Starting password change for {Path}", dbPath);
+
+            // Validate new password strength
+            var (isValid, validationError) = _passwordDerivation.ValidatePasswordStrength(newPassword);
+            if (!isValid)
+                return (false, validationError);
+
+            SQLitePCL.Batteries_V2.Init();
+            SQLitePCL.raw.sqlite3_initialize();
+            SqliteConnection.ClearAllPools();
+
+            // Step 1 — open with current password and verify
+            using (var conn = new SqliteConnection($"Data Source={dbPath}"))
+            {
+                await conn.OpenAsync();
+
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = $"PRAGMA key = '{currentPassword}';";
+                    await cmd.ExecuteNonQueryAsync();
+
+                    cmd.CommandText = "PRAGMA cipher_page_size = 4096;";
+                    await cmd.ExecuteNonQueryAsync();
+                    cmd.CommandText = "PRAGMA kdf_iter = 256000;";
+                    await cmd.ExecuteNonQueryAsync();
+                    cmd.CommandText = "PRAGMA cipher_hmac_algorithm = HMAC_SHA512;";
+                    await cmd.ExecuteNonQueryAsync();
+                    cmd.CommandText = "PRAGMA cipher_kdf_algorithm = PBKDF2_HMAC_SHA512;";
+                    await cmd.ExecuteNonQueryAsync();
+                }
+
+                // Verify current password is correct
+                try
+                {
+                    using (var cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = "SELECT count(*) FROM sqlite_master;";
+                        await cmd.ExecuteScalarAsync();
+                    }
+                }
+                catch
+                {
+                    return (false, "Current password is incorrect.");
+                }
+
+                // Step 2 — rekey in-place
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = $"PRAGMA rekey = '{newPassword}';";
+                    await cmd.ExecuteNonQueryAsync();
+                    _logger.LogInformation("PRAGMA rekey executed");
+                }
+            }
+
+            SqliteConnection.ClearAllPools();
+            await Task.Delay(200);
+
+            // Step 3 — verify new password opens the database
+            var verifySuccess = await VerifyEncryptedDatabaseAsync(dbPath, newPassword);
+            if (!verifySuccess)
+                return (false, "Password change completed but verification with the new password failed. " +
+                               "The original password may still be active — please try again.");
+
+            // Step 4 — update keychain
+            var stored = _keychain.StoreKey(newPassword, "Nine Database Encryption Password");
+            if (!stored)
+                _logger.LogWarning("Password changed successfully but keychain update failed. " +
+                                   "You will be prompted for the new password on next startup.");
+
+            _logger.LogInformation("Database password changed successfully");
+            return (true, null);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to change database password");
+            return (false, $"Password change failed: {ex.Message}");
+        }
+    }
 }
