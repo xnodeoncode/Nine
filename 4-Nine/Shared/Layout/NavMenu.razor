@@ -1,9 +1,13 @@
 ﻿@implements IDisposable
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.EntityFrameworkCore
+@using Nine.Core.Constants
 
 @inject NavigationManager NavigationManager
 @inject UserContextService UserContext
 @inject ThemeService ThemeService
 @inject IJSRuntime JSRuntime
+@inject UserManager<ApplicationUser> UserManager
 
 
 <div class="top-row ps-3 navbar navbar-dark">
@@ -126,11 +130,14 @@
                         <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
                     </NavLink>
                 </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="Account/Register">
-                        <span class="bi bi-person-nav-menu" aria-hidden="true"></span> Register
-                    </NavLink>
-                </div>
+                @if (_showRegistrationLink)
+                {
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="Account/Register">
+                            <span class="bi bi-person-nav-menu" aria-hidden="true"></span> Register
+                        </NavLink>
+                    </div>
+                }
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="Account/Login">
                         <span class="bi bi-person-badge-nav-menu" aria-hidden="true"></span> Login
@@ -170,6 +177,7 @@
     private string? currentUrl;
     private string currentTheme = "light";
     private bool showBrandThemeDropdown = false;
+    private bool _showRegistrationLink = false;
 
     // Obsidian always uses the inverted logo. Bootstrap and Teal use inverted in dark mode only.
     private string LogoSrc => (ThemeService.CurrentBrandTheme == "obsidian" || ThemeService.CurrentTheme == "dark")
@@ -193,7 +201,11 @@
         ThemeService.OnThemeChanged += OnThemeChanged;
         ThemeService.OnBrandThemeChanged += OnBrandThemeChanged;
         currentTheme = ThemeService.CurrentTheme;
-        
+
+        var hasUsers = await UserManager.Users
+            .AnyAsync(u => u.Id != ApplicationConstants.SystemUser.Id);
+        _showRegistrationLink = !hasUsers;
+
         var orgId = await UserContext.GetActiveOrganizationIdAsync();
         OrganizationId = orgId?.ToString() ?? string.Empty;
     }

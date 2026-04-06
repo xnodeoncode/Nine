@@ -1,4 +1,6 @@
 ﻿@page "/"
+@using Microsoft.AspNetCore.Identity
+@using Nine.Core.Constants
 @using Nine.Application.Services
 @using Nine.Shared.UI.Components.Entities.Invoices
 @using Nine.Shared.UI.Components.Entities.Properties
@@ -21,6 +23,7 @@
 @inject InvoiceService InvoiceService
 @inject UserContextService UserContextService
 @inject ApplicationDbContext DbContext
+@inject UserManager<ApplicationUser> UserManager
 
 @rendermode InteractiveServer
 
@@ -88,7 +91,10 @@
                 <p>Sign in to access your dashboard and manage your properties.</p>
                 <div class="btn-group">
                     <a class="btn btn-primary btn-lg" href="/Account/Login" role="button">Sign In</a>
-                    <a class="btn btn-outline-primary btn-lg" href="/Account/Register" role="button">Create Account</a>
+                    @if (_showRegistrationLink)
+                    {
+                        <a class="btn btn-outline-primary btn-lg" href="/Account/Register" role="button">Create Account</a>
+                    }
                 </div>
             </div>
         </div>
@@ -129,6 +135,7 @@
 
 @code {
     private bool isLoading = true;
+    private bool _showRegistrationLink = false;
     private int totalProperties = 0;
     private int availableProperties = 0;
     private int totalTenants = 0;
@@ -155,6 +162,9 @@
 
     protected override async Task OnInitializedAsync()
     {
+        var hasUsers = await UserManager.Users
+            .AnyAsync(u => u.Id != ApplicationConstants.SystemUser.Id);
+        _showRegistrationLink = !hasUsers;
         var authState = await AuthenticationStateTask;
         if (authState.User.Identity?.IsAuthenticated == true)
         {
