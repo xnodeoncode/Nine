@@ -793,11 +793,11 @@ async Task ElectronAppReady()
         window.LoadURL($"{backendUrl}/offline.html");
     }
 
-    if (app.Environment.IsDevelopment())
-    {
-        window.WebContents.OpenDevTools();
-        app.Logger.LogInformation("DevTools opened for debugging");
-    }
+    // if (app.Environment.IsDevelopment())
+    // {
+    //     window.WebContents.OpenDevTools();
+    //     app.Logger.LogInformation("DevTools opened for debugging");
+    // }
 
     // Re-register DevTools shortcut because RemoveMenu() strips default accelerators
     Electron.GlobalShortcut.Register("CmdOrCtrl+Shift+I", () =>

@@ -66,6 +66,8 @@ article.content {
     height: 100vh;
     position: sticky;
     top: 0;
+    display: flex;
+    flex-direction: column;
   }
 
   .top-row {
