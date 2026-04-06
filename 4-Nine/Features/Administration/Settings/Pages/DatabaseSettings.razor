@@ -1253,40 +1253,66 @@
     {
         isExporting = true;
         errorMessage = null;
-        
+        successMessage = null;
+
         try
         {
             var password = await passwordModal.ShowAsync(
                 "Export Unencrypted Backup",
                 "Enter your master password to export unencrypted backup:",
                 requireConfirmation: false);
-            
+
             if (string.IsNullOrWhiteSpace(password))
             {
                 errorMessage = "Export cancelled.";
                 return;
             }
-            
-            var confirmed = await JSRuntime.InvokeAsync<bool>("confirm", 
+
+            var confirmed = await JSRuntime.InvokeAsync<bool>("confirm",
                 "⚠️ SECURITY WARNING ⚠️\n\n" +
                 "This will create an UNENCRYPTED backup of your database.\n" +
                 "Anyone with access to this file can read all your data.\n\n" +
                 "Only use this if you need to transfer data to another system.\n\n" +
                 "Continue?");
-            
+
             if (!confirmed)
             {
                 errorMessage = "Export cancelled.";
                 return;
             }
-            
-            // TODO: Implement unencrypted export
-            // 1. Verify password
-            // 2. Decrypt database to temporary file
-            // 3. Trigger download
-            // 4. Delete temporary file
-            
-            errorMessage = "⚠️ Unencrypted export feature not yet implemented (Phase 2).";
+
+            var dbPath = await PathService.GetDatabasePathAsync();
+            var (success, decryptedTempPath, decryptError) = await EncryptionService.DecryptDatabaseAsync(dbPath, password);
+
+            if (!success || decryptedTempPath == null)
+            {
+                errorMessage = decryptError?.Contains("file is not a database") == true
+                    ? "⚠️ Incorrect password. Please try again."
+                    : $"⚠️ {decryptError ?? "Failed to decrypt database."}";
+                return;
+            }
+
+            try
+            {
+                // Save to the Backups folder alongside regular backups
+                var backupDir = Path.Combine(Path.GetDirectoryName(dbPath)!, "Backups");
+                Directory.CreateDirectory(backupDir);
+
+                var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+                var backupFileName = $"Nine_Unencrypted_Backup_{timestamp}.db";
+                var backupPath = Path.Combine(backupDir, backupFileName);
+
+                File.Move(decryptedTempPath, backupPath);
+
+                successMessage = $"✅ Unencrypted backup saved as '{backupFileName}' in the Backups folder.";
+                await LoadBackups();
+            }
+            finally
+            {
+                // Clean up temp file if move failed
+                if (File.Exists(decryptedTempPath))
+                    File.Delete(decryptedTempPath);
+            }
         }
         catch (Exception ex)
         {
