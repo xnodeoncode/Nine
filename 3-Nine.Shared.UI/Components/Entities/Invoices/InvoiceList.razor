@@ -7,7 +7,7 @@
         @if (Invoices.Any())
         {
             <div class="list-group list-group-flush">
-                @foreach (var invoice in Invoices.OrderByDescending(i => i.InvoiceNumber))
+                @foreach (var invoice in PagedInvoices)
                 {
                     <div class="list-group-item">
                         <div class="d-flex w-100 justify-content-between">
@@ -37,6 +37,17 @@
                     </div>
                 }
             </div>
+            @if (TotalPages > 1)
+            {
+                <div class="d-flex justify-content-between align-items-center mt-2">
+                    <small class="text-muted">@(((_currentPage - 1) * PageSize) + 1)–@(Math.Min(_currentPage * PageSize, SortedInvoices.Count)) of @SortedInvoices.Count</small>
+                    <div class="btn-group btn-group-sm">
+                        <button class="btn btn-outline-secondary" @onclick="PrevPage" disabled="@(_currentPage == 1)">&#8249;</button>
+                        <button class="btn btn-outline-secondary" disabled>@_currentPage / @TotalPages</button>
+                        <button class="btn btn-outline-secondary" @onclick="NextPage" disabled="@(_currentPage == TotalPages)">&#8250;</button>
+                    </div>
+                </div>
+            }
         }
         else
         {
@@ -46,7 +57,6 @@
 </div>
 @code {
     [Parameter, EditorRequired]
-    
     public List<Invoice> Invoices { get; set; } = new();
 
     [Parameter]
@@ -56,10 +66,22 @@
     public string HeaderCssClass { get; set; } = "";
 
     [Parameter]
+    public int PageSize { get; set; } = 5;
+
+    [Parameter]
     public EventCallback OnViewAll { get; set; }
 
     [Parameter]
     public EventCallback<Guid> OnViewItem { get; set; }
+
+    private int _currentPage = 1;
+
+    private List<Invoice> SortedInvoices => Invoices.OrderByDescending(i => i.InvoiceNumber).ToList();
+    private int TotalPages => (int)Math.Ceiling(SortedInvoices.Count / (double)PageSize);
+    private List<Invoice> PagedInvoices => SortedInvoices.Skip((_currentPage - 1) * PageSize).Take(PageSize).ToList();
+
+    private void PrevPage() { if (_currentPage > 1) _currentPage--; }
+    private void NextPage() { if (_currentPage < TotalPages) _currentPage++; }
 
     private string GetInvoiceStatusBadgeClass(string status)
     {

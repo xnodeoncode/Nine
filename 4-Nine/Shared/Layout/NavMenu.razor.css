@@ -188,8 +188,8 @@
     /* Never collapse the sidebar for wide screens */
     display: block;
 
-    /* Allow sidebar to scroll for tall menus */
-    height: calc(100vh - 3.5rem);
+    /* Fill remaining sidebar height after top-row */
+    flex: 1;
     overflow-y: auto;
     /* background-color: #0f172a; */
   }
@@ -198,8 +198,8 @@
     /* Never collapse the sidebar for wide screens */
     display: block;
 
-    /* Allow sidebar to scroll for tall menus */
-    height: calc(100vh - 3.5rem);
+    /* Fill remaining sidebar height after top-row */
+    flex: 1;
     overflow-y: auto;
     /* background-color: #0a0f1a; */
   }

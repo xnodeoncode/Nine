@@ -143,14 +143,7 @@ builder.Services.AddScoped<NoteService>();
 // Add to service registration section
 builder.Services.AddScoped<NotificationService>();
 
-// Phase 2.4: Notification Infrastructure
-builder.Services.AddScoped<IEmailService, EmailService>();
-builder.Services.AddScoped<ISMSService, SMSService>();
-
-// Phase 2.5: Email/SMS Integration
-builder.Services.AddScoped<EmailSettingsService>();
-builder.Services.AddScoped<SMSSettingsService>();
-// SendGridEmailService and TwilioSMSService registered in extension methods
+// Email/SMS not used in desktop app (available in Professional product via Infrastructure layer)
 
 // Workflow services
 builder.Services.AddScoped<ApplicationWorkflowService>();
@@ -793,11 +786,11 @@ async Task ElectronAppReady()
         window.LoadURL($"{backendUrl}/offline.html");
     }
 
-    if (app.Environment.IsDevelopment())
-    {
-        window.WebContents.OpenDevTools();
-        app.Logger.LogInformation("DevTools opened for debugging");
-    }
+    // if (app.Environment.IsDevelopment())
+    // {
+    //     window.WebContents.OpenDevTools();
+    //     app.Logger.LogInformation("DevTools opened for debugging");
+    // }
 
     // Re-register DevTools shortcut because RemoveMenu() strips default accelerators
     Electron.GlobalShortcut.Register("CmdOrCtrl+Shift+I", () =>

@@ -1,21 +1,76 @@
 @page "/about"
+@inject ThemeService ThemeService
+@attribute [AllowAnonymous]
+@rendermode InteractiveServer
+@implements IDisposable
 
 <div class="text-center py-5">
     <div class="container">
-        <h1 class="display-4">Property Management System</h1>
-        <p class="lead">Manage your rental properties, tenants, leases, and payments with ease.</p>
-        <hr class="my-4">
-        <AuthorizeView>
-        <Authorized>
-            <p>Welcome back! Access your <a href="/">dashboard</a> to manage your properties.</p>
-        </Authorized>
-        <NotAuthorized>
-        <p>Sign in to access your dashboard and manage your properties.</p>
-        <div class="btn-group">
-            <a class="btn btn-primary btn-lg" href="/Account/Login" role="button">Sign In</a>
-            <a class="btn btn-outline-primary btn-lg" href="/Account/Register" role="button">Create Account</a>
+        <div class="text-start">
+            <h1 class="display-4"><img src="@LogoSrc" width="90" alt="Nine." /></h1>
         </div>
-        </NotAuthorized>
-        </AuthorizeView>
+        <div class="d-flex flex-wrap gap-2 my-3">
+            <a href="https://github.com/xnodeoncode/Nine/releases" target="_blank">
+                <img src="https://img.shields.io/badge/version-1.1.0-blue.svg" alt="Version" />
+            </a>
+            <a href="https://github.com/xnodeoncode/Nine/blob/main/LICENSE" target="_blank">
+                <img src="https://img.shields.io/badge/license-MIT-green.svg" alt="License" />
+            </a>
+            <a href="https://dotnet.microsoft.com/" target="_blank">
+                <img src="https://img.shields.io/badge/.NET-10.0-purple.svg" alt=".NET" />
+            </a>
+            <img src="https://img.shields.io/badge/platform-Linux%20%7C%20Windows-lightgrey.svg" alt="Platform" />
+            <a href="https://nineapp.co/" target="_blank">
+                <img src="https://img.shields.io/badge/website-nineapp.co-blue.svg" alt="Website" />
+            </a>
+        </div>
+
+        <hr class="my-4">
+        <div class="text-start">
+            <h5 class="mb-3">What is Nine?</h5>
+            <p class="lead">
+                <strong>Nine</strong> is a free, open-source desktop application designed to help real estate investors, property managers, and landlords manage up to nine residential rental properties with ease.
+            </p>
+        </div>
+        <div class="text-start">
+            <h5 class="mt-4 mb-3">Nine is perfect for:</h5>
+            <ul class="list leading-relaxed">
+                <li>Independent property managers and landlords</li>
+                <li>Property owners who self-manage their rentals</li>
+                <li>New real estate investors building their portfolio</li>
+                <li>Anyone seeking focused, no-subscription property management software</li>
+            </ul>
+        </div>
+        <hr class="my-4">
+
+        <div class="d-flex flex-wrap justify-content-center gap-2 mt-3">
+            <a class="btn btn-outline-success" href="https://github.com/xnodeoncode/Nine/releases" target="_blank">
+                Download Latest Release
+            </a>
+        </div>
     </div>
 </div>
+
+@code {
+    // Obsidian always uses the inverted logo. Bootstrap and Teal use inverted in dark mode only.
+    private string LogoSrc => (ThemeService.CurrentTheme == "dark")
+        ? "/assets/nine-logo-inverted.svg"
+        : "/assets/nine-logo.svg";
+
+    protected override void OnInitialized()
+    {
+        ThemeService.OnThemeChanged += OnThemeChanged;
+        ThemeService.OnBrandThemeChanged += OnThemeChanged;
+    }
+
+    private void OnThemeChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        ThemeService.OnThemeChanged -= OnThemeChanged;
+        ThemeService.OnBrandThemeChanged -= OnThemeChanged;
+    }
+}
