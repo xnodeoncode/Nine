@@ -157,7 +157,7 @@
                     </li>
                     <li class="mb-2">
                         <i class="bi bi-info-circle text-primary"></i>
-                        Select an active lease to create an invoice
+                        Select an active, month-to-month, or expired (holdover) lease to create an invoice
                     </li>
                     <li class="mb-2">
                         <i class="bi bi-info-circle text-primary"></i>
@@ -203,7 +203,7 @@
     private async Task LoadLeases()
     {
         var allLeases = await LeaseService.GetAllAsync();
-        leases = allLeases.Where(l => l.Status == "Active").ToList();
+        leases = allLeases.Where(l => l.Status == "Active" || l.Status == "Month-to-Month" || l.Status == "Expired").ToList();
     }
 
     private void OnLeaseSelected()

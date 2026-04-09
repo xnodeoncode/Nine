@@ -332,6 +332,17 @@ namespace Nine.Core.Constants
                 Occupied,
                 MoveOutPending
             };
+
+            /// <summary>
+            /// Statuses that classify a property as Inactive (off-market). User-driven only.
+            /// All other statuses are considered Active.
+            /// </summary>
+            public static IReadOnlyList<string> InactiveStatuses { get; } = new List<string>
+            {
+                OffMarket,
+                UnderRenovation
+            };
+
             public static IReadOnlyList<string> AllPropertyStatuses { get; } = new List<string>
             {
                 Available,

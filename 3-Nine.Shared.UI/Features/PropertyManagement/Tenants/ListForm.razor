@@ -16,7 +16,42 @@
         </button>
     }
 </div>
-
+<hr />
+<div class="row mb-3">
+        <div class="col-md-3">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <h6>Active Tenants</h6>
+                    <h4>@activeTenantsCount</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-warning">
+                <div class="card-body">
+                    <h6>Without Lease</h6>
+                    <h4>@tenantsWithoutLeaseCount</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-info">
+                <div class="card-body">
+                    <h6>Total Tenants</h6>
+                    <h4>@filteredTenants.Count</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-primary">
+                <div class="card-body">
+                    <h6>New This Month</h6>
+                    <h4>@newThisMonthCount</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+<hr />
 @if (tenants == null)
 {
     <div class="text-center">
@@ -64,42 +99,8 @@ else
             </button>
         </div>
     </div>
-
-    <div class="row mb-3">
-        <div class="col-md-3">
-            <div class="card text-white bg-success">
-                <div class="card-body">
-                    <h6>Active Tenants</h6>
-                    <h4>@activeTenantsCount</h4>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-white bg-warning">
-                <div class="card-body">
-                    <h6>Without Lease</h6>
-                    <h4>@tenantsWithoutLeaseCount</h4>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-white bg-info">
-                <div class="card-body">
-                    <h6>Total Tenants</h6>
-                    <h4>@filteredTenants.Count</h4>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-white bg-primary">
-                <div class="card-body">
-                    <h6>New This Month</h6>
-                    <h4>@newThisMonthCount</h4>
-                </div>
-            </div>
-        </div>
-    </div>
-
+<hr />
+    
     <div class="card">
         <div class="card-body">
             <div class="table-responsive">

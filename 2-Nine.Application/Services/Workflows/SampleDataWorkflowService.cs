@@ -272,7 +272,7 @@ namespace Nine.Application.Services.Workflows
                     SquareFeet = data.SqFt,
                     MonthlyRent = data.Rent,
                     Status = data.Status,
-                    IsActive = data.Status == ApplicationConstants.PropertyStatuses.Available,
+                    IsActive = true,
                     Description = $"Beautiful {data.Beds} bedroom, {data.Baths} bath {data.Type.ToLower()} in {data.City}. " +
                                  $"{data.SqFt} square feet with modern amenities and convenient location.",
                     RoutineInspectionIntervalMonths = 12,
@@ -399,7 +399,6 @@ namespace Nine.Application.Services.Workflows
 
                 // Update property status to Occupied
                 property.Status = ApplicationConstants.PropertyStatuses.Occupied;
-                property.IsActive = false;
             }
 
             // Create 2 new leases expiring soon (properties 6 and 7, tenants 3 and 4)
@@ -429,7 +428,6 @@ namespace Nine.Application.Services.Workflows
             _context.Leases.Add(lease30Days);
             leases.Add(lease30Days);
             properties[6].Status = ApplicationConstants.PropertyStatuses.Occupied;
-            properties[6].IsActive = false;
 
             // Lease 2: Expires in 60 days from current date
             var endDate60 = currentDate.AddDays(60);
@@ -457,7 +455,6 @@ namespace Nine.Application.Services.Workflows
             _context.Leases.Add(lease60Days);
             leases.Add(lease60Days);
             properties[7].Status = ApplicationConstants.PropertyStatuses.Occupied;
-            properties[7].IsActive = false;
 
             await _context.SaveChangesAsync();
             _logger.LogInformation($"Generated {leases.Count} leases");
@@ -647,6 +644,14 @@ namespace Nine.Application.Services.Workflows
                     invoice.PaidOn = paymentDate;
                     invoice.LastModifiedBy = userId;
                     invoice.LastModifiedOn = paymentDate;
+
+                    // Record late fee on invoice so BalanceDue = Amount + LateFeeAmount - AmountPaid = 0
+                    if (lateFee > 0)
+                    {
+                        invoice.LateFeeAmount = lateFee;
+                        invoice.LateFeeApplied = true;
+                        invoice.LateFeeAppliedOn = paymentDate;
+                    }
                     
                     // Save invoice status update immediately
                     await _context.SaveChangesAsync();

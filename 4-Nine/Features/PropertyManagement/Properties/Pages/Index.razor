@@ -3,6 +3,7 @@
 
 @inject PropertyService PropertyService
 @inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
 @attribute [OrganizationAuthorize("Owner", "Administrator", "PropertyManager", "User")]
 @rendermode InteractiveServer
 
@@ -20,7 +21,7 @@
                 <i class="bi bi-list-ul"></i>
             </button>
         </div>
-        @if (Properties.Count < maxProperties)
+        @if (showActiveTab && activeCount < maxProperties)
         {
             <button class="btn btn-primary" @onclick="CreateProperty">
                 <i class="bi bi-plus-lg"></i> Add Property
@@ -35,6 +36,21 @@
     TotalMonthlyRent="@totalMonthlyRent"
     ShowTotalProperties="false" ShowAvailableProperties="true" ShowOccupiedProperties="true" ShowTotalMonthlyRent="true" />
 <hr />
+<ul class="nav nav-tabs mb-3">
+    <li class="nav-item">
+        <button class="nav-link @(showActiveTab ? "active" : "")" @onclick='() => SwitchTab(true)'>
+            <i class="bi bi-check-circle me-1"></i> Active
+            <span class="badge bg-success ms-2">@activeCount</span>
+        </button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link @(!showActiveTab ? "active" : "")" @onclick='() => SwitchTab(false)'>
+            <i class="bi bi-pause-circle me-1"></i> Inactive
+            <span class="badge bg-secondary ms-2">@inactiveCount</span>
+        </button>
+    </li>
+</ul>
+
 <PropertyListView Properties="@filteredProperties"
     ViewMode="@viewMode"
     SortColumn="@sortColumn"
@@ -54,8 +70,12 @@
     ShowMetrics="false" />
 
 @code {
+    private List<Property> allProperties = new List<Property>();
     private List<Property> Properties = new List<Property>();
     private List<Property> filteredProperties = new List<Property>();
+    private bool showActiveTab = true;
+    private int activeCount => allProperties.Count(p => p.IsActive);
+    private int inactiveCount => allProperties.Count(p => !p.IsActive);
     private PropertyListViewMode viewMode = PropertyListViewMode.Table;
     private string sortColumn = nameof(Property.Address);
     private bool sortAscending = true;
@@ -73,14 +93,25 @@
 
     protected override async Task OnInitializedAsync()
     {
-        Properties = await PropertyService.GetAllAsync();
-        Console.WriteLine($"Loaded {Properties.Count} properties from the service.");
-        
-        availableProperties = Properties.Where(p => p.IsActive).Count();
-        occupiedProperties = Properties.Where(p => !p.IsActive).Count();
-        totalMonthlyRent = Properties.Where(p => !p.IsActive).Sum(p => p.MonthlyRent);
-        
-        ApplySort();
+        allProperties = await PropertyService.GetAllAsync();
+        availableProperties = allProperties.Count(p => p.Status == ApplicationConstants.PropertyStatuses.Available);
+        occupiedProperties = allProperties.Count(p => ApplicationConstants.PropertyStatuses.OccupiedStatuses.Contains(p.Status));
+        totalMonthlyRent = allProperties.Where(p => p.IsActive).Sum(p => p.MonthlyRent);
+        ApplyTab(true);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var saved = await JSRuntime.InvokeAsync<string>("localStorage.getItem", "propertyListActiveTab");
+            bool savedTab = saved != "inactive";
+            if (savedTab != showActiveTab)
+            {
+                ApplyTab(savedTab);
+                StateHasChanged();
+            }
+        }
     }
 
     private void HandleSort((string Column, bool Ascending) sortInfo)
@@ -88,6 +119,21 @@
         sortColumn = sortInfo.Column;
         sortAscending = sortInfo.Ascending;
         ApplySort();
+    }
+
+    private void ApplyTab(bool active)
+    {
+        showActiveTab = active;
+        statusFilter = string.Empty;
+        searchTerm = string.Empty;
+        Properties = allProperties.Where(p => p.IsActive == active).ToList();
+        ApplySort();
+    }
+
+    private async Task SwitchTab(bool active)
+    {
+        ApplyTab(active);
+        await JSRuntime.InvokeVoidAsync("localStorage.setItem", "propertyListActiveTab", active ? "active" : "inactive");
     }
 
     private void ApplySort()

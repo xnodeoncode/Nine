@@ -141,6 +141,20 @@ namespace Nine.Application.Services
                 throw new ValidationException($"A property with address '{property.Address}' already exists in this location.");
             }
 
+            // Inactive properties must have an inactive status (Off Market or Under Renovation)
+            if (!property.IsActive && !ApplicationConstants.PropertyStatuses.InactiveStatuses.Contains(property.Status))
+            {
+                throw new ValidationException(
+                    $"An inactive property must have a status of '{ApplicationConstants.PropertyStatuses.OffMarket}' or '{ApplicationConstants.PropertyStatuses.UnderRenovation}'.");
+            }
+
+            // Properties with an inactive status must be marked inactive
+            if (property.IsActive && ApplicationConstants.PropertyStatuses.InactiveStatuses.Contains(property.Status))
+            {
+                throw new ValidationException(
+                    $"A property with status '{property.Status}' must be marked as inactive.");
+            }
+
             await base.ValidateEntityAsync(property);
         }
 

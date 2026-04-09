@@ -22,7 +22,43 @@
         <p class="text-muted mb-0">Documents uploaded in the last 30 days</p>
     </div>
 </div>
-
+<hr />
+ <!-- Summary Cards -->
+    <div class="row mb-3">
+        <div class="col-md-3">
+            <div class="card text-white bg-primary">
+                <div class="card-body">
+                    <h6>Lease Agreements</h6>
+                    <h4>@allDocuments.Count(d => d.DocumentType == "Lease Agreement")</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-warning">
+                <div class="card-body">
+                    <h6>Invoices</h6>
+                    <h4>@allDocuments.Count(d => d.DocumentType == "Invoice")</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <h6>Payment Receipts</h6>
+                    <h4>@allDocuments.Count(d => d.DocumentType == "Payment Receipt")</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-info">
+                <div class="card-body">
+                    <h6>Total Documents</h6>
+                    <h4>@filteredDocuments.Count</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+<hr />
 @if (isLoading)
 {
     <div class="text-center">
@@ -80,41 +116,7 @@ else
         </div>
     </div>
 
-    <!-- Summary Cards -->
-    <div class="row mb-3">
-        <div class="col-md-3">
-            <div class="card text-white bg-primary">
-                <div class="card-body">
-                    <h6>Lease Agreements</h6>
-                    <h4>@allDocuments.Count(d => d.DocumentType == "Lease Agreement")</h4>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-white bg-warning">
-                <div class="card-body">
-                    <h6>Invoices</h6>
-                    <h4>@allDocuments.Count(d => d.DocumentType == "Invoice")</h4>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-white bg-success">
-                <div class="card-body">
-                    <h6>Payment Receipts</h6>
-                    <h4>@allDocuments.Count(d => d.DocumentType == "Payment Receipt")</h4>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-white bg-info">
-                <div class="card-body">
-                    <h6>Total Documents</h6>
-                    <h4>@filteredDocuments.Count</h4>
-                </div>
-            </div>
-        </div>
-    </div>
+   <hr />
 
     <div class="card">
         <div class="card-body">

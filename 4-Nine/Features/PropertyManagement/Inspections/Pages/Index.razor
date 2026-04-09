@@ -17,7 +17,7 @@
         <i class="bi bi-arrow-clockwise"></i> Refresh
     </button>
 </div>
-
+<hr />
 @if (isLoading)
 {
     <div class="text-center">
@@ -67,203 +67,230 @@ else
             </div>
         </div>
     </div>
+<hr />
+    <!-- Tabs -->
+    <ul class="nav nav-tabs mb-0">
+        <li class="nav-item">
+            <button class="nav-link @(activeTab == "upcoming" ? "active" : "")" @onclick='() => SetTab("upcoming")'>
+                <i class="bi bi-calendar3"></i> Upcoming
+                <span class="badge @(activeTab == "upcoming" ? "bg-primary" : "bg-secondary") ms-1">@upcomingProperties.Count</span>
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link @(activeTab == "overdue" ? "active" : "")" @onclick='() => SetTab("overdue")'>
+                <i class="bi bi-exclamation-triangle-fill text-danger"></i> Overdue
+                <span class="badge bg-danger ms-1">@overdueProperties.Count</span>
+            </button>
+        </li>
+    </ul>
 
-    <!-- Overdue Inspections -->
-    @if (overdueProperties.Any())
-    {
-        <div class="card mb-3">
-            <div class="card-header bg-danger text-white">
-                <h5 class="mb-0"><i class="bi bi-exclamation-triangle-fill"></i> Overdue Inspections</h5>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-                        <thead>
-                            <tr>
-                                <th>Property</th>
-                                <th>Last Inspection</th>
-                                <th>Due Date</th>
-                                <th>Days Overdue</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var property in overdueProperties)
-                            {
-                                <tr>
-                                    <td>
-                                        <strong>@property.Address</strong>
-                                        <br /><small class="text-muted">@property.City, @property.State</small>
-                                    </td>
-                                    <td>
-                                        @if (property.LastRoutineInspectionDate.HasValue)
-                                        {
-                                            @property.LastRoutineInspectionDate.Value.ToString("MMM dd, yyyy")
-                                        }
-                                        else
-                                        {
-                                            <span class="text-muted">Never</span>
-                                        }
-                                    </td>
-                                    <td>@property.NextRoutineInspectionDueDate!.Value.ToString("MMM dd, yyyy")</td>
-                                    <td>
-                                        <span class="badge bg-danger">@property.DaysOverdue days</span>
-                                    </td>
-                                    <td>
-                                        <div class="btn-group btn-group-sm">
-                                            <button class="btn btn-outline-primary" @onclick="() => ViewProperty(property.Id)" title="View Property">
-                                                <i class="bi bi-eye"></i>
-                                            </button>
-                                            <button class="btn btn-outline-warning" @onclick="() => CreateInspection(property.Id)" title="Create Inspection">
-                                                <i class="bi bi-clipboard-check"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    }
-
-    <!-- Due Soon Inspections -->
-    @if (dueSoonProperties.Any())
-    {
-        <div class="card mb-3">
-            <div class="card-header bg-warning">
-                <h5 class="mb-0"><i class="bi bi-exclamation-circle-fill"></i> Due Within 30 Days</h5>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-                        <thead>
-                            <tr>
-                                <th>Property</th>
-                                <th>Last Inspection</th>
-                                <th>Due Date</th>
-                                <th>Days Until Due</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var property in dueSoonProperties)
-                            {
-                                <tr>
-                                    <td>
-                                        <strong>@property.Address</strong>
-                                        <br /><small class="text-muted">@property.City, @property.State</small>
-                                    </td>
-                                    <td>
-                                        @if (property.LastRoutineInspectionDate.HasValue)
-                                        {
-                                            @property.LastRoutineInspectionDate.Value.ToString("MMM dd, yyyy")
-                                        }
-                                        else
-                                        {
-                                            <span class="text-muted">Never</span>
-                                        }
-                                    </td>
-                                    <td>@property.NextRoutineInspectionDueDate!.Value.ToString("MMM dd, yyyy")</td>
-                                    <td>
-                                        <span class="badge bg-warning">@property.DaysUntilInspectionDue days</span>
-                                    </td>
-                                    <td>
-                                        <div class="btn-group btn-group-sm">
-                                            <button class="btn btn-outline-primary" @onclick="() => ViewProperty(property.Id)" title="View Property">
-                                                <i class="bi bi-eye"></i>
-                                            </button>
-                                            <button class="btn btn-outline-warning" @onclick="() => CreateInspection(property.Id)" title="Create Inspection">
-                                                <i class="bi bi-clipboard-check"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    }
-
-    <!-- All Properties Inspection Status -->
-    <div class="card">
-        <div class="card-header">
-            <h5 class="mb-0"><i class="bi bi-list-check"></i> All Properties</h5>
-        </div>
+    <div class="card border-top-0 rounded-top-0">
         <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover mb-0">
-                    <thead>
-                        <tr>
-                            <th>Property</th>
-                            <th>Last Inspection</th>
-                            <th>Next Due</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var property in allProperties.OrderBy(p => p.NextRoutineInspectionDueDate ?? DateTime.MaxValue))
-                        {
-                            <tr>
-                                <td>
-                                    <strong>@property.Address</strong>
-                                    <br /><small class="text-muted">@property.City, @property.State</small>
-                                </td>
-                                <td>
-                                    @if (property.LastRoutineInspectionDate.HasValue)
+            @if (activeTab == "upcoming")
+            {
+                @if (!upcomingProperties.Any())
+                {
+                    <div class="p-4 text-center text-muted">
+                        <i class="bi bi-calendar-check fs-1"></i>
+                        <p class="mt-2">No upcoming inspections.</p>
+                    </div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Property</th>
+                                    <th>Last Inspection</th>
+                                    <th>Next Due</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var property in PagedUpcoming)
+                                {
+                                    <tr>
+                                        <td>
+                                            <strong>@property.Address</strong>
+                                            <br /><small class="text-muted">@property.City, @property.State</small>
+                                        </td>
+                                        <td>
+                                            @if (property.LastRoutineInspectionDate.HasValue)
+                                            {
+                                                @property.LastRoutineInspectionDate.Value.ToString("MMM dd, yyyy")
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">Never</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (property.NextRoutineInspectionDueDate.HasValue)
+                                            {
+                                                @property.NextRoutineInspectionDueDate.Value.ToString("MMM dd, yyyy")
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">Not scheduled</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <span class="badge @GetInspectionStatusBadge(property.InspectionStatus)">
+                                                @property.InspectionStatus
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <button class="btn btn-outline-primary" @onclick="() => ViewProperty(property.Id)" title="View Property">
+                                                    <i class="bi bi-eye"></i>
+                                                </button>
+                                                <button class="btn btn-outline-warning" @onclick="() => CreateInspection(property.Id)" title="Create Inspection">
+                                                    <i class="bi bi-clipboard-check"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    @if (UpcomingPageCount > 1)
+                    {
+                        <div class="d-flex justify-content-between align-items-center px-3 py-2 border-top">
+                            <small class="text-muted">Showing @(((upcomingPage - 1) * pageSize) + 1)–@(Math.Min(upcomingPage * pageSize, upcomingProperties.Count)) of @upcomingProperties.Count</small>
+                            <nav>
+                                <ul class="pagination pagination-sm mb-0">
+                                    <li class="page-item @(upcomingPage == 1 ? "disabled" : "")">
+                                        <button class="page-link" @onclick="() => upcomingPage--" disabled="@(upcomingPage == 1)">&#8249;</button>
+                                    </li>
+                                    @for (int i = 1; i <= UpcomingPageCount; i++)
                                     {
-                                        @property.LastRoutineInspectionDate.Value.ToString("MMM dd, yyyy")
+                                        int p = i;
+                                        <li class="page-item @(upcomingPage == p ? "active" : "")">
+                                            <button class="page-link" @onclick="() => upcomingPage = p">@p</button>
+                                        </li>
                                     }
-                                    else
+                                    <li class="page-item @(upcomingPage == UpcomingPageCount ? "disabled" : "")">
+                                        <button class="page-link" @onclick="() => upcomingPage++" disabled="@(upcomingPage == UpcomingPageCount)">&#8250;</button>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    }
+                }
+            }
+            else
+            {
+                @if (!overdueProperties.Any())
+                {
+                    <div class="p-4 text-center text-muted">
+                        <i class="bi bi-check-circle fs-1 text-success"></i>
+                        <p class="mt-2">No overdue inspections.</p>
+                    </div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Property</th>
+                                    <th>Last Inspection</th>
+                                    <th>Due Date</th>
+                                    <th>Days Overdue</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var property in PagedOverdue)
+                                {
+                                    <tr>
+                                        <td>
+                                            <strong>@property.Address</strong>
+                                            <br /><small class="text-muted">@property.City, @property.State</small>
+                                        </td>
+                                        <td>
+                                            @if (property.LastRoutineInspectionDate.HasValue)
+                                            {
+                                                @property.LastRoutineInspectionDate.Value.ToString("MMM dd, yyyy")
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">Never</span>
+                                            }
+                                        </td>
+                                        <td>@property.NextRoutineInspectionDueDate!.Value.ToString("MMM dd, yyyy")</td>
+                                        <td>
+                                            <span class="badge bg-danger">@property.DaysOverdue days</span>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <button class="btn btn-outline-primary" @onclick="() => ViewProperty(property.Id)" title="View Property">
+                                                    <i class="bi bi-eye"></i>
+                                                </button>
+                                                <button class="btn btn-outline-warning" @onclick="() => CreateInspection(property.Id)" title="Create Inspection">
+                                                    <i class="bi bi-clipboard-check"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    @if (OverduePageCount > 1)
+                    {
+                        <div class="d-flex justify-content-between align-items-center px-3 py-2 border-top">
+                            <small class="text-muted">Showing @(((overduePage - 1) * pageSize) + 1)–@(Math.Min(overduePage * pageSize, overdueProperties.Count)) of @overdueProperties.Count</small>
+                            <nav>
+                                <ul class="pagination pagination-sm mb-0">
+                                    <li class="page-item @(overduePage == 1 ? "disabled" : "")">
+                                        <button class="page-link" @onclick="() => overduePage--" disabled="@(overduePage == 1)">&#8249;</button>
+                                    </li>
+                                    @for (int i = 1; i <= OverduePageCount; i++)
                                     {
-                                        <span class="text-muted">Never</span>
+                                        int p = i;
+                                        <li class="page-item @(overduePage == p ? "active" : "")">
+                                            <button class="page-link" @onclick="() => overduePage = p">@p</button>
+                                        </li>
                                     }
-                                </td>
-                                <td>
-                                    @if (property.NextRoutineInspectionDueDate.HasValue)
-                                    {
-                                        @property.NextRoutineInspectionDueDate.Value.ToString("MMM dd, yyyy")
-                                    }
-                                    else
-                                    {
-                                        <span class="text-muted">Not scheduled</span>
-                                    }
-                                </td>
-                                <td>
-                                    <span class="badge @GetInspectionStatusBadge(property.InspectionStatus)">
-                                        @property.InspectionStatus
-                                    </span>
-                                </td>
-                                <td>
-                                    <div class="btn-group btn-group-sm">
-                                        <button class="btn btn-outline-primary" @onclick="() => ViewProperty(property.Id)" title="View Property">
-                                            <i class="bi bi-eye"></i>
-                                        </button>
-                                        <button class="btn btn-outline-warning" @onclick="() => CreateInspection(property.Id)" title="Create Inspection">
-                                            <i class="bi bi-clipboard-check"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
+                                    <li class="page-item @(overduePage == OverduePageCount ? "disabled" : "")">
+                                        <button class="page-link" @onclick="() => overduePage++" disabled="@(overduePage == OverduePageCount)">&#8250;</button>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    }
+                }
+            }
         </div>
     </div>
 }
 
 @code {
     private bool isLoading = true;
+    private string activeTab = "upcoming";
+    private int pageSize = 10;
+    private int upcomingPage = 1;
+    private int overduePage = 1;
+
     private List<Property> allProperties = new();
     private List<Property> overdueProperties = new();
     private List<Property> dueSoonProperties = new();
     private List<Property> scheduledProperties = new();
     private List<Property> notScheduledProperties = new();
+    private List<Property> upcomingProperties = new();
+
+    private IEnumerable<Property> PagedUpcoming =>
+        upcomingProperties.Skip((upcomingPage - 1) * pageSize).Take(pageSize);
+
+    private IEnumerable<Property> PagedOverdue =>
+        overdueProperties.Skip((overduePage - 1) * pageSize).Take(pageSize);
+
+    private int UpcomingPageCount => (int)Math.Ceiling(upcomingProperties.Count / (double)pageSize);
+    private int OverduePageCount => (int)Math.Ceiling(overdueProperties.Count / (double)pageSize);
 
     protected override async Task OnInitializedAsync()
     {
@@ -278,14 +305,20 @@ else
             allProperties = await PropertyService.GetAllAsync();
             overdueProperties = await PropertyService.GetPropertiesWithOverdueInspectionsAsync();
             dueSoonProperties = await PropertyService.GetPropertiesWithInspectionsDueSoonAsync(30);
-            
+
             scheduledProperties = allProperties
-                .Where(p => p.NextRoutineInspectionDueDate.HasValue && 
-                           p.InspectionStatus == "Scheduled")
+                .Where(p => p.NextRoutineInspectionDueDate.HasValue &&
+                            p.InspectionStatus == "Scheduled")
                 .ToList();
-            
+
             notScheduledProperties = allProperties
                 .Where(p => !p.NextRoutineInspectionDueDate.HasValue)
+                .ToList();
+
+            var overdueIds = overdueProperties.Select(p => p.Id).ToHashSet();
+            upcomingProperties = allProperties
+                .Where(p => !overdueIds.Contains(p.Id))
+                .OrderBy(p => p.NextRoutineInspectionDueDate ?? DateTime.MaxValue)
                 .ToList();
         }
         finally
@@ -297,6 +330,13 @@ else
     private async Task RefreshData()
     {
         await LoadData();
+    }
+
+    private void SetTab(string tab)
+    {
+        activeTab = tab;
+        upcomingPage = 1;
+        overduePage = 1;
     }
 
     private void ViewProperty(Guid propertyId)

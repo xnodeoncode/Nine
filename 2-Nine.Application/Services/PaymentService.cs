@@ -77,8 +77,9 @@ namespace Nine.Application.Services
                         .SumAsync(p => p.Amount);
 
                     var totalWithThisPayment = existingPayments + entity.Amount;
-                    // Invoice amount already includes late fees (added by ScheduledTaskService)
-                    var invoiceTotal = invoice.Amount;
+                    
+                    // Include late fee in invoice total if it has been applied, since payments should cover the full amount due
+                    var invoiceTotal = invoice.Amount + (invoice.LateFeeAmount ?? 0);
 
                     if (totalWithThisPayment > invoiceTotal)
                     {

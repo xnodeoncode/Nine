@@ -122,7 +122,7 @@ else
                                     <InputNumber @bind-Value="invoiceModel.AmountPaid" class="form-control" step="0.01" />
                                 </div>
                                 <ValidationMessage For="() => invoiceModel.AmountPaid" class="text-danger" />
-                                <small class="text-muted">Balance Due: @((invoiceModel.Amount - invoiceModel.AmountPaid).ToString("C"))</small>
+                                <small class="text-muted">Balance Due: @((invoiceModel.Amount + (invoiceModel.LateFeeAmount ?? 0) - invoiceModel.AmountPaid).ToString("C"))</small>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Paid Date</label>
@@ -252,6 +252,7 @@ else
                 Description = invoice.Description,
                 Status = invoice.Status,
                 AmountPaid = invoice.AmountPaid,
+                LateFeeAmount = invoice.LateFeeAmount,
                 PaidOn = invoice.PaidOn,
                 Notes = invoice.Notes
             };
@@ -379,6 +380,8 @@ else
 
         [Range(0, double.MaxValue, ErrorMessage = "Paid amount cannot be negative")]
         public decimal AmountPaid { get; set; }
+
+        public decimal? LateFeeAmount { get; set; }
 
         public DateTime? PaidOn { get; set; }
 

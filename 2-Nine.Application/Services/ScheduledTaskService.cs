@@ -204,7 +204,6 @@ namespace Nine.Application.Services
                         invoice.LateFeeAmount = lateFee;
                         invoice.LateFeeApplied = true;
                         invoice.LateFeeAppliedOn = DateTime.UtcNow;
-                        invoice.Amount += lateFee;
                         invoice.Notes = string.IsNullOrEmpty(invoice.Notes)
                             ? $"Late fee of {lateFee:C} applied on {DateTime.Now:MMM dd, yyyy}"
                             : $"{invoice.Notes}\nLate fee of {lateFee:C} applied on {DateTime.Now:MMM dd, yyyy}";

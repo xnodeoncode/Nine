@@ -52,7 +52,7 @@
         }
     </div>
 </div>
-
+<hr />
 @if (leases == null)
 {
     <div class="text-center">
@@ -114,7 +114,7 @@ else
         OnView="@HandleView"
         OnEdit="@HandleEdit"
         OnDelete="@HandleDelete" />
-    
+ <hr />   
     @if (totalPages > 1 && !groupByProperty)
     {
         <div class="card-footer">

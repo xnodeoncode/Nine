@@ -506,4 +506,47 @@ public class NotificationService : BaseService<Notification>
     }
 
     #endregion
+
+    #region Sample Data Inheritance
+
+    /// <summary>
+    /// Automatically inherits IsSampleData from the related entity so that
+    /// notifications created from sample data actions are themselves flagged
+    /// as sample data and removed when sample data is cleared.
+    /// </summary>
+    protected override async Task<Notification> SetCreateDefaultsAsync(Notification entity)
+    {
+        entity = await base.SetCreateDefaultsAsync(entity);
+
+        if (!entity.IsSampleData && entity.RelatedEntityId.HasValue && entity.RelatedEntityType != null)
+        {
+            entity.IsSampleData = await IsRelatedEntitySampleDataAsync(
+                entity.RelatedEntityId.Value,
+                entity.RelatedEntityType);
+        }
+
+        return entity;
+    }
+
+    private async Task<bool> IsRelatedEntitySampleDataAsync(Guid entityId, string entityType)
+    {
+        return entityType switch
+        {
+            ApplicationConstants.EntityTypes.Lease =>
+                await _context.Leases.Where(e => e.Id == entityId).Select(e => e.IsSampleData).FirstOrDefaultAsync(),
+            ApplicationConstants.EntityTypes.Application =>
+                await _context.RentalApplications.Where(e => e.Id == entityId).Select(e => e.IsSampleData).FirstOrDefaultAsync(),
+            ApplicationConstants.EntityTypes.Property =>
+                await _context.Properties.Where(e => e.Id == entityId).Select(e => e.IsSampleData).FirstOrDefaultAsync(),
+            ApplicationConstants.EntityTypes.Tenant =>
+                await _context.Tenants.Where(e => e.Id == entityId).Select(e => e.IsSampleData).FirstOrDefaultAsync(),
+            ApplicationConstants.EntityTypes.Invoice =>
+                await _context.Invoices.Where(e => e.Id == entityId).Select(e => e.IsSampleData).FirstOrDefaultAsync(),
+            ApplicationConstants.EntityTypes.MaintenanceRequest =>
+                await _context.MaintenanceRequests.Where(e => e.Id == entityId).Select(e => e.IsSampleData).FirstOrDefaultAsync(),
+            _ => false
+        };
+    }
+
+    #endregion
 }

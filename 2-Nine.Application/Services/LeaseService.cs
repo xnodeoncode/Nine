@@ -111,7 +111,6 @@ namespace Nine.Application.Services
                 if (property != null)
                 {
                     property.Status = ApplicationConstants.PropertyStatuses.Occupied;
-                    property.IsActive = false;
                     property.LastModifiedOn = DateTime.UtcNow;
                     property.LastModifiedBy = await _userContext.GetUserIdAsync();
                     _context.Properties.Update(property);
@@ -142,7 +141,6 @@ namespace Nine.Application.Services
                 if (property != null)
                 {
                     property.Status = ApplicationConstants.PropertyStatuses.Occupied;
-                    property.IsActive = false;
                     property.LastModifiedOn = DateTime.UtcNow;
                     property.LastModifiedBy = await _userContext.GetUserIdAsync();
                     _context.Properties.Update(property);
@@ -179,7 +177,7 @@ namespace Nine.Application.Services
 
                     if (!hasOtherActiveLeases)
                     {
-                        property.IsActive = true;
+                        property.Status = ApplicationConstants.PropertyStatuses.Available;
                         property.LastModifiedOn = DateTime.UtcNow;
                         property.LastModifiedBy = await _userContext.GetUserIdAsync();
                         _context.Properties.Update(property);
@@ -486,7 +484,7 @@ namespace Nine.Application.Services
                 {
                     if (newStatus == ApplicationConstants.LeaseStatuses.Active)
                     {
-                        property.IsActive = false;
+                        // Property status is already set to Occupied by CreateAsync/UpdateAsync
                     }
                     else if (newStatus == ApplicationConstants.LeaseStatuses.Terminated 
                         || newStatus == ApplicationConstants.LeaseStatuses.Expired)
@@ -501,7 +499,6 @@ namespace Nine.Application.Services
 
                         if (!hasOtherActiveLeases)
                         {
-                            property.IsActive = true;
                             property.Status = ApplicationConstants.PropertyStatuses.Available;
                         }
                     }

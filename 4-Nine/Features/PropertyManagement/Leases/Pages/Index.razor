@@ -57,7 +57,7 @@
         }
     </div>
 </div>
-
+<hr />
 @if (leases == null)
 {
     <div class="text-center">
@@ -463,24 +463,33 @@ else
         }
     }
 
-    private void ViewLeaseOffers()
-    {
-        NavigationManager.NavigateTo("/propertymanagement/leaseoffers");
-    }
-
     private void CreateLease()
     {
-        NavigationManager.NavigateTo("/propertymanagement/leaseoffers");
+        NavigationManager.NavigateTo("/propertymanagement/leases/create");
     }
 
     private void CreateLeaseForTenant()
     {
-        NavigationManager.NavigateTo("/propertymanagement/leaseoffers");
+        if (TenantId.HasValue)
+        {
+            NavigationManager.NavigateTo($"/propertymanagement/leases/create?tenantId={TenantId.Value}");
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/propertymanagement/leases/create");
+        }
     }
 
     private void CreateLeaseForProperty()
     {
-        NavigationManager.NavigateTo("/propertymanagement/leaseoffers");
+        if (PropertyId.HasValue)
+        {
+            NavigationManager.NavigateTo($"/propertymanagement/leases/create?propertyId={PropertyId.Value}");
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/propertymanagement/leases/create");
+        }
     }
 
     private void ClearFilter()

@@ -624,7 +624,6 @@ namespace Nine.Application.Services.Workflows
                         if (!hasOtherActiveLeases)
                         {
                             lease.Property.Status = ApplicationConstants.PropertyStatuses.Available;
-                            lease.Property.IsActive = true;
                             lease.Property.LastModifiedBy = userId;
                             lease.Property.LastModifiedOn = DateTime.UtcNow;
                         }

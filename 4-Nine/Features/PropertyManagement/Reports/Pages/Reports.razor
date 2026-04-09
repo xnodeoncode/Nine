@@ -9,7 +9,7 @@
 @attribute [OrganizationAuthorize("Owner", "Administrator", "PropertyManager")]
 
 
-<PageTitle>Financial Reports - Nine</PageTitle>
+<PageTitle>Financial Reports</PageTitle>
 
 
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -18,7 +18,7 @@
         <i class="bi bi-arrow-clockwise"></i> Refresh
     </button>
 </div>
-
+<hr />
 @if (isLoading)
 {
     <div class="text-center">
@@ -67,7 +67,7 @@ else
             </div>
         </div>
     </div>
-
+<hr />
     @if (statistics != null)
     {
         <div class="card">
@@ -113,7 +113,7 @@ else
             <p class="text-muted">Generate comprehensive financial reports for your properties</p>
         </div>
     </div>
-
+<hr />
     <div class="row">
         <div class="col-md-6 col-lg-3 mb-4">
             <div class="card h-100 shadow-sm hover-card">

@@ -2,4 +2,9 @@
 @attribute [OrganizationAuthorize("Owner", "Administrator", "PropertyManager")]
 @rendermode InteractiveServer
 
-<Nine.Shared.UI.Features.PropertyManagement.Leases.CreateForm />
+<Nine.Shared.UI.Features.PropertyManagement.Leases.CreateForm PropertyId="@PropertyId" />
+
+@code {
+    [SupplyParameterFromQuery]
+    public Guid? PropertyId { get; set; }
+}

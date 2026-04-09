@@ -80,14 +80,33 @@
 
     <div class="row">
         <div class="col-md-6 mb-3">
+            <label class="form-label">Market Status</label>
+            <div class="form-check mb-2">
+                <InputCheckbox @bind-Value="Model.IsActive" @bind-Value:after="OnIsActiveChanged" class="form-check-input" id="isActiveCheck" />
+                <label class="form-check-label" for="isActiveCheck">
+                    Property is active (available for rent)
+                </label>
+            </div>
+        </div>
+        <div class="col-md-6 mb-3">
             <label class="form-label">Status *</label>
-            <InputSelect @bind-Value="Model.Status" class="form-select">
-                <option value="@ApplicationConstants.PropertyStatuses.Available">Available</option>
-                <option value="@ApplicationConstants.PropertyStatuses.ApplicationPending">Application Pending</option>
-                <option value="@ApplicationConstants.PropertyStatuses.LeasePending">Lease Pending</option>
-                <option value="@ApplicationConstants.PropertyStatuses.Occupied">Occupied</option>
-                <option value="@ApplicationConstants.PropertyStatuses.UnderRenovation">Under Renovation</option>
-                <option value="@ApplicationConstants.PropertyStatuses.OffMarket">Off Market</option>
+            @* @if (!Model.IsActive)
+            {
+                <div class="form-text text-muted">Select the reason this property is inactive.</div>
+            } *@
+            <InputSelect @bind-Value="Model.Status" @bind-Value:after="OnStatusChanged" class="form-select">
+                @if (Model.IsActive)
+                {
+                    <option value="@ApplicationConstants.PropertyStatuses.Available">Available</option>
+                    <option value="@ApplicationConstants.PropertyStatuses.ApplicationPending">Application Pending</option>
+                    <option value="@ApplicationConstants.PropertyStatuses.LeasePending">Lease Pending</option>
+                    <option value="@ApplicationConstants.PropertyStatuses.Occupied">Occupied</option>
+                }
+                else
+                {
+                    <option value="@ApplicationConstants.PropertyStatuses.OffMarket">Off Market</option>
+                    <option value="@ApplicationConstants.PropertyStatuses.UnderRenovation">Under Renovation</option>
+                }
             </InputSelect>
             <ValidationMessage For="() => Model.Status" class="text-danger" />
         </div>
@@ -116,17 +135,6 @@
             <label class="form-label">Description</label>
             <InputTextArea @bind-Value="Model.Description" class="form-control" rows="4" placeholder="Property description and features" />
             <ValidationMessage For="() => Model.Description" class="text-danger" />
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-md-12 mb-3">
-            <div class="form-check">
-                <InputCheckbox @bind-Value="Model.IsActive" class="form-check-input" />
-                <label class="form-check-label">
-                    Property is available for rent
-                </label>
-            </div>
         </div>
     </div>
 
@@ -163,5 +171,29 @@
 
     [Parameter]
     public EventCallback OnCancel { get; set; }
+
+    private void OnIsActiveChanged()
+    {
+        if (!Model.IsActive && !ApplicationConstants.PropertyStatuses.InactiveStatuses.Contains(Model.Status))
+        {
+            Model.Status = ApplicationConstants.PropertyStatuses.OffMarket;
+        }
+        else if (Model.IsActive && ApplicationConstants.PropertyStatuses.InactiveStatuses.Contains(Model.Status))
+        {
+            Model.Status = ApplicationConstants.PropertyStatuses.Available;
+        }
+    }
+
+    private void OnStatusChanged()
+    {
+        if (ApplicationConstants.PropertyStatuses.InactiveStatuses.Contains(Model.Status))
+        {
+            Model.IsActive = false;
+        }
+        else if (!ApplicationConstants.PropertyStatuses.InactiveStatuses.Contains(Model.Status))
+        {
+            Model.IsActive = true;
+        }
+    }
 
 }

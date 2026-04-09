@@ -193,7 +193,7 @@
             var allProperties = await PropertyService.GetAllAsync();
             properties = allProperties.Where(p => !p.IsDeleted).ToList();
             totalProperties = properties.Count;
-            availableProperties = properties.Count(p => p.IsActive);
+            availableProperties = properties.Count(p => p.Status == ApplicationConstants.PropertyStatuses.Available);
     
             var allTenants = await TenantService.GetAllAsync();
             tenants = allTenants.Where(t => !t.IsDeleted).ToList();
@@ -201,13 +201,13 @@
 
             var allLeases = await LeaseService.GetAllAsync();
             leases = allLeases.Where(l => !l.IsDeleted).ToList();
-            activeLeases = leases.Count(l => l.Status == "Active");
+            activeLeases = leases.Count(l => l.Status == ApplicationConstants.LeaseStatuses.Active);
 
             // Load available properties and pending leases
             availablePropertiesList = properties
-                .Where(p => p.OrganizationId == organizationId && p.IsActive)
+                .Where(p => p.OrganizationId == organizationId && p.Status == ApplicationConstants.PropertyStatuses.Available)
                 .OrderByDescending(p => p.CreatedOn)
-                .Take(5)
+                .Take(20)
                 .ToList();
 
             // Load outstanding repairs (incomplete only - CompletedOn is null)
@@ -221,7 +221,7 @@
             // Load outstanding invoices (unpaid and overdue only)
             var allInvoices = await InvoiceService.GetAllAsync();
             recentInvoices = allInvoices
-                .Where(i => i.Status != "Paid" && i.Status != "Cancelled")
+                .Where(i => i.Status != ApplicationConstants.InvoiceStatuses.Paid && i.Status != ApplicationConstants.InvoiceStatuses.Cancelled)
                 .OrderByDescending(i => i.IsOverdue)
                 .ThenBy(i => i.DueOn)
                 .Take(5)
@@ -303,10 +303,10 @@
     {
         return status switch
         {
-            "Paid" => "bg-success",
-            "Pending" => "bg-warning",
-            "Overdue" => "bg-danger",
-            "Cancelled" => "bg-secondary",
+            ApplicationConstants.InvoiceStatuses.Paid => "bg-success",
+            ApplicationConstants.InvoiceStatuses.Pending => "bg-warning",
+            ApplicationConstants.InvoiceStatuses.Overdue => "bg-danger",
+            ApplicationConstants.InvoiceStatuses.Cancelled => "bg-secondary",
             _ => "bg-info"
         };
     }
@@ -315,12 +315,12 @@
     {
         return status switch
         {
-            "Available" => "bg-success",
-            "ApplicationPending" => "bg-info",
-            "LeasePending" => "bg-warning",
-            "Occupied" => "bg-danger",
-            "UnderRenovation" => "bg-secondary",
-            "OffMarket" => "bg-dark",
+            ApplicationConstants.PropertyStatuses.Available => "bg-success",
+            ApplicationConstants.PropertyStatuses.ApplicationPending => "bg-info",
+            ApplicationConstants.PropertyStatuses.LeasePending => "bg-warning",
+            ApplicationConstants.PropertyStatuses.Occupied => "bg-danger",
+            ApplicationConstants.PropertyStatuses.UnderRenovation => "bg-secondary",
+            ApplicationConstants.PropertyStatuses.OffMarket => "bg-dark",
             _ => "bg-secondary"
         };
     }
@@ -329,10 +329,10 @@
     {
         return status switch
         {
-            "ApplicationPending" => "Application Pending",
-            "LeasePending" => "Lease Pending",
-            "UnderRenovation" => "Under Renovation",
-            "OffMarket" => "Off Market",
+            ApplicationConstants.PropertyStatuses.ApplicationPending => "Application Pending",
+            ApplicationConstants.PropertyStatuses.LeasePending => "Lease Pending",
+            ApplicationConstants.PropertyStatuses.UnderRenovation => "Under Renovation",
+            ApplicationConstants.PropertyStatuses.OffMarket => "Off Market",
             _ => status
         };
     }
