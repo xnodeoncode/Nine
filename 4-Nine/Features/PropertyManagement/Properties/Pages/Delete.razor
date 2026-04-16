@@ -248,7 +248,7 @@
                 var propertyLeases = allLeases.Where(l => l.PropertyId == PropertyId).ToList();
 
                 activeLeases = propertyLeases
-                    .Where(l => l.Status == ApplicationConstants.LeaseStatuses.Active)
+                    .Where(l => l.IsActive)
                     .ToList();
 
                 upcomingLeases = propertyLeases

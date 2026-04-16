@@ -121,7 +121,8 @@ namespace Nine.Application.Services.Workflows
                 var oldStatus = lease.Status;
 
                 // Update lease
-                lease.Status = ApplicationConstants.LeaseStatuses.Active;
+                lease.Status = ApplicationConstants.LeaseStatuses.Accepted;
+                lease.IsActive = true;
                 lease.SignedOn = moveInDate ?? DateTime.Today;
                 lease.LastModifiedBy = userId;
                 lease.LastModifiedOn = DateTime.UtcNow;
@@ -183,7 +184,7 @@ namespace Nine.Application.Services.Workflows
                     return WorkflowResult.Fail("Lease not found");
 
                 var activeStatuses = new[] {
-                    ApplicationConstants.LeaseStatuses.Active,
+                    ApplicationConstants.LeaseStatuses.Accepted,
                     ApplicationConstants.LeaseStatuses.MonthToMonth,
                     ApplicationConstants.LeaseStatuses.Renewed
                 };
@@ -248,7 +249,7 @@ namespace Nine.Application.Services.Workflows
                     return WorkflowResult.Fail("Lease not found");
 
                 var validStatuses = new[] {
-                    ApplicationConstants.LeaseStatuses.Active,
+                    ApplicationConstants.LeaseStatuses.Accepted,
                     ApplicationConstants.LeaseStatuses.Expired
                 };
 
@@ -304,7 +305,7 @@ namespace Nine.Application.Services.Workflows
                     return WorkflowResult<Lease>.Fail("Lease not found");
 
                 var renewableStatuses = new[] {
-                    ApplicationConstants.LeaseStatuses.Active,
+                    ApplicationConstants.LeaseStatuses.Accepted,
                     ApplicationConstants.LeaseStatuses.MonthToMonth,
                     ApplicationConstants.LeaseStatuses.NoticeGiven // Can be cancelled with renewal
                 };
@@ -337,7 +338,8 @@ namespace Nine.Application.Services.Workflows
                     MonthlyRent = model.NewMonthlyRent,
                     SecurityDeposit = model.UpdatedSecurityDeposit ?? existingLease.SecurityDeposit,
                     Terms = model.NewTerms ?? existingLease.Terms,
-                    Status = ApplicationConstants.LeaseStatuses.Active,
+                    Status = ApplicationConstants.LeaseStatuses.Accepted,
+                    IsActive = true,
                     SignedOn = DateTime.Today,
                     RenewalNumber = existingLease.RenewalNumber + 1,
                     CreatedBy = userId,
@@ -348,6 +350,7 @@ namespace Nine.Application.Services.Workflows
 
                 // Update existing lease status
                 existingLease.Status = ApplicationConstants.LeaseStatuses.Renewed;
+                existingLease.IsActive = false;
                 existingLease.LastModifiedBy = userId;
                 existingLease.LastModifiedOn = DateTime.UtcNow;
 
@@ -404,7 +407,7 @@ namespace Nine.Application.Services.Workflows
                 var moveOutStatuses = new[] {
                     ApplicationConstants.LeaseStatuses.NoticeGiven,
                     ApplicationConstants.LeaseStatuses.Expired,
-                    ApplicationConstants.LeaseStatuses.Active // Emergency move-out
+                    ApplicationConstants.LeaseStatuses.Accepted // Emergency move-out
                 };
 
                 if (!moveOutStatuses.Contains(lease.Status))
@@ -417,6 +420,7 @@ namespace Nine.Application.Services.Workflows
 
                 // Update lease
                 lease.Status = ApplicationConstants.LeaseStatuses.Terminated;
+                lease.IsActive = false;
                 lease.ActualMoveOutDate = actualMoveOutDate;
                 lease.LastModifiedBy = userId;
                 lease.LastModifiedOn = DateTime.UtcNow;
@@ -436,8 +440,7 @@ namespace Nine.Application.Services.Workflows
                         .AnyAsync(l => l.TenantId == lease.TenantId &&
                                       l.Id != leaseId &&
                                       l.OrganizationId == orgId &&
-                                      (l.Status == ApplicationConstants.LeaseStatuses.Active ||
-                                       l.Status == ApplicationConstants.LeaseStatuses.MonthToMonth) &&
+                                      l.IsActive &&
                                       !l.IsDeleted);
 
                     if (!hasOtherActiveLeases)
@@ -497,7 +500,7 @@ namespace Nine.Application.Services.Workflows
                     return WorkflowResult.Fail("Lease not found");
 
                 var terminableStatuses = new[] {
-                    ApplicationConstants.LeaseStatuses.Active,
+                    ApplicationConstants.LeaseStatuses.Accepted,
                     ApplicationConstants.LeaseStatuses.MonthToMonth,
                     ApplicationConstants.LeaseStatuses.NoticeGiven,
                     ApplicationConstants.LeaseStatuses.Pending
@@ -515,6 +518,7 @@ namespace Nine.Application.Services.Workflows
 
                 // Update lease
                 lease.Status = ApplicationConstants.LeaseStatuses.Terminated;
+                lease.IsActive = false;
                 lease.TerminationReason = $"[{terminationType}] {reason}";
                 lease.ActualMoveOutDate = effectiveDate;
                 lease.LastModifiedBy = userId;
@@ -536,8 +540,7 @@ namespace Nine.Application.Services.Workflows
                         .AnyAsync(l => l.TenantId == lease.TenantId &&
                                       l.Id != leaseId &&
                                       l.OrganizationId == orgId &&
-                                      (l.Status == ApplicationConstants.LeaseStatuses.Active ||
-                                       l.Status == ApplicationConstants.LeaseStatuses.MonthToMonth) &&
+                                      l.IsActive &&
                                       !l.IsDeleted);
 
                     if (!hasOtherActiveLeases)
@@ -596,7 +599,7 @@ namespace Nine.Application.Services.Workflows
                     .Include(l => l.Property)
                     .Include(l => l.Tenant)
                     .Where(l => l.OrganizationId == organizationId &&
-                               l.Status == ApplicationConstants.LeaseStatuses.Active &&
+                               l.IsActive &&
                                l.EndDate < DateTime.Today &&
                                !l.IsDeleted)
                     .ToListAsync();
@@ -607,6 +610,7 @@ namespace Nine.Application.Services.Workflows
                 {
                     var oldStatus = lease.Status;
                     lease.Status = ApplicationConstants.LeaseStatuses.Expired;
+                    lease.IsActive = false;
                     lease.RenewalStatus = "Expired";
                     lease.LastModifiedBy = userId;
                     lease.LastModifiedOn = DateTime.UtcNow;
@@ -618,8 +622,7 @@ namespace Nine.Application.Services.Workflows
                             .AnyAsync(l => l.PropertyId == lease.PropertyId
                                 && l.Id != lease.Id
                                 && !l.IsDeleted
-                                && (l.Status == ApplicationConstants.LeaseStatuses.Active
-                                    || l.Status == ApplicationConstants.LeaseStatuses.Pending));
+                                && l.IsActive);
 
                         if (!hasOtherActiveLeases)
                         {
@@ -673,7 +676,7 @@ namespace Nine.Application.Services.Workflows
             
             var expiringLeases = await _context.Leases
                 .Where(l => l.EndDate.Date == targetDate 
-                        && l.Status == ApplicationConstants.LeaseStatuses.Active
+                        && l.IsActive
                         && l.OrganizationId == orgId
                         && !l.IsDeleted)
                 .Include(l => l.Property)
@@ -864,8 +867,7 @@ namespace Nine.Application.Services.Workflows
                 AuditHistory = auditHistory,
                 DaysUntilExpiration = (lease.EndDate - DateTime.Today).Days,
                 IsExpiring = (lease.EndDate - DateTime.Today).Days <= 60,
-                CanRenew = lease.Status == ApplicationConstants.LeaseStatuses.Active ||
-                          lease.Status == ApplicationConstants.LeaseStatuses.MonthToMonth,
+                CanRenew = lease.IsActive,
                 CanTerminate = lease.Status != ApplicationConstants.LeaseStatuses.Terminated &&
                               lease.Status != ApplicationConstants.LeaseStatuses.Expired
             };
@@ -883,7 +885,7 @@ namespace Nine.Application.Services.Workflows
                 .Include(l => l.Tenant)
                 .Include(l => l.Property)
                 .Where(l => l.OrganizationId == orgId &&
-                           l.Status == ApplicationConstants.LeaseStatuses.Active &&
+                           l.IsActive &&
                            l.EndDate <= cutoffDate &&
                            l.EndDate >= DateTime.Today &&
                            !l.IsDeleted)

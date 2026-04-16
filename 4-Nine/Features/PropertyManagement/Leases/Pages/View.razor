@@ -19,8 +19,14 @@
         <button class="btn btn-sm btn-primary" @onclick="EditLease">
             <i class="bi bi-pencil"></i> Edit
         </button>
-        <button class="btn btn-secondary" @onclick="BackToProperty">
-            <i class="bi bi-arrow-left"></i> Back to Property
+        @if (lease?.PropertyId != null)
+        {
+            <button class="btn btn-sm btn-outline-secondary" @onclick="BackToProperty">
+                <i class="bi bi-house"></i> View Property
+            </button>
+        }
+        <button class="btn btn-secondary" @onclick="BackToList">
+            <i class="bi bi-arrow-left"></i> Back to List
         </button>
     </div>
 </div>
@@ -209,7 +215,7 @@
                 <div class="modal-body">
                     <p class="text-muted">The lease will continue on a month-to-month basis. You may optionally update the monthly rent.</p>
                     <div class="mb-3">
-                        <label class="form-label">New Monthly Rent (leave blank to keep current: $@lease.MonthlyRent.ToString("N2"))</label>
+                        <label class="form-label">New Monthly Rent (leave blank to keep current: $@lease?.MonthlyRent.ToString("N2"))</label>
                         <input type="number" class="form-control" @bind="mtmNewRent" placeholder="Optional new rent amount" min="0" step="0.01" />
                     </div>
                 </div>
@@ -243,7 +249,7 @@
                     <div class="mb-3">
                         <label class="form-label">New End Date <span class="text-danger">*</span></label>
                         <input type="date" class="form-control" @bind="renewalNewEndDate" />
-                        <div class="form-text">Must be after current end date (@lease.EndDate.ToString("MMM dd, yyyy")).</div>
+                        <div class="form-text">Must be after current end date (@lease?.EndDate.ToString("MMM dd, yyyy")).</div>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Monthly Rent <span class="text-danger">*</span></label>
@@ -362,6 +368,11 @@
     private void BackToProperty()
     {
         Navigation.NavigateTo($"/propertymanagement/properties/{lease?.PropertyId}");
+    }
+
+     private void BackToList()
+    {
+        Navigation.NavigateTo($"/propertymanagement/leases");
     }
 
     private void EditLease()

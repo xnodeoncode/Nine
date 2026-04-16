@@ -32,7 +32,9 @@ namespace Nine.Core.Entities
         public decimal SecurityDeposit { get; set; }
 
         [StringLength(50)]
-        public string Status { get; set; } = "Active"; // Active, Pending, Expired, Terminated
+        public string Status { get; set; } = "Offered";
+
+        public bool IsActive { get; set; } = true;
 
         [StringLength(1000)]
         public string Terms { get; set; } = string.Empty;
@@ -101,7 +103,6 @@ namespace Nine.Core.Entities
         public virtual ICollection<Document> Documents { get; set; } = new List<Document>();
 
         // Computed properties
-        public bool IsActive => Status == "Active" && DateTime.Now >= StartDate && DateTime.Now <= EndDate;
         public int DaysRemaining => EndDate > DateTime.Now ? (EndDate - DateTime.Now).Days : 0;
         public bool IsExpiringSoon => DaysRemaining > 0 && DaysRemaining <= 90;
         public bool IsExpired => DateTime.Now > EndDate;

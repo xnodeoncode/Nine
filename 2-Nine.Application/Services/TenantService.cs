@@ -235,7 +235,7 @@ namespace Nine.Application.Services
                                t.OrganizationId == organizationId)
                     .Where(t => _context.Leases.Any(l =>
                         l.TenantId == t.Id &&
-                        l.Status == ApplicationConstants.LeaseStatuses.Active &&
+                        l.IsActive &&
                         !l.IsDeleted))
                     .ToListAsync();
             }

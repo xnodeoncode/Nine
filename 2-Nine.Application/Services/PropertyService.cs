@@ -225,7 +225,7 @@ namespace Nine.Application.Services
                                p.OrganizationId == organizationId)
                     .Where(p => !_context.Leases.Any(l =>
                         l.PropertyId == p.Id &&
-                        l.Status == Core.Constants.ApplicationConstants.LeaseStatuses.Active &&
+                        l.IsActive &&
                         !l.IsDeleted))
                     .ToListAsync();
             }
@@ -264,7 +264,7 @@ namespace Nine.Application.Services
                                     p.OrganizationId == organizationId &&
                                     _context.Leases.Any(l =>
                                         l.PropertyId == p.Id &&
-                                        l.Status == Core.Constants.ApplicationConstants.LeaseStatuses.Active &&
+                                        l.IsActive &&
                                         !l.IsDeleted));
 
                 return (decimal)occupiedProperties / totalProperties * 100;
@@ -294,15 +294,13 @@ namespace Nine.Application.Services
                 var endDate = startDate.AddYears(1).AddDays(-1);
 
                 // Get all leases for this property that overlap with the period
-                // Include all occupied statuses: Active, Renewed, Month-to-Month, Notice Given, Terminated
+                // Include active leases, renewed (historical), and terminated (for actual move-out)
                 var leases = await _context.Leases
                     .Where(l => l.PropertyId == propertyId &&
                                l.OrganizationId == organizationId &&
                                !l.IsDeleted &&
-                               (l.Status == ApplicationConstants.LeaseStatuses.Active || 
+                               (l.IsActive ||
                                 l.Status == ApplicationConstants.LeaseStatuses.Renewed ||
-                                l.Status == ApplicationConstants.LeaseStatuses.MonthToMonth ||
-                                l.Status == ApplicationConstants.LeaseStatuses.NoticeGiven ||
                                 l.Status == ApplicationConstants.LeaseStatuses.Terminated) &&
                                l.StartDate <= endDate)
                     .ToListAsync();
@@ -395,10 +393,8 @@ namespace Nine.Application.Services
                         .Where(l => l.PropertyId == propertyId &&
                                    l.OrganizationId == organizationId &&
                                    !l.IsDeleted &&
-                                   (l.Status == ApplicationConstants.LeaseStatuses.Active || 
+                                   (l.IsActive ||
                                     l.Status == ApplicationConstants.LeaseStatuses.Renewed ||
-                                    l.Status == ApplicationConstants.LeaseStatuses.MonthToMonth ||
-                                    l.Status == ApplicationConstants.LeaseStatuses.NoticeGiven ||
                                     l.Status == ApplicationConstants.LeaseStatuses.Terminated) &&
                                    l.StartDate <= endDate)
                         .ToListAsync();

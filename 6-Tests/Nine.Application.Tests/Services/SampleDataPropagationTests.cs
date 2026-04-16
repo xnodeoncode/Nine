@@ -91,7 +91,7 @@ namespace Nine.Application.Tests.Services
                 EndDate = DateTime.UtcNow.AddYears(1).Date,
                 MonthlyRent = 1500m,
                 SecurityDeposit = 1500m,
-                Status = ApplicationConstants.LeaseStatuses.Active,
+                Status = ApplicationConstants.LeaseStatuses.Accepted,
                 CreatedBy = _userId,
                 CreatedOn = DateTime.UtcNow,
                 IsSampleData = true
@@ -185,7 +185,7 @@ namespace Nine.Application.Tests.Services
                 EndDate = DateTime.UtcNow.AddYears(1).Date,
                 MonthlyRent = 2000m,
                 SecurityDeposit = 2000m,
-                Status = ApplicationConstants.LeaseStatuses.Active,
+                Status = ApplicationConstants.LeaseStatuses.Accepted,
                 CreatedBy = _userId,
                 CreatedOn = DateTime.UtcNow,
                 IsSampleData = false
@@ -303,7 +303,7 @@ namespace Nine.Application.Tests.Services
                 StartDate = DateTime.UtcNow.Date,
                 EndDate = DateTime.UtcNow.Date.AddMonths(12),
                 MonthlyRent = 1800m,
-                Status = ApplicationConstants.LeaseStatuses.Active
+                Status = ApplicationConstants.LeaseStatuses.Accepted
                 // IsSampleData NOT set
             };
 
@@ -356,7 +356,7 @@ namespace Nine.Application.Tests.Services
                 StartDate = DateTime.UtcNow.Date.AddMonths(-3),
                 EndDate = DateTime.UtcNow.Date.AddMonths(9),
                 MonthlyRent = 1500m,
-                Status = ApplicationConstants.LeaseStatuses.Active,
+                Status = ApplicationConstants.LeaseStatuses.Accepted,
                 CreatedBy = ApplicationConstants.SystemUser.Id,
                 CreatedOn = DateTime.UtcNow,
                 IsSampleData = true // SAMPLE DATA
@@ -427,7 +427,7 @@ namespace Nine.Application.Tests.Services
                 EndDate = DateTime.UtcNow.AddYears(1).Date,
                 MonthlyRent = 3000m,
                 SecurityDeposit = 3000m,
-                Status = ApplicationConstants.LeaseStatuses.Active,
+                Status = ApplicationConstants.LeaseStatuses.Accepted,
                 CreatedBy = _userId,
                 CreatedOn = DateTime.UtcNow,
                 IsSampleData = false

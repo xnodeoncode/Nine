@@ -3,6 +3,8 @@
 # Build outputs - ignore bin/obj in all project folders
 **/bin/
 **/obj/
+# EF tools on Linux can create a literal "bin\Debug" directory (backslash in name)
+**/bin\Debug/
 
 # Electron host - track the folder but ignore node_modules
 obj/Host/node_modules/

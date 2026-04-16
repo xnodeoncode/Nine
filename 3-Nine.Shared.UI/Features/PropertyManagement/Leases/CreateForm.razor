@@ -91,8 +91,8 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Status</label>
-                            <InputSelect @bind-Value="leaseModel.Status" class="form-select">
-                                @foreach (var status in ApplicationConstants.LeaseStatuses.DefaultStatuses)
+                            <InputSelect @bind-Value="leaseModel.Status" @bind-Value:after="OnStatusChanged" class="form-select">
+                                @foreach (var status in ApplicationConstants.LeaseStatuses.AllLeaseStatuses)
                                 {
                                     <option value="@status">@status</option>
                                 }
@@ -225,7 +225,13 @@
         // Set default values
         leaseModel.StartDate = DateTime.Today;
         leaseModel.EndDate = DateTime.Today.AddYears(1);
-        leaseModel.Status = ApplicationConstants.LeaseStatuses.Active;
+        leaseModel.Status = ApplicationConstants.LeaseStatuses.Offered;
+        leaseModel.IsActive = true;
+    }
+
+    private void OnStatusChanged()
+    {
+        leaseModel.IsActive = ApplicationConstants.LeaseStatuses.ActiveStatuses.Contains(leaseModel.Status);
     }
 
     private async Task OnPropertyChanged()
@@ -287,7 +293,6 @@
 
             var lease = new Lease
             {
-                
                 PropertyId = leaseModel.PropertyId,
                 TenantId = leaseModel.TenantId,
                 StartDate = leaseModel.StartDate,
@@ -295,19 +300,12 @@
                 MonthlyRent = leaseModel.MonthlyRent,
                 SecurityDeposit = leaseModel.SecurityDeposit,
                 Status = leaseModel.Status,
+                IsActive = leaseModel.IsActive,
                 Terms = leaseModel.Terms,
                 Notes = leaseModel.Notes
             };
 
             await LeaseService.CreateAsync(lease);
-
-            // Mark property as unavailable if lease is active
-            if (leaseModel.Status == ApplicationConstants.LeaseStatuses.Active)
-            {
-                property.IsActive = false;
-            }
-
-            await PropertyService.UpdateAsync(property);
 
             Navigation.NavigateTo("/propertymanagement/properties/" + leaseModel.PropertyId);
         }
@@ -360,7 +358,9 @@
 
         [Required(ErrorMessage = "Status is required")]
         [StringLength(50)]
-        public string Status { get; set; } = ApplicationConstants.LeaseStatuses.Active;
+        public string Status { get; set; } = ApplicationConstants.LeaseStatuses.Offered;
+
+        public bool IsActive { get; set; } = true;
 
         [StringLength(1000, ErrorMessage = "Terms cannot exceed 1000 characters")]
         public string Terms { get; set; } = string.Empty;

@@ -11,7 +11,7 @@ namespace Nine.Infrastructure.Data.CompiledModels
     public partial class ApplicationDbContextModel
     {
         private ApplicationDbContextModel()
-            : base(skipDetectChanges: false, modelId: new Guid("409a29cb-f330-41bb-8099-305ed7a81084"), entityTypeCount: 35)
+            : base(skipDetectChanges: false, modelId: new Guid("9a95d70f-f839-413c-93b9-36f025f875f7"), entityTypeCount: 35)
         {
         }
 

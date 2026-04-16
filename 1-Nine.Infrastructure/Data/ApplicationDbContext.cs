@@ -155,6 +155,8 @@ namespace Nine.Infrastructure.Data
 
                 entity.Property(e => e.MonthlyRent).HasPrecision(18, 2);
                 entity.Property(e => e.SecurityDeposit).HasPrecision(18, 2);
+
+                entity.HasIndex(e => e.IsActive);
                 
                 // Configure relationship with Organization
                 entity.HasOne<Organization>()

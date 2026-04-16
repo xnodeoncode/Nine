@@ -2,10 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using Nine.Core.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Nine.Core.Entities;
 
 #pragma warning disable 219, 612, 618
 #nullable disable
@@ -21,10 +21,10 @@ namespace Nine.Infrastructure.Data.CompiledModels
                 "Nine.Core.Entities.Lease",
                 typeof(Lease),
                 baseEntityType,
-                propertyCount: 37,
+                propertyCount: 38,
                 navigationCount: 5,
                 foreignKeyCount: 4,
-                unnamedIndexCount: 4,
+                unnamedIndexCount: 5,
                 keyCount: 1);
 
             var id = runtimeEntityType.AddProperty(
@@ -90,6 +90,13 @@ namespace Nine.Infrastructure.Data.CompiledModels
                 propertyInfo: typeof(Lease).GetProperty("ExpiresOn", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Lease).GetField("<ExpiresOn>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
+
+            var isActive = runtimeEntityType.AddProperty(
+                "IsActive",
+                typeof(bool),
+                propertyInfo: typeof(Lease).GetProperty("IsActive", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(Lease).GetField("<IsActive>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                sentinel: false);
 
             var isDeleted = runtimeEntityType.AddProperty(
                 "IsDeleted",
@@ -306,12 +313,15 @@ namespace Nine.Infrastructure.Data.CompiledModels
                 new[] { documentId });
 
             var index0 = runtimeEntityType.AddIndex(
-                new[] { organizationId });
+                new[] { isActive });
 
             var index1 = runtimeEntityType.AddIndex(
-                new[] { propertyId });
+                new[] { organizationId });
 
             var index2 = runtimeEntityType.AddIndex(
+                new[] { propertyId });
+
+            var index3 = runtimeEntityType.AddIndex(
                 new[] { tenantId });
 
             return runtimeEntityType;

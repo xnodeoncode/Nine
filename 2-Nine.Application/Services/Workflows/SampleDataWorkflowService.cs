@@ -383,7 +383,8 @@ namespace Nine.Application.Services.Workflows
                     EndDate = endDate,
                     MonthlyRent = property.MonthlyRent,
                     SecurityDeposit = property.MonthlyRent, // 1x rent
-                    Status = ApplicationConstants.LeaseStatuses.Active,
+                    Status = ApplicationConstants.LeaseStatuses.Accepted,
+                    IsActive = true,
                     Terms = $"12-month {ApplicationConstants.LeaseTypes.FixedTerm} lease. Rent: ${property.MonthlyRent}/month. " +
                            $"Security Deposit: ${property.MonthlyRent}. Payment due on the 5th of each month.",
                     SignedOn = startDate.AddDays(-10), // Signed 10 days before start
@@ -415,7 +416,8 @@ namespace Nine.Application.Services.Workflows
                 EndDate = endDate30,
                 MonthlyRent = properties[6].MonthlyRent,
                 SecurityDeposit = properties[6].MonthlyRent,
-                Status = ApplicationConstants.LeaseStatuses.Active,
+                Status = ApplicationConstants.LeaseStatuses.Accepted,
+                IsActive = true,
                 Terms = $"12-month {ApplicationConstants.LeaseTypes.FixedTerm} lease. Rent: ${properties[6].MonthlyRent}/month. " +
                        $"Security Deposit: ${properties[6].MonthlyRent}. Payment due on the 5th of each month. EXPIRING SOON.",
                 SignedOn = startDate30.AddDays(-10), // Signed 10 days before start
@@ -442,7 +444,8 @@ namespace Nine.Application.Services.Workflows
                 EndDate = endDate60,
                 MonthlyRent = properties[7].MonthlyRent,
                 SecurityDeposit = properties[7].MonthlyRent,
-                Status = ApplicationConstants.LeaseStatuses.Active,
+                Status = ApplicationConstants.LeaseStatuses.Accepted,
+                IsActive = true,
                 Terms = $"12-month {ApplicationConstants.LeaseTypes.FixedTerm} lease. Rent: ${properties[7].MonthlyRent}/month. " +
                        $"Security Deposit: ${properties[7].MonthlyRent}. Payment due on the 5th of each month. EXPIRING SOON.",
                 SignedOn = startDate60.AddDays(-10), // Signed 10 days before start

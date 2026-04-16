@@ -201,7 +201,7 @@
 
             var allLeases = await LeaseService.GetAllAsync();
             leases = allLeases.Where(l => !l.IsDeleted).ToList();
-            activeLeases = leases.Count(l => l.Status == ApplicationConstants.LeaseStatuses.Active);
+            activeLeases = leases.Count(l => l.IsActive);
 
             // Load available properties and pending leases
             availablePropertiesList = properties
@@ -236,7 +236,7 @@
 
             occupancyRate = await PropertyService.CalculatePortfolioOccupancyRateAsync();
             totalMonthlyIncome = leases
-                                    .Where(l => !l.IsDeleted && l.Status == ApplicationConstants.LeaseStatuses.Active)
+                                    .Where(l => !l.IsDeleted && l.IsActive)
                                     .Sum(l => l.MonthlyRent);
             totalRevenueOpportunity = properties
                                     .Where(p => !p.IsDeleted)

@@ -244,8 +244,6 @@ namespace Nine.Core.Constants
             public const string Offered = "Offered";
             public const string Pending = "Pending";
             public const string Accepted = "Accepted";
-            public const string AcceptedPendingStart = "Accepted - Pending Start";
-            public const string Active = "Active";
             public const string Declined = "Declined";
             public const string Renewed = "Renewed";
             public const string MonthToMonth = "Month-to-Month";
@@ -264,27 +262,38 @@ namespace Nine.Core.Constants
                 "Expired"
             };
 
+            /// <summary>Active leases: IsActive = true</summary>
+            public static IReadOnlyList<string> ActiveStatuses { get; } = new List<string>
+            {
+                Offered,
+                Pending,
+                Accepted,
+                MonthToMonth,
+                NoticeGiven,
+            };
+
+            /// <summary>Inactive leases: IsActive = false</summary>
+            public static IReadOnlyList<string> InactiveStatuses { get; } = new List<string>
+            {
+                Renewed,
+                Declined,
+                Interrupted,
+                Terminated,
+                Expired,
+            };
+
             public static IReadOnlyList<string> AllLeaseStatuses { get; } = new List<string>
             {
                 Offered,
                 Pending,
                 Accepted,
-                AcceptedPendingStart,
-                Active,
-                Declined,
-                Renewed,
                 MonthToMonth,
                 NoticeGiven,
+                Renewed,
+                Declined,
                 Interrupted,
                 Terminated,
-                Expired
-            };
-
-            public static IReadOnlyList<string> DefaultStatuses { get; } = new List<string>
-            {
-                Active,
-                MonthToMonth,
-                Terminated
+                Expired,
             };
         }
 

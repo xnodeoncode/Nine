@@ -428,15 +428,15 @@ else
     {
         if (filteredLeases != null && filteredLeases.Any())
         {
-            activeCount = filteredLeases.Count(l => l.Status == "Active");
+            activeCount = filteredLeases.Count(l => l.IsActive);
             
             // Expiring within 30 days
             var thirtyDaysFromNow = DateTime.Now.AddDays(30);
             expiringSoonCount = filteredLeases.Count(l => 
-                l.Status == "Active" && l.EndDate <= thirtyDaysFromNow);
+                l.IsActive && l.EndDate <= thirtyDaysFromNow);
             
             totalMonthlyRent = filteredLeases
-                .Where(l => l.Status == "Active")
+                .Where(l => l.IsActive)
                 .Sum(l => l.MonthlyRent);
         }
         else

@@ -134,15 +134,13 @@ public class NineFinancialReportService
                 .SumAsync(r => r.Cost);
 
             // Calculate occupancy days
-            // Include occupied lease statuses: Active, Renewed, Month-to-Month, Notice Given
-            // Also include Terminated to count actual days occupied before move-out
+            // Include active leases (IsActive covers Accepted/MonthToMonth/NoticeGiven/Pending/Offered),
+            // renewed (historical), and terminated (to count actual days occupied before move-out)
             var leases = await context.Leases
                 .Where(l => l.PropertyId == property.Id &&
                            !l.IsDeleted &&
-                           (l.Status == ApplicationConstants.LeaseStatuses.Active || 
+                           (l.IsActive ||
                             l.Status == ApplicationConstants.LeaseStatuses.Renewed ||
-                            l.Status == ApplicationConstants.LeaseStatuses.MonthToMonth ||
-                            l.Status == ApplicationConstants.LeaseStatuses.NoticeGiven ||
                             l.Status == ApplicationConstants.LeaseStatuses.Terminated) &&
                            l.StartDate <= endDate)
                 .ToListAsync();

@@ -294,7 +294,7 @@ namespace Nine.Application.Tests
                 StartDate = DateTime.Today,
                 EndDate = DateTime.Today.AddYears(1),
                 MonthlyRent = 1500m,
-                Status = ApplicationConstants.LeaseStatuses.Active,
+                Status = ApplicationConstants.LeaseStatuses.Accepted,
                 CreatedBy = _testUserId,
                 CreatedOn = DateTime.UtcNow
             };
@@ -483,7 +483,7 @@ namespace Nine.Application.Tests
                 StartDate = DateTime.Today.AddMonths(-1),
                 EndDate = DateTime.Today.AddMonths(11),
                 MonthlyRent = 1500m,
-                Status = ApplicationConstants.LeaseStatuses.Active,
+                Status = ApplicationConstants.LeaseStatuses.Accepted,
                 CreatedBy = _testUserId,
                 CreatedOn = DateTime.UtcNow
             };
@@ -585,7 +585,7 @@ namespace Nine.Application.Tests
                     StartDate = DateTime.Today,
                     EndDate = DateTime.Today.AddYears(1),
                     MonthlyRent = 1500m,
-                    Status = ApplicationConstants.LeaseStatuses.Active,
+                    Status = ApplicationConstants.LeaseStatuses.Accepted,
                     CreatedBy = _testUserId,
                     CreatedOn = DateTime.UtcNow
                 };

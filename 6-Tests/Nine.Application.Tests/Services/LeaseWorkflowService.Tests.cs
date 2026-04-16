@@ -116,7 +116,7 @@ public class LeaseWorkflowServiceTests
             Email = "tenant@test.com",
             PhoneNumber = "555-0100",
             IdentificationNumber = Guid.NewGuid().ToString("N")[..10], // Unique ID
-            IsActive = leaseStatus == ApplicationConstants.LeaseStatuses.Active,
+            IsActive = leaseStatus == ApplicationConstants.LeaseStatuses.Accepted,
             CreatedBy = ctx.UserId,
             CreatedOn = DateTime.UtcNow
         };
@@ -129,7 +129,7 @@ public class LeaseWorkflowServiceTests
             City = "TestCity",
             State = "TS",
             ZipCode = "12345",
-            Status = leaseStatus == ApplicationConstants.LeaseStatuses.Active 
+            Status = leaseStatus == ApplicationConstants.LeaseStatuses.Accepted 
                 ? ApplicationConstants.PropertyStatuses.Occupied 
                 : ApplicationConstants.PropertyStatuses.LeasePending,
             MonthlyRent = monthlyRent,
@@ -223,7 +223,7 @@ public class LeaseWorkflowServiceTests
         Assert.True(result.Success, string.Join(";", result.Errors));
 
         var dbLease = await ctx.Context.Leases.FirstAsync(l => l.Id == lease.Id);
-        Assert.Equal(ApplicationConstants.LeaseStatuses.Active, dbLease.Status);
+        Assert.Equal(ApplicationConstants.LeaseStatuses.Accepted, dbLease.Status);
         Assert.NotNull(dbLease.SignedOn);
 
         var dbProperty = await ctx.Context.Properties.FirstAsync(p => p.Id == property.Id);
@@ -239,7 +239,7 @@ public class LeaseWorkflowServiceTests
         // Arrange
         await using var ctx = await CreateTestContextAsync();
         var (_, _, lease) = await CreateTenantPropertyAndLeaseAsync(ctx, 
-            leaseStatus: ApplicationConstants.LeaseStatuses.Active);
+            leaseStatus: ApplicationConstants.LeaseStatuses.Accepted);
 
         // Act
         var result = await ctx.WorkflowService.ActivateLeaseAsync(lease.Id);
@@ -290,7 +290,7 @@ public class LeaseWorkflowServiceTests
         // Arrange
         await using var ctx = await CreateTestContextAsync();
         var (_, _, lease) = await CreateTenantPropertyAndLeaseAsync(ctx, 
-            leaseStatus: ApplicationConstants.LeaseStatuses.Active);
+            leaseStatus: ApplicationConstants.LeaseStatuses.Accepted);
 
         var noticeDate = DateTime.Today;
         var moveOutDate = DateTime.Today.AddDays(30);
@@ -333,7 +333,7 @@ public class LeaseWorkflowServiceTests
         // Arrange
         await using var ctx = await CreateTestContextAsync();
         var (_, _, lease) = await CreateTenantPropertyAndLeaseAsync(ctx, 
-            leaseStatus: ApplicationConstants.LeaseStatuses.Active);
+            leaseStatus: ApplicationConstants.LeaseStatuses.Accepted);
 
         // Act
         var result = await ctx.WorkflowService.RecordTerminationNoticeAsync(
@@ -350,7 +350,7 @@ public class LeaseWorkflowServiceTests
         // Arrange
         await using var ctx = await CreateTestContextAsync();
         var (_, _, lease) = await CreateTenantPropertyAndLeaseAsync(ctx, 
-            leaseStatus: ApplicationConstants.LeaseStatuses.Active);
+            leaseStatus: ApplicationConstants.LeaseStatuses.Accepted);
 
         // Act
         var result = await ctx.WorkflowService.RecordTerminationNoticeAsync(
@@ -387,7 +387,7 @@ public class LeaseWorkflowServiceTests
         // Arrange
         await using var ctx = await CreateTestContextAsync();
         var (_, _, lease) = await CreateTenantPropertyAndLeaseAsync(ctx, 
-            leaseStatus: ApplicationConstants.LeaseStatuses.Active);
+            leaseStatus: ApplicationConstants.LeaseStatuses.Accepted);
 
         // Act
         var result = await ctx.WorkflowService.ConvertToMonthToMonthAsync(lease.Id);
@@ -420,7 +420,7 @@ public class LeaseWorkflowServiceTests
         // Arrange
         await using var ctx = await CreateTestContextAsync();
         var (_, _, lease) = await CreateTenantPropertyAndLeaseAsync(ctx, 
-            leaseStatus: ApplicationConstants.LeaseStatuses.Active,
+            leaseStatus: ApplicationConstants.LeaseStatuses.Accepted,
             monthlyRent: 1500m);
 
         // Act
@@ -459,7 +459,7 @@ public class LeaseWorkflowServiceTests
         // Arrange
         await using var ctx = await CreateTestContextAsync();
         var (tenant, property, lease) = await CreateTenantPropertyAndLeaseAsync(ctx, 
-            leaseStatus: ApplicationConstants.LeaseStatuses.Active,
+            leaseStatus: ApplicationConstants.LeaseStatuses.Accepted,
             endDate: DateTime.Today.AddMonths(1));
 
         var renewalModel = new LeaseRenewalModel
@@ -480,7 +480,7 @@ public class LeaseWorkflowServiceTests
         var newLease = result.Data;
         Assert.NotEqual(lease.Id, newLease.Id);
         Assert.Equal(lease.Id, newLease.PreviousLeaseId);
-        Assert.Equal(ApplicationConstants.LeaseStatuses.Active, newLease.Status);
+        Assert.Equal(ApplicationConstants.LeaseStatuses.Accepted, newLease.Status);
         Assert.Equal(1600m, newLease.MonthlyRent);
         Assert.Equal(1, newLease.RenewalNumber);
         Assert.Equal(renewalModel.NewEndDate, newLease.EndDate);
@@ -496,7 +496,7 @@ public class LeaseWorkflowServiceTests
         // Arrange
         await using var ctx = await CreateTestContextAsync();
         var (_, _, lease) = await CreateTenantPropertyAndLeaseAsync(ctx, 
-            leaseStatus: ApplicationConstants.LeaseStatuses.Active,
+            leaseStatus: ApplicationConstants.LeaseStatuses.Accepted,
             endDate: DateTime.Today.AddYears(1));
 
         var renewalModel = new LeaseRenewalModel
@@ -519,7 +519,7 @@ public class LeaseWorkflowServiceTests
         // Arrange
         await using var ctx = await CreateTestContextAsync();
         var (_, _, lease) = await CreateTenantPropertyAndLeaseAsync(ctx, 
-            leaseStatus: ApplicationConstants.LeaseStatuses.Active);
+            leaseStatus: ApplicationConstants.LeaseStatuses.Accepted);
 
         var renewalModel = new LeaseRenewalModel
         {
@@ -650,7 +650,7 @@ public class LeaseWorkflowServiceTests
             StartDate = DateTime.Today,
             EndDate = DateTime.Today.AddYears(1),
             MonthlyRent = 1600m,
-            Status = ApplicationConstants.LeaseStatuses.Active,
+            Status = ApplicationConstants.LeaseStatuses.Accepted,
             CreatedBy = ctx.UserId,
             CreatedOn = DateTime.UtcNow
         };
@@ -690,7 +690,7 @@ public class LeaseWorkflowServiceTests
         // Arrange
         await using var ctx = await CreateTestContextAsync();
         var (_, _, lease) = await CreateTenantPropertyAndLeaseAsync(ctx, 
-            leaseStatus: ApplicationConstants.LeaseStatuses.Active);
+            leaseStatus: ApplicationConstants.LeaseStatuses.Accepted);
 
         // Act - emergency move-out directly from Active (no notice given)
         var result = await ctx.WorkflowService.CompleteMoveOutAsync(lease.Id, DateTime.Today, 
@@ -726,7 +726,7 @@ public class LeaseWorkflowServiceTests
         // Arrange
         await using var ctx = await CreateTestContextAsync();
         var (tenant, property, lease) = await CreateTenantPropertyAndLeaseAsync(ctx, 
-            leaseStatus: ApplicationConstants.LeaseStatuses.Active);
+            leaseStatus: ApplicationConstants.LeaseStatuses.Accepted);
 
         // Act
         var result = await ctx.WorkflowService.EarlyTerminateAsync(
@@ -750,7 +750,7 @@ public class LeaseWorkflowServiceTests
         // Arrange
         await using var ctx = await CreateTestContextAsync();
         var (_, _, lease) = await CreateTenantPropertyAndLeaseAsync(ctx, 
-            leaseStatus: ApplicationConstants.LeaseStatuses.Active);
+            leaseStatus: ApplicationConstants.LeaseStatuses.Accepted);
 
         // Act
         var result = await ctx.WorkflowService.EarlyTerminateAsync(
@@ -769,7 +769,7 @@ public class LeaseWorkflowServiceTests
         // Arrange
         await using var ctx = await CreateTestContextAsync();
         var (_, _, lease) = await CreateTenantPropertyAndLeaseAsync(ctx, 
-            leaseStatus: ApplicationConstants.LeaseStatuses.Active);
+            leaseStatus: ApplicationConstants.LeaseStatuses.Accepted);
 
         // Act
         var result = await ctx.WorkflowService.EarlyTerminateAsync(
@@ -802,7 +802,7 @@ public class LeaseWorkflowServiceTests
         // Arrange
         await using var ctx = await CreateTestContextAsync();
         var (_, property, lease) = await CreateTenantPropertyAndLeaseAsync(ctx, 
-            leaseStatus: ApplicationConstants.LeaseStatuses.Active);
+            leaseStatus: ApplicationConstants.LeaseStatuses.Accepted);
 
         var futureDate = DateTime.Today.AddDays(30);
 
@@ -830,7 +830,7 @@ public class LeaseWorkflowServiceTests
 
         // Create an active lease that ended yesterday
         var (tenant, property, lease) = await CreateTenantPropertyAndLeaseAsync(ctx, 
-            leaseStatus: ApplicationConstants.LeaseStatuses.Active,
+            leaseStatus: ApplicationConstants.LeaseStatuses.Accepted,
             startDate: DateTime.Today.AddYears(-1),
             endDate: DateTime.Today.AddDays(-1)); // Ended yesterday
 
@@ -853,7 +853,7 @@ public class LeaseWorkflowServiceTests
 
         // Create an active lease that ends in the future
         var (_, _, lease) = await CreateTenantPropertyAndLeaseAsync(ctx, 
-            leaseStatus: ApplicationConstants.LeaseStatuses.Active,
+            leaseStatus: ApplicationConstants.LeaseStatuses.Accepted,
             endDate: DateTime.Today.AddMonths(6)); // 6 months remaining
 
         // Act
@@ -864,7 +864,7 @@ public class LeaseWorkflowServiceTests
         Assert.Equal(0, result.Data); // No leases expired
 
         var dbLease = await ctx.Context.Leases.FirstAsync(l => l.Id == lease.Id);
-        Assert.Equal(ApplicationConstants.LeaseStatuses.Active, dbLease.Status);
+        Assert.Equal(ApplicationConstants.LeaseStatuses.Accepted, dbLease.Status);
     }
 
     #endregion
@@ -935,7 +935,7 @@ public class LeaseWorkflowServiceTests
         // Arrange
         await using var ctx = await CreateTestContextAsync();
         var (tenant, property, lease) = await CreateTenantPropertyAndLeaseAsync(ctx, 
-            leaseStatus: ApplicationConstants.LeaseStatuses.Active);
+            leaseStatus: ApplicationConstants.LeaseStatuses.Accepted);
         await CreateSecurityDepositAsync(ctx, lease.Id, tenant.Id);
 
         // Act
@@ -1098,7 +1098,7 @@ public class LeaseWorkflowServiceTests
         // Arrange
         await using var ctx = await CreateTestContextAsync();
         var (tenant, property, lease) = await CreateTenantPropertyAndLeaseAsync(ctx, 
-            leaseStatus: ApplicationConstants.LeaseStatuses.Active,
+            leaseStatus: ApplicationConstants.LeaseStatuses.Accepted,
             endDate: DateTime.Today.AddDays(45)); // Expiring soon
         await CreateSecurityDepositAsync(ctx, lease.Id, tenant.Id);
 
@@ -1138,7 +1138,7 @@ public class LeaseWorkflowServiceTests
 
         // Create lease expiring in 30 days
         var (_, _, lease1) = await CreateTenantPropertyAndLeaseAsync(ctx, 
-            leaseStatus: ApplicationConstants.LeaseStatuses.Active,
+            leaseStatus: ApplicationConstants.LeaseStatuses.Accepted,
             endDate: DateTime.Today.AddDays(30));
 
         // Create lease expiring in 90 days (outside default 60-day window)
@@ -1176,7 +1176,7 @@ public class LeaseWorkflowServiceTests
             StartDate = DateTime.Today.AddYears(-1),
             EndDate = DateTime.Today.AddDays(90), // Outside 60-day window
             MonthlyRent = 1600m,
-            Status = ApplicationConstants.LeaseStatuses.Active,
+            Status = ApplicationConstants.LeaseStatuses.Accepted,
             CreatedBy = ctx.UserId,
             CreatedOn = DateTime.UtcNow
         };
@@ -1238,7 +1238,7 @@ public class LeaseWorkflowServiceTests
             StartDate = DateTime.Today,
             EndDate = DateTime.Today.AddYears(1),
             MonthlyRent = 1700m,
-            Status = ApplicationConstants.LeaseStatuses.Active,
+            Status = ApplicationConstants.LeaseStatuses.Accepted,
             CreatedBy = ctx.UserId,
             CreatedOn = DateTime.UtcNow
         };
@@ -1284,11 +1284,11 @@ public class LeaseWorkflowServiceTests
         // Verify activation log
         var activateLog = auditLogs.First(l => l.Action == "ActivateLease");
         Assert.Equal(ApplicationConstants.LeaseStatuses.Pending, activateLog.FromStatus);
-        Assert.Equal(ApplicationConstants.LeaseStatuses.Active, activateLog.ToStatus);
+        Assert.Equal(ApplicationConstants.LeaseStatuses.Accepted, activateLog.ToStatus);
 
         // Verify notice log
         var noticeLog = auditLogs.First(l => l.Action == "RecordTerminationNotice");
-        Assert.Equal(ApplicationConstants.LeaseStatuses.Active, noticeLog.FromStatus);
+        Assert.Equal(ApplicationConstants.LeaseStatuses.Accepted, noticeLog.FromStatus);
         Assert.Equal(ApplicationConstants.LeaseStatuses.NoticeGiven, noticeLog.ToStatus);
     }
 

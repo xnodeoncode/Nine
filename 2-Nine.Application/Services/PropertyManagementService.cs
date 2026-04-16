@@ -516,8 +516,7 @@ namespace Nine.Application.Services
                 .Where(l => l.PropertyId == propertyId 
                     && !l.IsDeleted 
                     && l.Property.OrganizationId == organizationId
-                    && (l.Status == ApplicationConstants.LeaseStatuses.Pending
-                        || l.Status == ApplicationConstants.LeaseStatuses.Active))
+                    && l.IsActive)
                 .ToListAsync();
         }
 

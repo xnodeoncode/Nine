@@ -91,11 +91,11 @@ else
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Status *</label>
-                                <InputSelect @bind-Value="leaseModel.Status" class="form-select" @onchange="OnStatusChanged">
-                                    <option value="Active">Active</option>
-                                    <option value="Pending">Pending</option>
-                                    <option value="Expired">Expired</option>
-                                    <option value="Terminated">Terminated</option>
+                                <InputSelect @bind-Value="leaseModel.Status" @bind-Value:after="OnStatusChanged" class="form-select">
+                                    @foreach (var status in ApplicationConstants.LeaseStatuses.AllLeaseStatuses)
+                                    {
+                                        <option value="@status">@status</option>
+                                    }
                                 </InputSelect>
                                 <ValidationMessage For="() => leaseModel.Status" class="text-danger" />
                             </div>
@@ -215,6 +215,7 @@ else
             MonthlyRent = lease.MonthlyRent,
             SecurityDeposit = lease.SecurityDeposit,
             Status = lease.Status,
+            IsActive = lease.IsActive,
             Terms = lease.Terms,
         };
     }
@@ -227,35 +228,14 @@ else
             errorMessage = string.Empty;
             successMessage = string.Empty;
 
-            var oldStatus = lease!.Status;
-
             // Update lease with form data
             lease.StartDate = leaseModel.StartDate;
             lease.EndDate = leaseModel.EndDate;
             lease.MonthlyRent = leaseModel.MonthlyRent;
             lease.SecurityDeposit = leaseModel.SecurityDeposit;
             lease.Status = leaseModel.Status;
+            lease.IsActive = leaseModel.IsActive;
             lease.Terms = leaseModel.Terms;
-            
-            // Update property availability based on lease status change
-            if (lease.Property != null && oldStatus != leaseModel.Status)
-            {
-                if (leaseModel.Status == "Active")
-                {
-                    lease.Property.IsActive = false;
-                }
-                else if (oldStatus == "Active" && leaseModel.Status != "Active")
-                {
-                    // Check if there are other active leases for this property
-                    var activeLeases = await LeaseService.GetActiveLeasesByPropertyIdAsync(lease.PropertyId);
-                    var otherActiveLeases = activeLeases.Any(l => l.PropertyId == lease.PropertyId && l.Id != LeaseId && l.Status == "Active");
-                    
-                    if (!otherActiveLeases)
-                    {
-                        lease.Property.IsActive = true;
-                    }
-                }
-            }
 
             await LeaseService.UpdateAsync(lease);
             successMessage = "Lease updated successfully!";
@@ -273,6 +253,7 @@ else
 
     private void OnStatusChanged()
     {
+        leaseModel.IsActive = ApplicationConstants.LeaseStatuses.ActiveStatuses.Contains(leaseModel.Status);
         statusChangeWarning = true;
         StateHasChanged();
     }
@@ -298,18 +279,6 @@ else
         {
             try
             {
-                // If deleting an active lease, make property available
-                if (lease.Status == "Active" && lease.Property != null)
-                {
-                    var otherActiveLeases = await LeaseService.GetActiveLeasesByPropertyIdAsync(lease.PropertyId);
-                    var otherActiveLeasesExist = otherActiveLeases.Any(l => l.Id != LeaseId && l.Status == "Active");
-
-                    if (!otherActiveLeasesExist)
-                    {
-                        lease.Property.IsActive = true;
-                    }
-                }
-    
                 await LeaseService.DeleteAsync(lease.Id);
                 Navigation.NavigateTo("/propertymanagement/leases");
             }
@@ -337,7 +306,9 @@ else
 
         [Required(ErrorMessage = "Status is required")]
         [StringLength(50)]
-        public string Status { get; set; } = "Active";
+        public string Status { get; set; } = ApplicationConstants.LeaseStatuses.Offered;
+
+        public bool IsActive { get; set; } = true;
 
         [StringLength(5000, ErrorMessage = "Terms cannot exceed 2000 characters")]
         public string Terms { get; set; } = string.Empty;
