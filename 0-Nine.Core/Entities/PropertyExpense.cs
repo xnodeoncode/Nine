@@ -6,11 +6,13 @@ using Nine.Core.Validation;
 namespace Nine.Core.Entities;
 
 /// <summary>
-/// Represents a fixed/recurring expense associated with a property (e.g. mortgage,
-/// insurance, property tax, HOA, maintenance, utilities, or other custom costs).
-/// Amounts are captured with a Frequency and normalized to a monthly equivalent via
-/// <see cref="MonthlyAmount"/> so expenses of differing cadences can be rolled up
-/// together for reporting.
+/// Represents an expense associated with a property (e.g. mortgage, insurance,
+/// property tax, HOA, maintenance, utilities, an inspection fee, or other custom
+/// costs). An expense's recurrence (if any) is captured by its required
+/// <see cref="RecurrencePattern"/>; whether it repeats and how is a separate
+/// concern from what kind of expense it is (<see cref="ExpenseType"/>). Actual
+/// billable instances and payments are tracked separately via
+/// <see cref="ExpenseDue"/> and <see cref="ExpensePayment"/>.
 /// </summary>
 public class PropertyExpense : BaseModel
 {
@@ -32,13 +34,14 @@ public class PropertyExpense : BaseModel
     [Display(Name = "Amount")]
     public decimal Amount { get; set; }
 
-    [Required]
-    [StringLength(20)]
-    [Display(Name = "Frequency")]
-    public string Frequency { get; set; } = ApplicationConstants.ExpenseFrequencies.Monthly; // From ApplicationConstants.ExpenseFrequencies
-
     /// <summary>
-    /// Date the expense becomes effective. Defaults to today.
+    /// Date the expense obligation actually begins in the real world. This is a
+    /// business fact, distinct from <see cref="BaseModel.CreatedOn"/> (a system
+    /// audit timestamp of when the row was inserted) — entry may be retroactive
+    /// (EffectiveDate in the past) or advance (EffectiveDate in the future).
+    /// Immutable after creation: routine edits to Amount, ExpenseType,
+    /// Description, Notes, or RecurrencePattern never change this value. Only a
+    /// brand-new PropertyExpense row gets a new EffectiveDate.
     /// </summary>
     [Required]
     [Display(Name = "Effective Date")]
@@ -63,18 +66,27 @@ public class PropertyExpense : BaseModel
     [Display(Name = "Cancellation Reason")]
     public string? EndReason { get; set; }
 
+    /// <summary>
+    /// Mandatory recurrence definition for this expense. Every PropertyExpense has
+    /// exactly one — its Frequency is never absent/inferred, so "does this recur?"
+    /// is always an explicit, visible fact rather than ambiguous missing data.
+    /// </summary>
+    [Required]
+    public RecurrencePattern RecurrencePattern { get; set; } = new();
+
     // Navigation Properties
     public virtual Property? Property { get; set; }
+    public virtual ICollection<ExpenseDue> ExpenseDues { get; set; } = new List<ExpenseDue>();
 
     // Computed Properties
     [NotMapped]
     [Display(Name = "Monthly Amount")]
-    public decimal MonthlyAmount => Frequency switch
+    public decimal MonthlyAmount => RecurrencePattern.Frequency switch
     {
         ApplicationConstants.ExpenseFrequencies.Monthly => Amount,
         ApplicationConstants.ExpenseFrequencies.Quarterly => Amount / 3m,
         ApplicationConstants.ExpenseFrequencies.Annual => Amount / 12m,
-        ApplicationConstants.ExpenseFrequencies.OneTime => 0m, // One-time costs don't contribute to recurring monthly totals
+        ApplicationConstants.ExpenseFrequencies.OneTime => 0m, // One-time costs don't contribute to recurring monthly budget totals
         _ => Amount
     };
 

@@ -636,6 +636,25 @@ namespace Nine.Application.Services
                         .SetProperty(x => x.IsArchived, true)
                         .SetProperty(x => x.ArchivedOn, now)
                         .SetProperty(x => x.ArchivedBy, userId));
+
+                // ExpenseDue/ExpensePayment are PropertyExpense's own children.
+                // Reached directly here (rather than relying on
+                // PropertyExpenseService.ArchiveAsync's cascade) so the full
+                // expense chain goes offline together when the property itself
+                // is archived, per "Archive Property -> everything follows".
+                await _context.Set<ExpenseDue>()
+                    .Where(x => x.PropertyId == id && !x.IsDeleted && !x.IsArchived)
+                    .ExecuteUpdateAsync(s => s
+                        .SetProperty(x => x.IsArchived, true)
+                        .SetProperty(x => x.ArchivedOn, now)
+                        .SetProperty(x => x.ArchivedBy, userId));
+
+                await _context.Set<ExpensePayment>()
+                    .Where(x => !x.IsDeleted && !x.IsArchived && x.ExpenseDue!.PropertyId == id)
+                    .ExecuteUpdateAsync(s => s
+                        .SetProperty(x => x.IsArchived, true)
+                        .SetProperty(x => x.ArchivedOn, now)
+                        .SetProperty(x => x.ArchivedBy, userId));
             }
 
             return result;
@@ -699,6 +718,20 @@ namespace Nine.Application.Services
 
                 await _context.PropertyExpenses
                     .Where(x => x.PropertyId == id && !x.IsDeleted && x.IsArchived)
+                    .ExecuteUpdateAsync(s => s
+                        .SetProperty(x => x.IsArchived, false)
+                        .SetProperty(x => x.ArchivedOn, x => (DateTime?)null)
+                        .SetProperty(x => x.ArchivedBy, x => (string?)null));
+
+                await _context.Set<ExpenseDue>()
+                    .Where(x => x.PropertyId == id && !x.IsDeleted && x.IsArchived)
+                    .ExecuteUpdateAsync(s => s
+                        .SetProperty(x => x.IsArchived, false)
+                        .SetProperty(x => x.ArchivedOn, x => (DateTime?)null)
+                        .SetProperty(x => x.ArchivedBy, x => (string?)null));
+
+                await _context.Set<ExpensePayment>()
+                    .Where(x => !x.IsDeleted && x.IsArchived && x.ExpenseDue!.PropertyId == id)
                     .ExecuteUpdateAsync(s => s
                         .SetProperty(x => x.IsArchived, false)
                         .SetProperty(x => x.ArchivedOn, x => (DateTime?)null)

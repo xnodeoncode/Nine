@@ -13,13 +13,61 @@ namespace Nine.Application.Services;
 /// </summary>
 public class PropertyExpenseService : BaseService<PropertyExpense>
 {
+    private readonly ExpenseGenerationService _expenseGenerationService;
+
     public PropertyExpenseService(
         ApplicationDbContext context,
         ILogger<PropertyExpenseService> logger,
         IUserContextService userContext,
-        IOptions<ApplicationSettings> settings)
+        IOptions<ApplicationSettings> settings,
+        ExpenseGenerationService expenseGenerationService)
         : base(context, logger, userContext, settings)
     {
+        _expenseGenerationService = expenseGenerationService;
+    }
+
+    /// <summary>
+    /// Archives a PropertyExpense along with its ExpenseDue and ExpensePayment
+    /// history, mirroring LeaseService's Lease -> Invoices -> Payments archive
+    /// cascade. Used when an expense is archived independently of its Property
+    /// (Property-level archive already cascades to PropertyExpense via
+    /// PropertyService.ArchiveAsync; this handles the reverse direction so the
+    /// full expense chain goes offline together either way).
+    /// </summary>
+    public override async Task<bool> ArchiveAsync(Guid id)
+    {
+        var userId = await _userContext.GetUserIdAsync();
+        var now = DateTime.UtcNow;
+
+        var result = await base.ArchiveAsync(id);
+
+        if (result)
+        {
+            await _context.Set<ExpenseDue>()
+                .Where(d => d.PropertyExpenseId == id && !d.IsDeleted && !d.IsArchived)
+                .ExecuteUpdateAsync(s => s
+                    .SetProperty(d => d.IsArchived, true)
+                    .SetProperty(d => d.ArchivedOn, now)
+                    .SetProperty(d => d.ArchivedBy, userId));
+
+            await _context.Set<ExpensePayment>()
+                .Where(p => !p.IsDeleted && !p.IsArchived && p.ExpenseDue!.PropertyExpenseId == id)
+                .ExecuteUpdateAsync(s => s
+                    .SetProperty(p => p.IsArchived, true)
+                    .SetProperty(p => p.ArchivedOn, now)
+                    .SetProperty(p => p.ArchivedBy, userId));
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Restores an archived PropertyExpense. ExpenseDue/ExpensePayment history is
+    /// not automatically restored, matching InvoiceService's Restore behavior.
+    /// </summary>
+    public override async Task<bool> RestoreAsync(Guid id)
+    {
+        return await base.RestoreAsync(id);
     }
 
     /// <summary>
@@ -44,10 +92,33 @@ public class PropertyExpenseService : BaseService<PropertyExpense>
             throw new InvalidOperationException($"'{entity.ExpenseType}' is not a valid expense type.");
         }
 
-        // Validate Frequency is a known value
-        if (!ApplicationConstants.ExpenseFrequencies.AllExpenseFrequencies.Contains(entity.Frequency))
+        // Validate the required RecurrencePattern
+        if (entity.RecurrencePattern == null)
         {
-            throw new InvalidOperationException($"'{entity.Frequency}' is not a valid expense frequency.");
+            throw new InvalidOperationException("A recurrence pattern (including one-time) is required.");
+        }
+
+        if (!ApplicationConstants.ExpenseFrequencies.AllExpenseFrequencies.Contains(entity.RecurrencePattern.Frequency))
+        {
+            throw new InvalidOperationException($"'{entity.RecurrencePattern.Frequency}' is not a valid expense frequency.");
+        }
+
+        if (entity.RecurrencePattern.Frequency != ApplicationConstants.ExpenseFrequencies.OneTime)
+        {
+            if (!entity.RecurrencePattern.DueDayOfMonth.HasValue ||
+                entity.RecurrencePattern.DueDayOfMonth < 1 ||
+                entity.RecurrencePattern.DueDayOfMonth > 31)
+            {
+                throw new InvalidOperationException("A due day of month (1-31) is required for recurring expenses.");
+            }
+
+            if (entity.RecurrencePattern.Frequency != ApplicationConstants.ExpenseFrequencies.Monthly &&
+                (!entity.RecurrencePattern.AnchorMonth.HasValue ||
+                 entity.RecurrencePattern.AnchorMonth < 1 ||
+                 entity.RecurrencePattern.AnchorMonth > 12))
+            {
+                throw new InvalidOperationException("An anchor month (1-12) is required for quarterly and annual expenses.");
+            }
         }
 
         // Validate Amount is non-negative
@@ -63,6 +134,82 @@ public class PropertyExpenseService : BaseService<PropertyExpense>
         }
 
         await base.ValidateEntityAsync(entity);
+    }
+
+    /// <summary>
+    /// Creates a PropertyExpense along with its RecurrencePattern (derived from the
+    /// user-selected due date) and backfills any elapsed ExpenseDue cycles. This is
+    /// the primary entry point for adding an expense from the UI.
+    ///
+    /// For a OneTime expense, exactly one ExpenseDue is created at the exact
+    /// selected date, past or present. For a recurring expense (Monthly/
+    /// Quarterly/Annual), every cycle between the selected due date and today
+    /// is backfilled immediately — clamped to no earlier than January 1 of the
+    /// current year, so a user is never surprised by an auto-generated
+    /// ExpenseDue landing in a prior (potentially already-reported) tax year.
+    /// Any cycles before that boundary must be entered manually; the caller
+    /// should surface <see cref="CreateExpenseResult.WasBackfillClamped"/> to
+    /// the user when true.
+    /// </summary>
+    /// <param name="expense">
+    /// The expense to create. <see cref="PropertyExpense.RecurrencePattern"/>.Frequency
+    /// must already be set; DueDayOfMonth/AnchorMonth are derived here from
+    /// <paramref name="dueDate"/> and do not need to be pre-populated by the caller.
+    /// </param>
+    /// <param name="dueDate">
+    /// The due date explicitly selected by the user at entry time. Never inferred
+    /// from EffectiveDate.
+    /// </param>
+    public async Task<CreateExpenseResult> CreateExpenseAsync(PropertyExpense expense, DateTime dueDate)
+    {
+        if (expense.EffectiveDate.Date == DateTime.Today && dueDate.Date != DateTime.Today)
+        {
+            expense.EffectiveDate = dueDate.Date;
+        }
+
+        expense.RecurrencePattern ??= new RecurrencePattern();
+        var frequency = expense.RecurrencePattern.Frequency;
+
+        if (frequency != ApplicationConstants.ExpenseFrequencies.OneTime)
+        {
+            expense.RecurrencePattern.DueDayOfMonth = dueDate.Day;
+            expense.RecurrencePattern.AnchorMonth = frequency == ApplicationConstants.ExpenseFrequencies.Monthly
+                ? null
+                : dueDate.Month;
+        }
+        else
+        {
+            expense.RecurrencePattern.DueDayOfMonth = null;
+            expense.RecurrencePattern.AnchorMonth = null;
+        }
+
+        var created = await CreateAsync(expense);
+
+        if (frequency == ApplicationConstants.ExpenseFrequencies.OneTime)
+        {
+            var userId = await _userContext.GetUserIdAsync();
+            var due = new ExpenseDue
+            {
+                Id = Guid.NewGuid(),
+                OrganizationId = created.OrganizationId,
+                PropertyExpenseId = created.Id,
+                PropertyId = created.PropertyId,
+                DueDate = dueDate,
+                AmountDue = created.Amount,
+                CreatedBy = string.IsNullOrEmpty(userId) ? ApplicationConstants.SystemUser.Id : userId,
+                CreatedOn = DateTime.UtcNow
+            };
+
+            _context.Set<ExpenseDue>().Add(due);
+            await _context.SaveChangesAsync();
+
+            return new CreateExpenseResult(created, GeneratedDueCount: 1, WasBackfillClamped: false);
+        }
+
+        var (generatedCount, wasClamped) = await _expenseGenerationService.BackfillForNewExpenseAsync(
+            created, dueDate, DateTime.Today);
+
+        return new CreateExpenseResult(created, generatedCount, wasClamped);
     }
 
     /// <summary>
@@ -200,3 +347,12 @@ public class PropertyExpenseService : BaseService<PropertyExpense>
         await DeleteAsync(id);
     }
 }
+
+/// <summary>
+/// Result of PropertyExpenseService.CreateExpenseAsync — the created expense,
+/// how many ExpenseDue cycles were backfilled, and whether the backfill was
+/// clamped to January 1 of the current year (meaning the user selected a due
+/// date before that boundary, and any cycles prior to it must be entered
+/// manually). Callers should surface WasBackfillClamped to the user.
+/// </summary>
+public record CreateExpenseResult(PropertyExpense Expense, int GeneratedDueCount, bool WasBackfillClamped);

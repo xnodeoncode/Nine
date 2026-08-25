@@ -1385,6 +1385,146 @@ namespace Nine.Infrastructure.Migrations
                     b.ToTable("Documents");
                 });
 
+            modelBuilder.Entity("Nine.Core.Entities.ExpenseDue", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("AmountDue")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("ArchivedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ArchivedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("DueDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsArchived")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsSampleData")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(2000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("OrganizationId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("PropertyExpenseId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("PropertyId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("WaivedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("WaivedReason")
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DueDate");
+
+                    b.HasIndex("OrganizationId");
+
+                    b.HasIndex("PropertyExpenseId");
+
+                    b.HasIndex("PropertyId");
+
+                    b.ToTable("ExpenseDues");
+                });
+
+            modelBuilder.Entity("Nine.Core.Entities.ExpensePayment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("AmountPaid")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("ArchivedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ArchivedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("ExpenseDueId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsArchived")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsSampleData")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("OrganizationId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("PaidOn")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ExpenseDueId");
+
+                    b.HasIndex("OrganizationId");
+
+                    b.HasIndex("PaidOn");
+
+                    b.ToTable("ExpensePayments");
+                });
+
             modelBuilder.Entity("Nine.Core.Entities.Inspection", b =>
                 {
                     b.Property<Guid>("Id")
@@ -2987,11 +3127,6 @@ namespace Nine.Infrastructure.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Frequency")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("TEXT");
-
                     b.Property<bool>("IsArchived")
                         .HasColumnType("INTEGER");
 
@@ -4390,6 +4525,28 @@ namespace Nine.Infrastructure.Migrations
                     b.Navigation("Tenant");
                 });
 
+            modelBuilder.Entity("Nine.Core.Entities.ExpenseDue", b =>
+                {
+                    b.HasOne("Nine.Core.Entities.PropertyExpense", "PropertyExpense")
+                        .WithMany("ExpenseDues")
+                        .HasForeignKey("PropertyExpenseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PropertyExpense");
+                });
+
+            modelBuilder.Entity("Nine.Core.Entities.ExpensePayment", b =>
+                {
+                    b.HasOne("Nine.Core.Entities.ExpenseDue", "ExpenseDue")
+                        .WithMany("Payments")
+                        .HasForeignKey("ExpenseDueId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ExpenseDue");
+                });
+
             modelBuilder.Entity("Nine.Core.Entities.Inspection", b =>
                 {
                     b.HasOne("Nine.Core.Entities.Document", "Document")
@@ -4594,7 +4751,37 @@ namespace Nine.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.OwnsOne("Nine.Core.Entities.RecurrencePattern", "RecurrencePattern", b1 =>
+                        {
+                            b1.Property<Guid>("PropertyExpenseId")
+                                .HasColumnType("TEXT");
+
+                            b1.Property<int?>("AnchorMonth")
+                                .HasColumnType("INTEGER")
+                                .HasColumnName("RecurrenceAnchorMonth");
+
+                            b1.Property<int?>("DueDayOfMonth")
+                                .HasColumnType("INTEGER")
+                                .HasColumnName("RecurrenceDueDayOfMonth");
+
+                            b1.Property<string>("Frequency")
+                                .IsRequired()
+                                .HasMaxLength(20)
+                                .HasColumnType("TEXT")
+                                .HasColumnName("RecurrenceFrequency");
+
+                            b1.HasKey("PropertyExpenseId");
+
+                            b1.ToTable("PropertyExpenses");
+
+                            b1.WithOwner()
+                                .HasForeignKey("PropertyExpenseId");
+                        });
+
                     b.Navigation("Property");
+
+                    b.Navigation("RecurrencePattern")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Nine.Core.Entities.ProspectiveTenant", b =>
@@ -4762,6 +4949,11 @@ namespace Nine.Infrastructure.Migrations
                     b.Navigation("Items");
                 });
 
+            modelBuilder.Entity("Nine.Core.Entities.ExpenseDue", b =>
+                {
+                    b.Navigation("Payments");
+                });
+
             modelBuilder.Entity("Nine.Core.Entities.Invoice", b =>
                 {
                     b.Navigation("Payments");
@@ -4801,6 +4993,11 @@ namespace Nine.Infrastructure.Migrations
                     b.Navigation("MaintenanceRequests");
 
                     b.Navigation("Repairs");
+                });
+
+            modelBuilder.Entity("Nine.Core.Entities.PropertyExpense", b =>
+                {
+                    b.Navigation("ExpenseDues");
                 });
 
             modelBuilder.Entity("Nine.Core.Entities.ProspectiveTenant", b =>

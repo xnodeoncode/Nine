@@ -16,9 +16,75 @@
                 {
                     <div class="text-muted small">@Expense.Description</div>
                 }
-                <div class="text-muted small">@Expense.Amount.ToString("C") — @Expense.Frequency</div>
+                <div class="text-muted small">@Expense.Amount.ToString("C") — @Expense.RecurrencePattern.Frequency</div>
                 <div class="text-muted small">Effective: @Expense.EffectiveDate.ToShortDateString()</div>
             </div>
+
+            @if (CurrentDue != null)
+            {
+                <div class="mb-4 p-3 border rounded bg-light">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="fw-semibold">Current Due: @CurrentDue.DueDate.ToShortDateString()</span>
+                        <span class="badge @StatusBadgeClass(CurrentDue.Status)">@CurrentDue.Status</span>
+                    </div>
+                    <div class="small text-muted mt-1">
+                        Due @CurrentDue.AmountDue.ToString("C") — Paid @CurrentDue.AmountPaid.ToString("C")
+                        — Balance @CurrentDue.BalanceDue.ToString("C")
+                    </div>
+
+                    <div class="d-flex gap-2 mt-2">
+                        <button class="btn btn-success btn-sm" @onclick="ShowMarkPaidForm" disabled="@(activeAction != null)">
+                            <i class="bi bi-cash-coin me-1"></i> Mark Paid
+                        </button>
+                        @if (CurrentDue.WaivedOn == null)
+                        {
+                            <button class="btn btn-outline-secondary btn-sm" @onclick="ShowWaiveForm" disabled="@(activeAction != null)">
+                                <i class="bi bi-slash-circle me-1"></i> Waive / Skip
+                            </button>
+                        }
+                    </div>
+
+                    @if (activeAction == "markpaid")
+                    {
+                        <div class="mt-2 p-3 border rounded bg-white">
+                            <label class="form-label small">Amount Paid</label>
+                            <div class="input-group input-group-sm mb-2">
+                                <span class="input-group-text">$</span>
+                                <input type="number" step="0.01" class="form-control" @bind="markPaidAmount" />
+                            </div>
+                            <label class="form-label small">Paid On</label>
+                            <input type="date" class="form-control form-control-sm mb-2" @bind="markPaidOn" />
+                            <label class="form-label small">Notes <span class="text-muted">(optional)</span></label>
+                            <input type="text" class="form-control form-control-sm" maxlength="500"
+                                   @bind="markPaidNotes" placeholder="e.g., second half of mortgage payment" />
+                            <div class="d-flex gap-2 mt-2">
+                                <button class="btn btn-success btn-sm" @onclick="ConfirmMarkPaid" disabled="@isSaving">
+                                    @if (isSaving) { <span class="spinner-border spinner-border-sm me-1"></span> }
+                                    Confirm Payment
+                                </button>
+                                <button class="btn btn-outline-secondary btn-sm" @onclick="ResetActions">Back</button>
+                            </div>
+                        </div>
+                    }
+
+                    @if (activeAction == "waive")
+                    {
+                        <div class="mt-2 p-3 border rounded bg-white">
+                            <label class="form-label small">Reason <span class="text-danger">(required)</span></label>
+                            <input type="text" class="form-control form-control-sm" maxlength="200"
+                                   @bind="waiveReason" placeholder="e.g., Landlord covered this cycle" />
+                            <div class="d-flex gap-2 mt-2">
+                                <button class="btn btn-outline-secondary btn-sm" @onclick="ConfirmWaive" disabled="@isSaving">
+                                    @if (isSaving) { <span class="spinner-border spinner-border-sm me-1"></span> }
+                                    Confirm Waive
+                                </button>
+                                <button class="btn btn-outline-secondary btn-sm" @onclick="ResetActions">Back</button>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+
             <hr />
             <div class="d-grid gap-2">
                 <div>
@@ -87,14 +153,21 @@
 @code {
     [Parameter] public bool IsVisible { get; set; }
     [Parameter] public PropertyExpense? Expense { get; set; }
+    [Parameter] public ExpenseDue? CurrentDue { get; set; }
     [Parameter] public bool SoftDeleteEnabled { get; set; }
     [Parameter] public EventCallback<string?> OnCancelExpense { get; set; }
     [Parameter] public EventCallback OnVoidExpense { get; set; }
+    [Parameter] public EventCallback<ExpensePaymentRequest> OnMarkPaid { get; set; }
+    [Parameter] public EventCallback<string> OnWaiveExpenseDue { get; set; }
     [Parameter] public EventCallback OnDismiss { get; set; }
 
     private string? activeAction;
     private string? cancelReason;
     private string? voidReason;
+    private decimal markPaidAmount;
+    private DateTime markPaidOn = DateTime.Today;
+    private string? markPaidNotes;
+    private string? waiveReason;
     private bool isSaving;
     private string? errorMessage;
 
@@ -105,13 +178,33 @@
             activeAction = null;
             cancelReason = null;
             voidReason = null;
+            markPaidNotes = null;
+            waiveReason = null;
             errorMessage = null;
         }
     }
 
     private void ShowCancelForm() => activeAction = "cancel";
     private void ShowVoidForm() => activeAction = "void";
+
+    private void ShowMarkPaidForm()
+    {
+        markPaidAmount = CurrentDue?.BalanceDue > 0 ? CurrentDue.BalanceDue : (CurrentDue?.AmountDue ?? 0m);
+        markPaidOn = DateTime.Today;
+        activeAction = "markpaid";
+    }
+
+    private void ShowWaiveForm() => activeAction = "waive";
     private void ResetActions() => activeAction = null;
+
+    private static string StatusBadgeClass(string status) => status switch
+    {
+        "Paid" => "bg-success",
+        "PartiallyPaid" => "bg-warning text-dark",
+        "Overpaid" => "bg-info text-dark",
+        "Waived" => "bg-secondary",
+        _ => "bg-danger"
+    };
 
     private async Task ConfirmCancel()
     {
@@ -135,6 +228,42 @@
             isSaving = true;
             errorMessage = null;
             await OnVoidExpense.InvokeAsync();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error: {ex.Message}";
+        }
+        finally { isSaving = false; }
+    }
+
+    private async Task ConfirmMarkPaid()
+    {
+        if (CurrentDue == null) return;
+
+        try
+        {
+            isSaving = true;
+            errorMessage = null;
+            await OnMarkPaid.InvokeAsync(new ExpensePaymentRequest(CurrentDue.Id, markPaidAmount, markPaidOn, markPaidNotes));
+            activeAction = null;
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error: {ex.Message}";
+        }
+        finally { isSaving = false; }
+    }
+
+    private async Task ConfirmWaive()
+    {
+        if (CurrentDue == null || string.IsNullOrWhiteSpace(waiveReason)) return;
+
+        try
+        {
+            isSaving = true;
+            errorMessage = null;
+            await OnWaiveExpenseDue.InvokeAsync(waiveReason.Trim());
+            activeAction = null;
         }
         catch (Exception ex)
         {

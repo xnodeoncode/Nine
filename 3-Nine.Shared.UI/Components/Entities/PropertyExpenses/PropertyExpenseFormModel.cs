@@ -4,8 +4,9 @@ using Nine.Core.Constants;
 namespace Nine.Shared.UI.Components.Entities.PropertyExpenses;
 
 /// <summary>
-/// Form model for adding a fixed/recurring expense to a property via the
-/// Add Property Expense modal.
+/// Form model for adding an expense to a property via the Add Property Expense
+/// modal. Frequency and DueDate are always required and explicitly chosen by the
+/// user — DueDate is never inferred from EffectiveDate.
 /// </summary>
 public class PropertyExpenseFormModel
 {
@@ -23,4 +24,13 @@ public class PropertyExpenseFormModel
     [Required(ErrorMessage = "Frequency is required.")]
     [StringLength(20)]
     public string Frequency { get; set; } = ApplicationConstants.ExpenseFrequencies.Monthly;
+
+    /// <summary>
+    /// The date this expense is due, explicitly selected by the user. For
+    /// recurring expenses, only the day (and month, for Quarterly/Annual) are
+    /// retained as the recurring cadence; for One-Time expenses, the exact date
+    /// is used as-is.
+    /// </summary>
+    [Required(ErrorMessage = "Due date is required.")]
+    public DateTime DueDate { get; set; } = DateTime.Today;
 }

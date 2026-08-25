@@ -11,7 +11,7 @@ namespace Nine.Infrastructure.Data.CompiledModels
     public partial class ApplicationDbContextModel
     {
         private ApplicationDbContextModel()
-            : base(skipDetectChanges: false, modelId: new Guid("add1d3ce-6846-4378-a45f-4928e46ff923"), entityTypeCount: 36)
+            : base(skipDetectChanges: false, modelId: new Guid("97c75a38-e349-44c7-a120-d1b500f3570d"), entityTypeCount: 39)
         {
         }
 
@@ -26,6 +26,8 @@ namespace Nine.Infrastructure.Data.CompiledModels
             var checklistTemplateItem = ChecklistTemplateItemEntityType.Create(this);
             var databaseSettings = DatabaseSettingsEntityType.Create(this);
             var document = DocumentEntityType.Create(this);
+            var expenseDue = ExpenseDueEntityType.Create(this);
+            var expensePayment = ExpensePaymentEntityType.Create(this);
             var inspection = InspectionEntityType.Create(this);
             var invoice = InvoiceEntityType.Create(this);
             var lease = LeaseEntityType.Create(this);
@@ -42,6 +44,7 @@ namespace Nine.Infrastructure.Data.CompiledModels
             var property = PropertyEntityType.Create(this);
             var propertyExpense = PropertyExpenseEntityType.Create(this);
             var prospectiveTenant = ProspectiveTenantEntityType.Create(this);
+            var recurrencePattern = RecurrencePatternEntityType.Create(this);
             var rentalApplication = RentalApplicationEntityType.Create(this);
             var repair = RepairEntityType.Create(this);
             var schemaVersion = SchemaVersionEntityType.Create(this);
@@ -68,6 +71,8 @@ namespace Nine.Infrastructure.Data.CompiledModels
             DocumentEntityType.CreateForeignKey4(document, payment);
             DocumentEntityType.CreateForeignKey5(document, property);
             DocumentEntityType.CreateForeignKey6(document, tenant);
+            ExpenseDueEntityType.CreateForeignKey1(expenseDue, propertyExpense);
+            ExpensePaymentEntityType.CreateForeignKey1(expensePayment, expenseDue);
             InspectionEntityType.CreateForeignKey1(inspection, document);
             InspectionEntityType.CreateForeignKey2(inspection, lease);
             InspectionEntityType.CreateForeignKey3(inspection, property);
@@ -92,6 +97,7 @@ namespace Nine.Infrastructure.Data.CompiledModels
             PropertyEntityType.CreateForeignKey1(property, organization);
             PropertyExpenseEntityType.CreateForeignKey1(propertyExpense, property);
             ProspectiveTenantEntityType.CreateForeignKey1(prospectiveTenant, property);
+            RecurrencePatternEntityType.CreateForeignKey1(recurrencePattern, propertyExpense);
             RentalApplicationEntityType.CreateForeignKey1(rentalApplication, property);
             RentalApplicationEntityType.CreateForeignKey2(rentalApplication, prospectiveTenant);
             RepairEntityType.CreateForeignKey1(repair, lease);
@@ -118,6 +124,8 @@ namespace Nine.Infrastructure.Data.CompiledModels
             ChecklistTemplateItemEntityType.CreateAnnotations(checklistTemplateItem);
             DatabaseSettingsEntityType.CreateAnnotations(databaseSettings);
             DocumentEntityType.CreateAnnotations(document);
+            ExpenseDueEntityType.CreateAnnotations(expenseDue);
+            ExpensePaymentEntityType.CreateAnnotations(expensePayment);
             InspectionEntityType.CreateAnnotations(inspection);
             InvoiceEntityType.CreateAnnotations(invoice);
             LeaseEntityType.CreateAnnotations(lease);
@@ -134,6 +142,7 @@ namespace Nine.Infrastructure.Data.CompiledModels
             PropertyEntityType.CreateAnnotations(property);
             PropertyExpenseEntityType.CreateAnnotations(propertyExpense);
             ProspectiveTenantEntityType.CreateAnnotations(prospectiveTenant);
+            RecurrencePatternEntityType.CreateAnnotations(recurrencePattern);
             RentalApplicationEntityType.CreateAnnotations(rentalApplication);
             RepairEntityType.CreateAnnotations(repair);
             SchemaVersionEntityType.CreateAnnotations(schemaVersion);

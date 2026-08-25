@@ -49,6 +49,31 @@
             </div>
 
             <div class="mb-3">
+                <label class="form-label">Due Date *</label>
+                <InputDate @bind-Value="Model.DueDate" class="form-control" />
+                <ValidationMessage For="() => Model.DueDate" class="text-danger" />
+                <div class="form-text">
+                    <i class="bi bi-info-circle"></i>
+                    @if (Model.Frequency == ApplicationConstants.ExpenseFrequencies.OneTime)
+                    {
+                        <span>The exact date this expense is due.</span>
+                    }
+                    else
+                    {
+                        <span>The day (and month, for quarterly/annual) this expense recurs on going forward.</span>
+                    }
+                </div>
+                @if (ShowsPriorYearBackfillNotice)
+                {
+                    <div class="alert alert-warning mt-2 mb-0" role="alert">
+                        <i class="bi bi-exclamation-triangle me-1"></i>
+                        Automatic due records will only be created from January 1, @DateTime.Today.Year forward.
+                        Any earlier occurrences must be entered manually.
+                    </div>
+                }
+            </div>
+
+            <div class="mb-3">
                 <label class="form-label">Description</label>
                 <InputText @bind-Value="Model.Description" class="form-control" placeholder="Optional details, e.g., lender or policy name" />
                 <ValidationMessage For="() => Model.Description" class="text-danger" />
@@ -86,6 +111,10 @@
 
     private PropertyExpenseFormModel Model { get; set; } = new();
     private bool wasVisible;
+    private DateTime CurrentYearStart => new(DateTime.Today.Year, 1, 1);
+    private bool ShowsPriorYearBackfillNotice =>
+        Model.Frequency != ApplicationConstants.ExpenseFrequencies.OneTime &&
+        Model.DueDate.Date < CurrentYearStart;
 
     protected override void OnParametersSet()
     {

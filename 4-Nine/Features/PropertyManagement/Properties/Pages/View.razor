@@ -16,6 +16,9 @@
 @inject LeaseService LeaseService
 @inject RepairService RepairService
 @inject PropertyExpenseService PropertyExpenseService
+@inject ExpenseDueService ExpenseDueService
+@inject ExpensePaymentService ExpensePaymentService
+@inject ToastService ToastService
 @inject IOptions<ApplicationSettings> AppSettings
 @inject NavigationManager Navigation
 @inject IJSRuntime JSRuntime
@@ -121,9 +124,12 @@
 <PropertyExpenseEditModal
     IsVisible="@showEditExpenseModal"
     Expense="@selectedExpense"
+    CurrentDue="@selectedExpenseCurrentDue"
     SoftDeleteEnabled="@AppSettings.Value.SoftDeleteEnabled"
     OnCancelExpense="HandleCancelExpense"
     OnVoidExpense="HandleVoidExpense"
+    OnMarkPaid="HandleMarkPaid"
+    OnWaiveExpenseDue="HandleWaiveExpenseDue"
     OnDismiss="CloseEditExpenseModal" />
 
 <!-- Modals -->
@@ -293,11 +299,24 @@
     private bool isSavingExpense = false;
     private string expenseErrorMessage = string.Empty;
     private PropertyExpense? selectedExpense;
+    private ExpenseDue? selectedExpenseCurrentDue;
 
     private void ShowAddExpenseModal() { expenseErrorMessage = string.Empty; showAddExpenseModal = true; }
     private void CloseAddExpenseModal() => showAddExpenseModal = false;
-    private void ShowEditExpenseModal(PropertyExpense expense) { selectedExpense = expense; showEditExpenseModal = true; }
-    private void CloseEditExpenseModal() { showEditExpenseModal = false; selectedExpense = null; }
+
+    private async Task ShowEditExpenseModal(PropertyExpense expense)
+    {
+        selectedExpense = expense;
+        selectedExpenseCurrentDue = await ExpenseDueService.GetCurrentCycleForPropertyExpenseAsync(expense.Id);
+        showEditExpenseModal = true;
+    }
+
+    private void CloseEditExpenseModal()
+    {
+        showEditExpenseModal = false;
+        selectedExpense = null;
+        selectedExpenseCurrentDue = null;
+    }
 
     private async Task AddExpense(PropertyExpenseFormModel model)
     {
@@ -305,16 +324,25 @@
         {
             isSavingExpense = true;
             expenseErrorMessage = string.Empty;
-            await PropertyExpenseService.CreateAsync(new PropertyExpense
+            var result = await PropertyExpenseService.CreateExpenseAsync(new PropertyExpense
             {
                 PropertyId = PropertyId,
                 ExpenseType = model.ExpenseType,
                 Description = model.Description ?? string.Empty,
                 Amount = model.Amount,
-                Frequency = model.Frequency,
-            });
+                EffectiveDate = model.DueDate,
+                RecurrencePattern = new RecurrencePattern { Frequency = model.Frequency },
+            }, model.DueDate);
             propertyExpenses = await PropertyExpenseService.GetExpensesByPropertyAsync(PropertyId);
             showAddExpenseModal = false;
+
+            if (result.WasBackfillClamped)
+            {
+                ToastService.ShowInfo(
+                    $"'{result.Expense.ExpenseType}' was added. Cycles from January 1, {DateTime.Today.Year} forward were generated automatically; " +
+                    "any earlier occurrences must be entered manually.",
+                    "Backdated Expense");
+            }
         }
         catch (Exception ex) { expenseErrorMessage = $"Error adding expense: {ex.Message}"; }
         finally { isSavingExpense = false; }
@@ -335,6 +363,26 @@
         CloseEditExpenseModal();
         propertyExpenses = await PropertyExpenseService.GetExpensesByPropertyAsync(PropertyId);
     }
+
+    private async Task HandleMarkPaid(ExpensePaymentRequest request)
+    {
+        await ExpensePaymentService.RecordPaymentAsync(request.ExpenseDueId, request.AmountPaid, request.PaidOn, request.Notes);
+        if (selectedExpense != null)
+        {
+            selectedExpenseCurrentDue = await ExpenseDueService.GetCurrentCycleForPropertyExpenseAsync(selectedExpense.Id);
+        }
+    }
+
+    private async Task HandleWaiveExpenseDue(string reason)
+    {
+        if (selectedExpenseCurrentDue == null) return;
+        await ExpenseDueService.WaiveExpenseDueAsync(selectedExpenseCurrentDue.Id, reason);
+        if (selectedExpense != null)
+        {
+            selectedExpenseCurrentDue = await ExpenseDueService.GetCurrentCycleForPropertyExpenseAsync(selectedExpense.Id);
+        }
+    }
+
     private Lease? selectedLease;
     private Repair? selectedRepair;
     private Inspection? selectedInspection;

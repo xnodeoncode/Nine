@@ -21,8 +21,8 @@ namespace Nine.Infrastructure.Data.CompiledModels
                 "Nine.Core.Entities.PropertyExpense",
                 typeof(PropertyExpense),
                 baseEntityType,
-                propertyCount: 20,
-                navigationCount: 1,
+                propertyCount: 19,
+                navigationCount: 3,
                 foreignKeyCount: 1,
                 unnamedIndexCount: 4,
                 keyCount: 1);
@@ -109,13 +109,6 @@ namespace Nine.Infrastructure.Data.CompiledModels
                 propertyInfo: typeof(PropertyExpense).GetProperty("ExpenseType", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(PropertyExpense).GetField("<ExpenseType>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 maxLength: 50);
-
-            var frequency = runtimeEntityType.AddProperty(
-                "Frequency",
-                typeof(string),
-                propertyInfo: typeof(PropertyExpense).GetProperty("Frequency", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(PropertyExpense).GetField("<Frequency>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                maxLength: 20);
 
             var isArchived = runtimeEntityType.AddProperty(
                 "IsArchived",

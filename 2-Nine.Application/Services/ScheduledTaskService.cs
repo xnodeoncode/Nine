@@ -108,6 +108,21 @@ namespace Nine.Application.Services
                     var organizationService = scope.ServiceProvider.GetRequiredService<OrganizationService>();
                     var leaseNotificationService = scope.ServiceProvider.GetRequiredService<LeaseNotificationService>();
 
+                    // Cross-organization: catch up any recurring property expense
+                    // ExpenseDue cycles that elapsed since this last ran (e.g. the
+                    // application was closed for a period). Runs at every startup
+                    // and every 24h thereafter; idempotent and bounded to the
+                    // current calendar year (see ExpenseGenerationService), so it
+                    // never silently touches a prior tax year no matter how long
+                    // the app was closed.
+                    var expenseGenerationService = scope.ServiceProvider.GetRequiredService<ExpenseGenerationService>();
+                    var generatedExpenseDueCount = await expenseGenerationService.GenerateMissingDueAsync(DateTime.Today);
+                    if (generatedExpenseDueCount > 0)
+                    {
+                        _logger.LogInformation("Generated {Count} property expense due record(s) catching up through {Date}",
+                            generatedExpenseDueCount, DateTime.Today.ToString("yyyy-MM-dd"));
+                    }
+
                     // Get all distinct organization IDs from OrganizationSettings
                     var organizations = await dbContext.OrganizationSettings
                         .Where(s => !s.IsDeleted)

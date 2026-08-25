@@ -59,6 +59,7 @@
     private bool showEditExpenseModal = false;
     private PropertyExpense? selectedExpense;
     private List<PropertyExpense> pendingExpenses = new();
+    private Dictionary<Guid, DateTime> pendingExpenseDueDates = new();
 
     private async Task SaveProperty(PropertyFormModel model)
     {
@@ -88,7 +89,8 @@
         foreach (var expense in pendingExpenses)
         {
             expense.PropertyId = createdProperty.Id;
-            await PropertyExpenseService.CreateAsync(expense);
+            var dueDate = pendingExpenseDueDates.TryGetValue(expense.Id, out var d) ? d : DateTime.Today;
+            await PropertyExpenseService.CreateExpenseAsync(expense, dueDate);
         }
 
         isSubmitting = false;
@@ -107,20 +109,24 @@
 
     private void AddPendingExpense(PropertyExpenseFormModel model)
     {
-        pendingExpenses.Add(new PropertyExpense
+        var expense = new PropertyExpense
         {
             Id = Guid.NewGuid(),
             ExpenseType = model.ExpenseType,
             Description = model.Description ?? string.Empty,
             Amount = model.Amount,
-            Frequency = model.Frequency,
-        });
+            EffectiveDate = model.DueDate,
+            RecurrencePattern = new RecurrencePattern { Frequency = model.Frequency },
+        };
+        pendingExpenses.Add(expense);
+        pendingExpenseDueDates[expense.Id] = model.DueDate;
         showExpenseModal = false;
     }
 
     private void RemovePendingExpense(Guid id)
     {
         pendingExpenses.RemoveAll(e => e.Id == id);
+        pendingExpenseDueDates.Remove(id);
     }
 
     private void ShowEditExpenseModal(PropertyExpense expense)
@@ -157,4 +163,3 @@
         Navigation.NavigateTo("/propertymanagement/properties");
     }
 }
-

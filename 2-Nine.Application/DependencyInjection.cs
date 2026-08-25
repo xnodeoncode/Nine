@@ -39,6 +39,9 @@ public static class DependencyInjection
         services.AddScoped<EmailService>();
         services.AddScoped<IEmailService>(sp => sp.GetRequiredService<EmailService>());
         services.AddScoped<EmailSettingsService>();
+        services.AddScoped<ExpenseDueService>();
+        services.AddScoped<ExpenseGenerationService>();
+        services.AddScoped<ExpensePaymentService>();
         services.AddScoped<FinancialReportService>();
         services.AddScoped<InspectionService>();
         services.AddScoped<InvoiceService>();

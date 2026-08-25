@@ -320,9 +320,10 @@ namespace Nine.Application.Services.Workflows
                 // Use the same sq-footage rates as CalculateSampleMonthlyExpenses so that
                 // the amounts saved here are consistent with the rent set during property generation.
                 var sqFt = property.SquareFeet;
-                var mortgageMonthly  = Math.Round(sqFt * 0.55m, 2);
-                var insuranceAnnual  = Math.Round(sqFt * 0.864m, 2);   // $0.072/sqft/mo × 12
-                var taxAnnual        = Math.Round(sqFt * 1.08m, 2);    // $0.09/sqft/mo  × 12
+                var mortgageMonthly = Math.Round(sqFt * 0.55m, 2);
+                var insuranceAnnual = Math.Round(sqFt * 0.864m, 2);   // $0.072/sqft/mo × 12
+                var taxAnnual = Math.Round(sqFt * 1.08m, 2);          // $0.09/sqft/mo  × 12
+                var hoaQuarterly = Math.Round(sqFt * 0.90m, 2);       // $0.30/sqft/mo x 3
 
                 var propertyExpenses = new[]
                 {
@@ -334,7 +335,11 @@ namespace Nine.Application.Services.Workflows
                         ExpenseType = ApplicationConstants.PropertyExpenseTypes.Mortgage,
                         Description = "Primary mortgage",
                         Amount = mortgageMonthly,
-                        Frequency = ApplicationConstants.ExpenseFrequencies.Monthly,
+                        RecurrencePattern = new RecurrencePattern
+                        {
+                            Frequency = ApplicationConstants.ExpenseFrequencies.Monthly,
+                            DueDayOfMonth = 1
+                        },
                         EffectiveDate = today.AddYears(-1),
                         CreatedBy = userId,
                         CreatedOn = property.CreatedOn,
@@ -348,7 +353,12 @@ namespace Nine.Application.Services.Workflows
                         ExpenseType = ApplicationConstants.PropertyExpenseTypes.Insurance,
                         Description = "Homeowner's insurance (annual)",
                         Amount = insuranceAnnual,
-                        Frequency = ApplicationConstants.ExpenseFrequencies.Annual,
+                        RecurrencePattern = new RecurrencePattern
+                        {
+                            Frequency = ApplicationConstants.ExpenseFrequencies.Annual,
+                            DueDayOfMonth = 1,
+                            AnchorMonth = today.AddYears(-1).Month
+                        },
                         EffectiveDate = today.AddYears(-1),
                         CreatedBy = userId,
                         CreatedOn = property.CreatedOn,
@@ -362,8 +372,51 @@ namespace Nine.Application.Services.Workflows
                         ExpenseType = ApplicationConstants.PropertyExpenseTypes.PropertyTax,
                         Description = "Annual property tax",
                         Amount = taxAnnual,
-                        Frequency = ApplicationConstants.ExpenseFrequencies.Annual,
+                        RecurrencePattern = new RecurrencePattern
+                        {
+                            Frequency = ApplicationConstants.ExpenseFrequencies.Annual,
+                            DueDayOfMonth = 1,
+                            AnchorMonth = today.AddYears(-1).Month
+                        },
                         EffectiveDate = today.AddYears(-1),
+                        CreatedBy = userId,
+                        CreatedOn = property.CreatedOn,
+                        IsSampleData = true
+                    },
+                    new PropertyExpense
+                    {
+                        Id = Guid.NewGuid(),
+                        OrganizationId = organizationId,
+                        PropertyId = property.Id,
+                        ExpenseType = ApplicationConstants.PropertyExpenseTypes.HOA,
+                        Description = "HOA dues (quarterly)",
+                        Amount = hoaQuarterly,
+                        // Demonstrates a non-1st due day, e.g. quarterly due on the 22nd.
+                        RecurrencePattern = new RecurrencePattern
+                        {
+                            Frequency = ApplicationConstants.ExpenseFrequencies.Quarterly,
+                            DueDayOfMonth = 22,
+                            AnchorMonth = today.AddYears(-1).Month
+                        },
+                        EffectiveDate = today.AddYears(-1),
+                        CreatedBy = userId,
+                        CreatedOn = property.CreatedOn,
+                        IsSampleData = true
+                    },
+                    new PropertyExpense
+                    {
+                        Id = Guid.NewGuid(),
+                        OrganizationId = organizationId,
+                        PropertyId = property.Id,
+                        ExpenseType = ApplicationConstants.PropertyExpenseTypes.Maintenance,
+                        Description = "Move-in inspection fee",
+                        Amount = 150m,
+                        // One-off expense: no recurrence at all.
+                        RecurrencePattern = new RecurrencePattern
+                        {
+                            Frequency = ApplicationConstants.ExpenseFrequencies.OneTime
+                        },
+                        EffectiveDate = today.AddMonths(-6),
                         CreatedBy = userId,
                         CreatedOn = property.CreatedOn,
                         IsSampleData = true
@@ -375,7 +428,106 @@ namespace Nine.Application.Services.Workflows
             }
 
             await _context.SaveChangesAsync();
+
+            await GenerateExpenseDueHistoryAsync(expenses, organizationId, userId);
+
             return expenses;
+        }
+
+        /// <summary>
+        /// Seeds ExpenseDue (and mostly-paid ExpensePayment) history for sample
+        /// PropertyExpenses, from EffectiveDate through today, so demos show
+        /// realistic cycle-by-cycle due/paid data rather than an empty history.
+        /// The most recent cycle for each expense is left unpaid to demonstrate
+        /// the "Mark Paid" action.
+        /// </summary>
+        private async Task GenerateExpenseDueHistoryAsync(List<PropertyExpense> expenses, Guid organizationId, string userId)
+        {
+            var today = DateTime.Today;
+            var duesToAdd = new List<ExpenseDue>();
+            var paymentsToAdd = new List<ExpensePayment>();
+
+            foreach (var expense in expenses)
+            {
+                var cycles = BuildSampleCycleDates(expense, today);
+
+                for (var i = 0; i < cycles.Count; i++)
+                {
+                    var due = new ExpenseDue
+                    {
+                        Id = Guid.NewGuid(),
+                        OrganizationId = organizationId,
+                        PropertyExpenseId = expense.Id,
+                        PropertyId = expense.PropertyId,
+                        DueDate = cycles[i],
+                        AmountDue = expense.Amount,
+                        CreatedBy = userId,
+                        CreatedOn = expense.CreatedOn,
+                        IsSampleData = true
+                    };
+                    duesToAdd.Add(due);
+
+                    // Leave the most recent cycle unpaid so demos show a pending payment.
+                    var isMostRecentCycle = i == cycles.Count - 1;
+                    if (!isMostRecentCycle)
+                    {
+                        paymentsToAdd.Add(new ExpensePayment
+                        {
+                            Id = Guid.NewGuid(),
+                            OrganizationId = organizationId,
+                            ExpenseDueId = due.Id,
+                            AmountPaid = due.AmountDue,
+                            PaidOn = due.DueDate,
+                            CreatedBy = userId,
+                            CreatedOn = due.CreatedOn,
+                            IsSampleData = true
+                        });
+                    }
+                }
+            }
+
+            _context.Set<ExpenseDue>().AddRange(duesToAdd);
+            _context.Set<ExpensePayment>().AddRange(paymentsToAdd);
+            await _context.SaveChangesAsync();
+        }
+
+        /// <summary>
+        /// Builds the list of cycle due dates from EffectiveDate through today for
+        /// a sample expense, based on its RecurrencePattern. OneTime expenses
+        /// produce exactly one date (EffectiveDate itself).
+        /// </summary>
+        private static List<DateTime> BuildSampleCycleDates(PropertyExpense expense, DateTime today)
+        {
+            var pattern = expense.RecurrencePattern;
+            var dates = new List<DateTime>();
+
+            if (pattern.Frequency == ApplicationConstants.ExpenseFrequencies.OneTime)
+            {
+                dates.Add(expense.EffectiveDate);
+                return dates;
+            }
+
+            var day = pattern.DueDayOfMonth ?? 1;
+            var monthStep = pattern.Frequency switch
+            {
+                ApplicationConstants.ExpenseFrequencies.Monthly => 1,
+                ApplicationConstants.ExpenseFrequencies.Quarterly => 3,
+                ApplicationConstants.ExpenseFrequencies.Annual => 12,
+                _ => 1
+            };
+
+            var cursor = new DateTime(expense.EffectiveDate.Year, expense.EffectiveDate.Month,
+                Math.Min(day, DateTime.DaysInMonth(expense.EffectiveDate.Year, expense.EffectiveDate.Month)));
+
+            while (cursor <= today)
+            {
+                dates.Add(cursor);
+                cursor = cursor.AddMonths(monthStep);
+                cursor = new DateTime(cursor.Year, cursor.Month,
+                    Math.Min(day, DateTime.DaysInMonth(cursor.Year, cursor.Month)));
+            }
+
+            return dates;
         }
 
         /// <summary>
@@ -1029,6 +1181,8 @@ namespace Nine.Application.Services.Workflows
                 .Where(e => e.OrganizationId == organizationId && e.IsSampleData)
                 .ToListAsync();
 
+            // PropertyExpense -> ExpenseDue -> ExpensePayment cascade on delete,
+            // so removing the expense is sufficient to remove its full history.
             _context.PropertyExpenses.RemoveRange(expenses);
             await _context.SaveChangesAsync();
 
