@@ -50,6 +50,13 @@
                         <input type="text" class="form-control" placeholder="Search repairs..."
                                @bind="searchTerm" @bind:event="oninput" />
                     </div>
+                     <div class="col-md-2">
+                        <select class="form-select" @bind="selectedRepairStatus">
+                            <option value="@RepairStatusFilter.AllRepairs">All Repairs</option>
+                            <option value="@RepairStatusFilter.InProgress">In Progress</option>
+                            <option value="@RepairStatusFilter.Completed">Completed</option>
+                        </select>
+                    </div>
                     <div class="col-md-2">
                         <select class="form-select" @bind="selectedPropertyId">
                             <option value="">All Properties</option>
@@ -68,13 +75,7 @@
                             }
                         </select>
                     </div>
-                    <div class="col-md-2">
-                        <select class="form-select" @bind="selectedRepairStatus">
-                            <option value="@RepairStatusFilter.AllRepairs">All Repairs</option>
-                            <option value="@RepairStatusFilter.InProgress">In Progress</option>
-                            <option value="@RepairStatusFilter.Completed">Completed</option>
-                        </select>
-                    </div>
+                   
                     <div class="col-md-3">
                         <div class="form-check form-switch">
                             <input class="form-check-input" type="checkbox" id="showInProgressOnly"
@@ -91,7 +92,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="card-body p-0">
                 @if (!repairs.Any())
                 {
