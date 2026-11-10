@@ -22,7 +22,7 @@ namespace Nine.Infrastructure.Data.CompiledModels
                 typeof(Repair),
                 baseEntityType,
                 propertyCount: 28,
-                navigationCount: 3,
+                navigationCount: 4,
                 foreignKeyCount: 3,
                 unnamedIndexCount: 6,
                 keyCount: 1);

@@ -11,7 +11,7 @@ namespace Nine.Infrastructure.Data.CompiledModels
     public partial class ApplicationDbContextModel
     {
         private ApplicationDbContextModel()
-            : base(skipDetectChanges: false, modelId: new Guid("97c75a38-e349-44c7-a120-d1b500f3570d"), entityTypeCount: 39)
+            : base(skipDetectChanges: false, modelId: new Guid("927d7770-b498-4af1-823a-f66b01919da1"), entityTypeCount: 39)
         {
         }
 
@@ -70,7 +70,8 @@ namespace Nine.Infrastructure.Data.CompiledModels
             DocumentEntityType.CreateForeignKey3(document, organization);
             DocumentEntityType.CreateForeignKey4(document, payment);
             DocumentEntityType.CreateForeignKey5(document, property);
-            DocumentEntityType.CreateForeignKey6(document, tenant);
+            DocumentEntityType.CreateForeignKey6(document, repair);
+            DocumentEntityType.CreateForeignKey7(document, tenant);
             ExpenseDueEntityType.CreateForeignKey1(expenseDue, propertyExpense);
             ExpensePaymentEntityType.CreateForeignKey1(expensePayment, expenseDue);
             InspectionEntityType.CreateForeignKey1(inspection, document);

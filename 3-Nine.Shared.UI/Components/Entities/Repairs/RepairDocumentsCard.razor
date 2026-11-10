@@ -1,0 +1,231 @@
+@namespace Nine.Shared.UI.Components.Entities.Repairs
+@using Nine.Shared.UI.Components.Entities.Documents
+@inject DocumentService DocumentService
+@inject IJSRuntime JSRuntime
+
+<div class="mb-3">
+    <DocumentListView
+        Documents="@repairDocuments"
+        OnUploadDocument="ShowUploadModal"
+        OnViewDocument="ViewRepairDocument"
+        OnDownloadDocument="DownloadRepairDocument"
+        OnDeleteDocument="ConfirmDeleteRepairDocument" />
+</div>
+
+@if (showUploadModal)
+{
+    <div class="card mb-3 border-primary">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Upload Document</h5>
+            <button type="button" class="btn-close btn-close-white" @onclick="CancelUpload" aria-label="Close"></button>
+        </div>
+        <div class="card-body">
+            <EditForm Model="this" OnValidSubmit="HandleUploadRepairDocument">
+                <div class="mb-3">
+                    <label for="repairDocumentType" class="form-label">Document Type *</label>
+                    <select id="repairDocumentType" class="form-select" @bind="selectedDocumentType">
+                        @foreach (var type in ApplicationConstants.DocumentTypes.RepairDocumentTypes)
+                        {
+                            <option value="@type">@type</option>
+                        }
+                    </select>
+                    <small class="text-muted">
+                        Anything that supports this repair you'd like to keep on record
+                        — e.g., a receipt, invoice, warranty, user guide, or photo.
+                    </small>
+                </div>
+                <div class="mb-3">
+                    <label for="repairDocumentFile" class="form-label">File *</label>
+                    <InputFile id="repairDocumentFile" class="form-control" OnChange="HandleRepairDocumentFileSelected"
+                               accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.txt" />
+                    @if (!string.IsNullOrEmpty(selectedDocumentFileName))
+                    {
+                        <small class="text-muted">Selected: @selectedDocumentFileName (@selectedDocumentFileSize)</small>
+                    }
+                </div>
+                <div class="mb-3">
+                    <label for="repairDocumentDescription" class="form-label">Description</label>
+                    <input id="repairDocumentDescription" class="form-control" @bind="documentDescription"
+                           placeholder="Optional, e.g., ABC Plumbing invoice #1234" />
+                </div>
+                <div class="d-flex justify-content-between">
+                    <button type="button" class="btn btn-outline-secondary" @onclick="CancelUpload">Cancel</button>
+                    <button type="submit" class="btn btn-primary" disabled="@(selectedDocumentFile == null || isUploadingDocument)">
+                        @if (isUploadingDocument)
+                        {
+                            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                            <span>Uploading...</span>
+                        }
+                        else
+                        {
+                            <i class="bi bi-upload"></i>
+                            <span> Upload</span>
+                        }
+                    </button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public Guid RepairId { get; set; }
+
+    /// <summary>
+    /// The repair's PropertyId, denormalized onto each uploaded Document so it
+    /// participates in the central Documents page's property filter/grouping,
+    /// matching the convention used elsewhere in the system.
+    /// </summary>
+    [Parameter]
+    public Guid? PropertyId { get; set; }
+
+    /// <summary>
+    /// Raised with a user-facing message after a successful upload or delete.
+    /// The host page is responsible for displaying it (e.g., via its own
+    /// ToastService) — ToastService itself lives in the 4-Nine product
+    /// project and is not available for injection from Shared.UI.
+    /// </summary>
+    [Parameter]
+    public EventCallback<string> OnSuccess { get; set; }
+
+    /// <summary>
+    /// Raised with a user-facing message after a failed upload or delete.
+    /// </summary>
+    [Parameter]
+    public EventCallback<string> OnError { get; set; }
+
+    private List<Document> repairDocuments = new();
+    private bool showUploadModal = false;
+    private bool isUploadingDocument = false;
+    private IBrowserFile? selectedDocumentFile;
+    private string selectedDocumentFileName = string.Empty;
+    private string selectedDocumentFileSize = string.Empty;
+    private string documentDescription = string.Empty;
+    private string selectedDocumentType = ApplicationConstants.DocumentTypes.Receipt;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDocuments();
+    }
+
+    private async Task LoadDocuments()
+    {
+        repairDocuments = await DocumentService.GetDocumentsByRepairIdAsync(RepairId);
+    }
+
+    private void ShowUploadModal()
+    {
+        showUploadModal = true;
+        selectedDocumentFile = null;
+        selectedDocumentFileName = string.Empty;
+        selectedDocumentFileSize = string.Empty;
+        documentDescription = string.Empty;
+        selectedDocumentType = ApplicationConstants.DocumentTypes.Receipt;
+    }
+
+    private void CancelUpload()
+    {
+        showUploadModal = false;
+        selectedDocumentFile = null;
+        selectedDocumentFileName = string.Empty;
+        selectedDocumentFileSize = string.Empty;
+        documentDescription = string.Empty;
+    }
+
+    private void HandleRepairDocumentFileSelected(InputFileChangeEventArgs e)
+    {
+        selectedDocumentFile = e.File;
+        selectedDocumentFileName = selectedDocumentFile.Name;
+        selectedDocumentFileSize = FormatFileSize(selectedDocumentFile.Size);
+    }
+
+    private async Task HandleUploadRepairDocument()
+    {
+        if (selectedDocumentFile == null) return;
+
+        isUploadingDocument = true;
+        try
+        {
+            using var memoryStream = new MemoryStream();
+            await selectedDocumentFile.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024).CopyToAsync(memoryStream); // 10MB max
+
+            var document = new Document
+            {
+                FileName = selectedDocumentFile.Name,
+                FileExtension = Path.GetExtension(selectedDocumentFile.Name),
+                FileData = memoryStream.ToArray(),
+                FileSize = selectedDocumentFile.Size,
+                FileType = selectedDocumentFile.ContentType,
+                DocumentType = selectedDocumentType,
+                FilePath = string.Empty,
+                Description = documentDescription ?? string.Empty,
+                RepairId = RepairId,
+                PropertyId = PropertyId,
+            };
+
+            await DocumentService.CreateAsync(document);
+            await OnSuccess.InvokeAsync("Document uploaded successfully.");
+            CancelUpload();
+            await LoadDocuments();
+        }
+        catch (Exception ex)
+        {
+            await OnError.InvokeAsync($"Error uploading document: {ex.Message}");
+        }
+        finally
+        {
+            isUploadingDocument = false;
+        }
+    }
+
+    private async Task ViewRepairDocument(Guid documentId)
+    {
+        var doc = repairDocuments.FirstOrDefault(d => d.Id == documentId);
+        if (doc == null) return;
+
+        var base64Data = Convert.ToBase64String(doc.FileData);
+        await JSRuntime.InvokeVoidAsync("viewFile", base64Data, doc.FileType);
+    }
+
+    private async Task DownloadRepairDocument(Guid documentId)
+    {
+        var doc = repairDocuments.FirstOrDefault(d => d.Id == documentId);
+        if (doc == null) return;
+
+        await JSRuntime.InvokeVoidAsync("downloadFile", doc.FileName, Convert.ToBase64String(doc.FileData), doc.FileType);
+    }
+
+    private async Task ConfirmDeleteRepairDocument(Guid documentId)
+    {
+        var doc = repairDocuments.FirstOrDefault(d => d.Id == documentId);
+        if (doc == null) return;
+
+        if (await JSRuntime.InvokeAsync<bool>("confirm", $"Are you sure you want to delete '{doc.FileName}'?"))
+        {
+            try
+            {
+                await DocumentService.DeleteAsync(documentId);
+                await OnSuccess.InvokeAsync("Document deleted successfully.");
+                await LoadDocuments();
+            }
+            catch (Exception ex)
+            {
+                await OnError.InvokeAsync($"Error deleting document: {ex.Message}");
+            }
+        }
+    }
+
+    private string FormatFileSize(long bytes)
+    {
+        string[] sizes = { "B", "KB", "MB", "GB" };
+        double len = bytes;
+        int order = 0;
+        while (len >= 1024 && order < sizes.Length - 1)
+        {
+            order++;
+            len = len / 1024;
+        }
+        return $"{len:0.##} {sizes[order]}";
+    }
+}

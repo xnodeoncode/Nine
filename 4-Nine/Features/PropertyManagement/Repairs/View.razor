@@ -1,6 +1,7 @@
 @page "/propertymanagement/repairs/{id:guid}"
 @attribute [OrganizationAuthorize("Owner", "Administrator", "PropertyManager")]
 
+@using Nine.Shared.UI.Components.Entities.Repairs
 @inject RepairService RepairService
 @inject NavigationManager Navigation
 @inject ToastService ToastService
@@ -223,6 +224,11 @@
                         </div>
                     </div>
                 }
+
+                <!-- Supporting Documents -->
+                <RepairDocumentsCard RepairId="@repair.Id" PropertyId="@repair.PropertyId"
+                                     OnSuccess="@(message => ToastService.ShowSuccess(message))"
+                                     OnError="@(message => ToastService.ShowError(message))" />
 
                 <!-- Related Maintenance Request -->
                 @if (repair.MaintenanceRequestId.HasValue)

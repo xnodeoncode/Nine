@@ -529,6 +529,10 @@ namespace Nine.Core.Constants
             public const string MaintenanceRecord = "Maintenance Record";
             public const string Invoice = "Invoice";
             public const string PaymentReceipt = "Payment Receipt";
+            public const string Receipt = "Receipt";
+            public const string Warranty = "Warranty";
+            public const string UserGuide = "User Guide";
+            public const string Photo = "Photo";
             public const string Other = "Other";
 
             public static IReadOnlyList<string> AllDocumentTypes { get; } = new List<string>
@@ -539,6 +543,27 @@ namespace Nine.Core.Constants
                 MaintenanceRecord,
                 Invoice,
                 PaymentReceipt,
+                Receipt,
+                Warranty,
+                UserGuide,
+                Photo,
+                Other
+            };
+
+            /// <summary>
+            /// Curated subset of document types relevant when attaching supporting
+            /// documentation to a Repair — anything the user would like to keep a
+            /// record of alongside the repair (e.g., the contractor's receipt or
+            /// invoice, a product warranty, a user guide for a replaced appliance/
+            /// fixture, or before/after photos). "Other" remains as a catch-all.
+            /// </summary>
+            public static IReadOnlyList<string> RepairDocumentTypes { get; } = new List<string>
+            {
+                Receipt,
+                Invoice,
+                Warranty,
+                UserGuide,
+                Photo,
                 Other
             };
 

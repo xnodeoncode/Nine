@@ -46,11 +46,11 @@
         <div class="card">
             <div class="card-header">
                 <div class="row g-3 align-items-center">
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <input type="text" class="form-control" placeholder="Search repairs..."
                                @bind="searchTerm" @bind:event="oninput" />
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <select class="form-select" @bind="selectedPropertyId">
                             <option value="">All Properties</option>
                             @foreach (var property in properties)
@@ -59,7 +59,7 @@
                             }
                         </select>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <select class="form-select" @bind="selectedRepairType">
                             <option value="">All Types</option>
                             @foreach (var type in ApplicationConstants.RepairTypes.AllRepairTypes)
@@ -69,6 +69,13 @@
                         </select>
                     </div>
                     <div class="col-md-2">
+                        <select class="form-select" @bind="selectedRepairStatus">
+                            <option value="@RepairStatusFilter.AllRepairs">All Repairs</option>
+                            <option value="@RepairStatusFilter.InProgress">In Progress</option>
+                            <option value="@RepairStatusFilter.Completed">Completed</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
                         <div class="form-check form-switch">
                             <input class="form-check-input" type="checkbox" id="showInProgressOnly"
                                    @bind="showInProgressOnly" />
@@ -249,6 +256,18 @@
 </div>
 
 @code {
+    /// <summary>
+    /// Repairs have no stored Status field (see Repair.IsCompleted), so this
+    /// filter is a UI-only concept derived from CompletedOn, not persisted
+    /// or part of ApplicationConstants.
+    /// </summary>
+    private enum RepairStatusFilter
+    {
+        AllRepairs,
+        InProgress,
+        Completed
+    }
+
     private List<Repair> repairs = new();
     private List<Property> properties = new();
     private bool isLoading = true;
@@ -256,6 +275,7 @@
     private string searchTerm = string.Empty;
     private string selectedPropertyId = string.Empty;
     private string selectedRepairType = string.Empty;
+    private RepairStatusFilter selectedRepairStatus = RepairStatusFilter.InProgress;
     private bool showInProgressOnly = false;
     private bool _showArchived = false;
     private string _sortColumn = "CompletedOn";
@@ -309,6 +329,15 @@
             if (!string.IsNullOrEmpty(selectedRepairType))
             {
                 filtered = filtered.Where(r => r.RepairType == selectedRepairType);
+            }
+
+            if (selectedRepairStatus == RepairStatusFilter.InProgress)
+            {
+                filtered = filtered.Where(r => !r.IsCompleted);
+            }
+            else if (selectedRepairStatus == RepairStatusFilter.Completed)
+            {
+                filtered = filtered.Where(r => r.IsCompleted);
             }
 
             if (showInProgressOnly)

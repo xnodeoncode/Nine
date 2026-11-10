@@ -245,7 +245,12 @@ namespace Nine.Infrastructure.Data
                     .WithMany()
                     .HasForeignKey(d => d.PaymentId)
                     .OnDelete(DeleteBehavior.SetNull);
-                
+
+                entity.HasOne(d => d.Repair)
+                    .WithMany(r => r.Documents)
+                    .HasForeignKey(d => d.RepairId)
+                    .OnDelete(DeleteBehavior.SetNull);
+
                 // FileData is automatically stored as BLOB in SQLite
                 // No need to specify column type
                 

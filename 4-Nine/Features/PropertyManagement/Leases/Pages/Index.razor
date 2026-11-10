@@ -1,10 +1,11 @@
 @page "/propertymanagement/leases"
 
 @using Microsoft.AspNetCore.Components.Authorization
-@using Nine.Core.Entities
-@using Nine.Core.Constants
 @using Nine.Application.Services
+@using Nine.Core.Constants
+@using Nine.Core.Entities
 @using Nine.Shared.UI.Components.Entities.Leases
+@using static Nine.Core.Constants.ApplicationConstants
 @inject NavigationManager NavigationManager
 @inject LeaseService LeaseService
 @inject TenantService TenantService
@@ -214,7 +215,7 @@ else
     private IEnumerable<IGrouping<Guid, Lease>> groupedLeases = Enumerable.Empty<IGrouping<Guid, Lease>>();
     private HashSet<int> expandedProperties = new();
     private string searchTerm = string.Empty;
-    private string selectedLeaseStatus = string.Empty;
+    private string selectedLeaseStatus = LeaseStatuses.Active;
     private Guid? selectedTenantId;
     private List<Tenant>? availableTenants;
     private int activeCount = 0;

@@ -1365,6 +1365,9 @@ namespace Nine.Infrastructure.Migrations
                     b.Property<Guid?>("PropertyId")
                         .HasColumnType("TEXT");
 
+                    b.Property<Guid?>("RepairId")
+                        .HasColumnType("TEXT");
+
                     b.Property<Guid?>("TenantId")
                         .HasColumnType("TEXT");
 
@@ -1379,6 +1382,8 @@ namespace Nine.Infrastructure.Migrations
                     b.HasIndex("PaymentId");
 
                     b.HasIndex("PropertyId");
+
+                    b.HasIndex("RepairId");
 
                     b.HasIndex("TenantId");
 
@@ -4509,6 +4514,11 @@ namespace Nine.Infrastructure.Migrations
                         .HasForeignKey("PropertyId")
                         .OnDelete(DeleteBehavior.SetNull);
 
+                    b.HasOne("Nine.Core.Entities.Repair", "Repair")
+                        .WithMany("Documents")
+                        .HasForeignKey("RepairId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("Nine.Core.Entities.Tenant", "Tenant")
                         .WithMany()
                         .HasForeignKey("TenantId")
@@ -4521,6 +4531,8 @@ namespace Nine.Infrastructure.Migrations
                     b.Navigation("Payment");
 
                     b.Navigation("Property");
+
+                    b.Navigation("Repair");
 
                     b.Navigation("Tenant");
                 });
@@ -5010,6 +5022,11 @@ namespace Nine.Infrastructure.Migrations
             modelBuilder.Entity("Nine.Core.Entities.RentalApplication", b =>
                 {
                     b.Navigation("Screening");
+                });
+
+            modelBuilder.Entity("Nine.Core.Entities.Repair", b =>
+                {
+                    b.Navigation("Documents");
                 });
 
             modelBuilder.Entity("Nine.Core.Entities.SecurityDeposit", b =>

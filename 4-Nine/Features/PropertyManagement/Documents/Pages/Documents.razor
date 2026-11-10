@@ -627,6 +627,8 @@ else
             Navigation.NavigateTo($"/propertymanagement/invoices/{doc.InvoiceId.Value}");
         else if (doc.PaymentId.HasValue)
             Navigation.NavigateTo($"/propertymanagement/payments/{doc.PaymentId.Value}");
+        else if (doc.RepairId.HasValue)
+            Navigation.NavigateTo($"/propertymanagement/repairs/{doc.RepairId.Value}");
         else if (doc.PropertyId.HasValue)
             Navigation.NavigateTo($"/propertymanagement/properties/{doc.PropertyId.Value}");
     }
@@ -637,6 +639,7 @@ else
         if (doc.TenantId.HasValue) return "View Tenant";
         if (doc.InvoiceId.HasValue) return "View Invoice";
         if (doc.PaymentId.HasValue) return "View Payment";
+        if (doc.RepairId.HasValue) return "View Repair";
         return "View Property";
     }
 
@@ -646,6 +649,7 @@ else
         if (doc.TenantId.HasValue) return "bi-person";
         if (doc.InvoiceId.HasValue) return "bi-receipt";
         if (doc.PaymentId.HasValue) return "bi-cash";
+        if (doc.RepairId.HasValue) return "bi-tools";
         return "bi-house";
     }
 

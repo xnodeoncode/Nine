@@ -61,9 +61,10 @@ namespace Nine.Application.Services
                 && !entity.TenantId.HasValue 
                 && !entity.LeaseId.HasValue 
                 && !entity.InvoiceId.HasValue 
-                && !entity.PaymentId.HasValue)
+                && !entity.PaymentId.HasValue
+                && !entity.RepairId.HasValue)
             {
-                errors.Add("Document must be associated with at least one entity (Property, Tenant, Lease, Invoice, or Payment)");
+                errors.Add("Document must be associated with at least one entity (Property, Tenant, Lease, Invoice, Payment, or Repair)");
             }
 
             // Validate file size (e.g., max 10MB)
@@ -278,6 +279,31 @@ namespace Nine.Application.Services
             catch (Exception ex)
             {
                 await HandleExceptionAsync(ex, "GetDocumentsByPaymentId");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Gets all documents (e.g., receipts) for a specific repair.
+        /// </summary>
+        public async Task<List<Document>> GetDocumentsByRepairIdAsync(Guid repairId)
+        {
+            try
+            {
+                var organizationId = await _userContext.GetActiveOrganizationIdAsync();
+
+                return await _context.Documents
+                    .Include(d => d.Repair)
+                    .Where(d => d.RepairId == repairId
+                        && !d.IsDeleted
+                        && !d.IsArchived
+                        && d.OrganizationId == organizationId)
+                    .OrderByDescending(d => d.CreatedOn)
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                await HandleExceptionAsync(ex, "GetDocumentsByRepairId");
                 throw;
             }
         }
