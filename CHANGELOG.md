@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.2.0] - 2026-04-08
+## [1.2.0] - 2026-11-11
 
 ### Changed
 
@@ -21,6 +21,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Property list replaced Active/Inactive tabs with Available/Occupied/Off-Market market-status tabs mapped to the existing Property.Status lifecycle
 - Leases list now defaults to the Active status filter instead of showing all statuses
 - Lease.IsActive is now synced from Lease.Status on creation so active-lease queries correctly exclude leases created with a non-active status
+- Income Statement, Tax Report (Schedule E), and Property Performance reports now populate expense categories from real `PropertyExpense` data instead of hardcoded `$0` placeholders
+- Schedule E Mortgage Expense line now references Form 1098, Box 1 for the tax-deductible interest portion, instead of a vague "verify" instruction
 
 ### Added
 
@@ -30,12 +32,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Repair supporting-document uploads (receipts, warranties, user guides, photos) via a new RepairDocumentsCard component
 - Repairs list status filter (All/Pending/Completed), combinable with the existing In-Progress-Only toggle
 - Dynamic port selection for the Electron desktop shell to prevent startup port conflicts
+- Actual-expense-by-category queries in `FinancialReportService` and `NineFinancialReportService` backing the report pages above
 
 ### Removed
 
 - SendGrid and Twilio packages, DI registrations, and appsettings entries removed from `4-Nine`; shared library implementations retained for Aquiis.Professional
 - Registration link hidden after first non-system user account exists
 - Lease.DocumentId / Document navigation property removed to break a circular FK cycle (Lease → Document → Lease); replaced with the Documents collection
+- Orphaned Applications feature pages removed (`Index.razor`, `Edit.razor`, `View.razor`) — unreachable, no linked Prospects UI or NavMenu entry
+- Unused `PropertyManagementService` injection removed from Calendar views and DI registration
 
 ### Fixed
 
