@@ -7,15 +7,14 @@
 @inject PropertyService PropertyService
 @inject NavigationManager Navigation
 @inject ToastService ToastService
+@inject IJSRuntime JSRuntime
+
 @rendermode InteractiveServer
 
 <PageTitle>Repairs - Nine</PageTitle>
 
-<div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3 mb-0">
-            <i class="bi bi-tools me-2"></i>Repairs
-        </h1>
+        <h1><span class="bi bi-tools me-2"> Repairs</span></h1>
         <button class="btn btn-primary" @onclick="NavigateToCreate">
             <i class="bi bi-plus-lg me-1"></i>New Repair
         </button>
@@ -253,7 +252,6 @@
             </div>
         </div>
     }
-</div>
 
 @code {
     /// <summary>

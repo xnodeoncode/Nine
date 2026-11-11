@@ -391,8 +391,11 @@ namespace Nine.Core.Constants
             public const string Insurance = "Insurance";
             public const string PropertyTax = "Property Tax";
             public const string HOA = "HOA";
+            // Also covers Cleaning for Schedule E purposes — no dedicated type for it.
             public const string Maintenance = "Maintenance";
             public const string Utilities = "Utilities";
+            // Also covers Advertising, Legal/professional fees, Supplies, and Management
+            // fees for Schedule E purposes — no dedicated type for these, by design.
             public const string Other = "Other";
 
             public static IReadOnlyList<string> AllPropertyExpenseTypes { get; } = new List<string>

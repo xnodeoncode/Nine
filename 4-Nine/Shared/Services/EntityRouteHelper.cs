@@ -20,10 +20,8 @@ public static class EntityRouteHelper
         { "Payment", "/propertymanagement/payments" },
         { "Invoice", "/propertymanagement/invoices" },
         { "Maintenance", "/propertymanagement/maintenance" },
-        { "Application", "/propertymanagement/applications" },
         { "Property", "/propertymanagement/properties" },
-        { "Tenant", "/propertymanagement/tenants" },
-        { "Prospect", "/propertymanagement/prospects" }
+        { "Tenant", "/propertymanagement/tenants" }
     };
 
     /// <summary>

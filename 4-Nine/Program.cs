@@ -124,7 +124,6 @@ builder.Services.ConfigureApplicationCookie(options =>
     };
 });
 
-builder.Services.AddScoped<PropertyManagementService>();
 builder.Services.AddScoped<PropertyService>(); // New refactored service
 builder.Services.AddScoped<TenantService>(); // New refactored service
 builder.Services.AddScoped<LeaseService>(); // New refactored service
