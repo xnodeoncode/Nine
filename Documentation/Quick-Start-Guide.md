@@ -1,7 +1,7 @@
 # Nine. - Quick Start Guide
 
-**Version:** 1.0.0  
-**Last Updated:** March 1, 2026  
+**Version:** 1.1.0  
+**Last Updated:** April 4, 2026  
 **Estimated Time:** 15 minutes
 
 ---
@@ -33,7 +33,7 @@ Before you begin, ensure you have:
 - **Hardware:**
   - 2 GB RAM minimum (4 GB recommended)
   - 500 MB disk space
-- **Downloaded:** Nine v1.0.0 installer for your platform
+- **Downloaded:** Nine v1.1.0 installer for your platform
 
 ### Universal Linux Support:
 
@@ -49,34 +49,24 @@ Nine. is available as a portable Windows executable (.exe). No installation requ
 
 ### Linux Installation
 
-**Option A: AppImage (Recommended for most users)**
+**AppImage (runs on all major distributions)**
 
 ```bash
 # 1. Download the file
-# File: Nine-1.0.0-x86_64.AppImage
+# File: Nine-1.1.0-x86_64.AppImage
 
 # 2. Make it executable
-chmod +x Nine-1.0.0-x86_64.AppImage
+chmod +x Nine-1.1.0-x86_64.AppImage
 
 # 3. Run the application
-./Nine-1.0.0-x86_64.AppImage
-```
-
-**Option B: Debian Package (Ubuntu/Debian users)**
-
-```bash
-# 1. Install the package
-sudo dpkg -i Nine-1.0.0-amd64.deb
-
-# 2. Run the application
-nine
+./Nine-1.1.0-x86_64.AppImage
 ```
 
 ### Windows Installation
 
 **Option A: NSIS Installer (Recommended)**
 
-1. **Download** `Nine-1.0.0-x64-Setup.exe`
+1. **Download** `Nine-1.1.0-x64-Setup.exe`
 2. **Double-click** the installer
 3. **Follow the wizard:**
    - Click "Next" to begin
@@ -88,7 +78,7 @@ nine
 
 **Option B: Portable Executable (No installation)**
 
-1. **Download** `Nine-1.0.0-x64-Portable.exe`
+1. **Download** `Nine-1.1.0-x64-Portable.exe`
 2. **Place** in your desired folder (e.g., `C:\Nine\`)
 3. **Double-click** to run
 
@@ -179,15 +169,12 @@ Let's add a rental property to your portfolio.
   - **Country:** USA
 
 - **Property Type:** Select from dropdown
-  - Options: Single Family, Multi-Family, Apartment, Condo, Townhouse
-  - Choose: **Single Family**
-
-- **Number of Units:** 1 (for single-family home)
+  - Options: House, Apartment, Condo, Townhouse, Duplex, Studio, Loft, Other
+  - Choose: **House**
 
 **Financial Information:**
 
 - **Monthly Rent:** $1,500.00
-- **Security Deposit:** $1,500.00 (typically equal to one month's rent)
 
 **Property Status:**
 
@@ -286,7 +273,7 @@ Let's create a lease agreement between your property and tenant.
 
 **Payment Terms:**
 
-- **Late Fee Grace Period:** 5 days (rent due 1st, late fee applied on 6th)
+- **Late Fee Grace Period:** 3 days (rent due 1st, late fee applied on 4th)
 - **Late Fee Amount:** $50.00 or 5% of rent
 - **Payment Methods Accepted:** Check all that apply
   - ☑ Cash
@@ -531,10 +518,9 @@ In just 15 minutes, you've learned how to:
 
 ### Documentation
 
-- **Release Notes** - What's new in v1.0.0
-- **User Guide** - Comprehensive 10-chapter guide covering all features
-- **Administrator Guide** - System configuration and management
-- **Database Management Guide** - Backup, restore, troubleshooting
+- **[CHANGELOG](../CHANGELOG.md)** — What's new in each release
+- **[Database Management Guide](Database-Management-Guide.md)** — Backup, restore, troubleshooting
+- **[Compatibility Matrix](Compatibility-Matrix.md)** — Version compatibility and upgrade paths
 
 ### Getting Help
 
@@ -543,7 +529,7 @@ In just 15 minutes, you've learned how to:
 - 📧 **Email Support:** cisguru@outlook.com
 - 🐛 **Report Bugs:** [GitHub Issues](https://github.com/xnodeoncode/nine/issues)
 - 💡 **Request Features:** [GitHub Discussions](https://github.com/xnodeoncode/nine/discussions)
-- 📖 **Documentation:** `/Documentation/v1.0.0/`
+- 📖 **Documentation:** [`/Documentation`](.)
 
 **Community:**
 
@@ -559,43 +545,39 @@ In just 15 minutes, you've learned how to:
 
 **Organization Settings:**
 
-1. Navigate to **Settings** → **Organization**
-2. Update business hours, contact information, logo
+1. Navigate to **Administration** → **Organizations**
+2. Edit your organization's contact info and address
 
 **User Settings:**
 
-1. Navigate to **Settings** → **Profile**
-2. Update personal information, password, notification preferences
+1. Navigate to **Account** → **Manage** (user menu, top-right)
+2. Update personal information, password, two-factor authentication
 
 **Notification Settings:**
 
-1. Navigate to **Settings** → **Notifications**
-2. Enable/disable email, SMS, in-app notifications
-3. Configure SendGrid (email) and Twilio (SMS) API keys if needed
+1. Navigate to **Notifications** → **Preferences**
+2. Enable/disable in-app notification categories
 
 **Database Settings:**
 
-1. Navigate to **Settings** → **Database**
+1. Navigate to **Administration** → **Settings** → **Database**
 2. Configure **automatic backups:**
    - Enable scheduled backups
-   - Set backup frequency (daily, weekly, monthly)
-   - Choose backup time (default: 2 AM)
-3. Monitor database health and size
+   - Set backup frequency
+   - Choose backup time
+3. Monitor database health, encryption, and size
 
-**Financial Settings:**
+**Application Settings (Late Fees):**
 
-1. Navigate to **Settings** → **Financial**
+1. Navigate to **Administration** → **Settings** → **Application**
 2. Configure **late fees:**
-   - Grace period (default: 5 days)
-   - Late fee amount ($50 or 5% of rent)
-   - Apply late fees automatically: Yes/No
+   - Grace period (default: 3 days)
+   - Late fee percentage and max fee cap
+   - Auto-apply late fees automatically: Yes/No
 
-**Inspection Settings:**
+**Inspection Scheduling:**
 
-1. Navigate to **Settings** → **Inspections**
-2. Configure **routine inspection frequency:**
-   - None, Quarterly, Semi-Annual, Annual
-3. Enable auto-scheduling of move-in inspections
+- Routine inspection interval (default: 12 months) is set **per property** on the property's edit page, not in a global settings screen
 
 ---
 

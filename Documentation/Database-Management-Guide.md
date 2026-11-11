@@ -1,7 +1,7 @@
 # Nine - Database Management Guide
 
-**Version:** 1.0.0  
-**Last Updated:** March 1, 2026  
+**Version:** 1.1.0  
+**Last Updated:** April 4, 2026  
 **Audience:** Administrators and Power Users
 
 ---
@@ -63,19 +63,19 @@ Your database contains **all your property management data:**
 **Linux:**
 
 ```bash
-~/.config/Nine/Data/app_v1.0.0.db
+~/.config/Nine/app_v1.1.0.db
 ```
 
 **Windows:**
 
 ```
-%APPDATA%\Nine\Data\app_v1.0.0.db
+%APPDATA%\Nine\app_v1.1.0.db
 ```
 
 **Full path examples:**
 
-- **Linux:** `/home/username/.config/Nine/Data/app_v1.0.0.db`
-- **Windows:** `C:\Users\YourName\AppData\Roaming\Nine\Data\app_v1.0.0.db`
+- **Linux:** `/home/username/.config/Nine/app_v1.1.0.db`
+- **Windows:** `C:\Users\YourName\AppData\Roaming\Nine\app_v1.1.0.db`
 
 ### Database Structure
 
@@ -94,13 +94,13 @@ The database file is a **single SQLite file** containing:
 
 ### Schema Version
 
-Nine v1.0.0 uses schema version `1.0.0`. This tracks the database structure and ensures compatibility.
+Nine v1.1.0 uses schema version `1.1.0`. This tracks the database structure and ensures compatibility.
 
 **Check your schema version:**
 
-1. Navigate to **Settings** → **Database**
+1. Navigate to **Administration** → **Settings** → **Database**
 2. View **"Database Information"** panel
-3. See \*\*"Schema Version: 1.0.0""
+3. See **"Schema Version: 1.1.0"**
 
 ### Auto-Migration System
 
@@ -119,7 +119,7 @@ Not all version upgrades are supported automatically. Check the **[Compatibility
 
 #### Migration to v1.0.0
 
-When upgrading from v1.0.0 to v1.0.0, the following schema changes are automatically applied:
+The v1.0.0 release introduced the following schema changes:
 
 > **Note:** For complete version compatibility information and upgrade paths, see the **[Compatibility Matrix](Compatibility-Matrix.md)**.
 
@@ -146,14 +146,15 @@ When upgrading from v1.0.0 to v1.0.0, the following schema changes are automatic
 
 - **EncryptionSalt** column added (nullable) for future encryption support
 
-**Migration Notes:**
+**Breaking Change - No Automatic Migration:**
 
-- All changes are additive (no data loss)
-- Migration runs automatically on first startup with v1.0.0
-- Backup created automatically before migration
-- Typical migration time: 5-15 seconds
+- This was a **breaking schema change** - there is no automatic migration path from pre-v1.0.0 databases
+- Pre-v1.0.0 data is **not carried forward**; upgrading requires starting with a fresh v1.0.0 database
+- If you need pre-v1.0.0 data, export it manually before upgrading (see [Data Export](#data-export))
+- This is why the **[Compatibility Matrix](Compatibility-Matrix.md)** exists - to track which version transitions support automatic migration and which require manual steps
+- This limitation is specific to the initial pre-v1.0.0 → v1.0.0 transition - releases from v1.0.0 onward use the additive, automatic migration process described above
 
-**Important:** v1.0.0 application **requires** v1.0.0 database schema - the DatabaseSettings table is queried on startup. Running v1.0.0 app with v1.0.0 database will result in an error.
+**Important:** v1.0.0 application **requires** v1.0.0 database schema - the DatabaseSettings table is queried on startup. Running v1.0.0 app against a pre-v1.0.0 database will result in an error; there is no automatic migration for this transition.
 
 **Version Compatibility:**  
 See the **[Compatibility Matrix](Compatibility-Matrix.md)** for detailed information about which app versions work with which database versions, and whether automatic migration is available.
@@ -183,7 +184,7 @@ See the **[Compatibility Matrix](Compatibility-Matrix.md)** for detailed informa
 **Step-by-step:**
 
 1. **Open Nine**
-2. **Navigate to:** Settings → Database
+2. **Navigate to:** Administration → Settings → Database
 3. **Click:** "Backup & Restore" tab
 4. **Click:** "Create Backup" button
 5. **Wait:** Progress indicator shows backup creation
@@ -193,9 +194,9 @@ See the **[Compatibility Matrix](Compatibility-Matrix.md)** for detailed informa
 
 - **Filename:** `backup_YYYYMMDD_HHMMSS.db`
   - Example: `backup_20260218_143022.db` (February 18, 2026 at 2:30:22 PM)
-- **Location:** `Data/Backups/` folder
-  - Linux: `~/.config/Nine/Data/Backups/`
-  - Windows: `%APPDATA%\Nine\Data\Backups\`
+- **Location:** `Backups/` folder
+  - Linux: `~/.config/Nine/Backups/`
+  - Windows: `%APPDATA%\Nine\Backups\`
 - **Size:** Same as database file (~5-200 MB)
 
 **Best practice:** Create a manual backup **before**:
@@ -211,7 +212,7 @@ Set up automatic backups that run on a schedule:
 
 **Configuration:**
 
-1. **Navigate to:** Settings → Database → Backup & Restore
+1. **Navigate to:** Administration → Settings → Database → Backup & Restore
 2. **Enable:** "Schedule Automatic Backups" toggle (turn ON)
 3. **Choose frequency:**
    - Daily (recommended)
@@ -235,7 +236,7 @@ Set up automatic backups that run on a schedule:
 **Verify automatic backups are working:**
 
 1. Check the "Last Backup" timestamp in Database settings
-2. Browse to `Data/Backups/` folder
+2. Browse to the `Backups/` folder
 3. Verify recent backup files exist
 4. Check file dates match your schedule
 
@@ -258,17 +259,17 @@ For **maximum protection**, copy backups to multiple locations:
 
 ```bash
 # Copy all backups to USB drive
-cp ~/.config/Nine/Data/Backups/*.db /media/usb/NineBackups/
+cp ~/.config/Nine/Backups/*.db /media/usb/NineBackups/
 
 # Or use rsync for incremental backups
-rsync -av ~/.config/Nine/Data/Backups/ /media/usb/NineBackups/
+rsync -av ~/.config/Nine/Backups/ /media/usb/NineBackups/
 ```
 
 **Windows:**
 
 ```powershell
 # Copy all backups to USB drive
-Copy-Item "$env:APPDATA\Nine\Data\Backups\*.db" "E:\NineBackups\" -Recurse
+Copy-Item "$env:APPDATA\Nine\Backups\*.db" "E:\NineBackups\" -Recurse
 ```
 
 **Automated cloud sync:**
@@ -276,7 +277,7 @@ Copy-Item "$env:APPDATA\Nine\Data\Backups\*.db" "E:\NineBackups\" -Recurse
 Many cloud services offer **folder sync** - configure your cloud client to sync the Backups folder:
 
 1. Install cloud storage client (e.g., Dropbox, Google Drive)
-2. Configure sync for: `Data/Backups/` folder
+2. Configure sync for: the `Backups/` folder
 3. Backups automatically uploaded to cloud
 4. Access your backups from anywhere
 
@@ -306,7 +307,7 @@ Restore from backup when:
 
 **Step-by-step:**
 
-1. **Navigate to:** Settings → Database → Backup & Restore
+1. **Navigate to:** Administration → Settings → Database → Backup & Restore
 2. **Click:** "Available Backups" dropdown
 3. **Select** a backup from the list:
    - Shows filename and date
@@ -324,7 +325,7 @@ Restore from backup when:
 
 **What happens during staged restore:**
 
-1. Backup file copied to staging area (`Data/Staging/`)
+1. Backup file copied to a staging area
 2. Backup validated (integrity check)
 3. Schema version verified
 4. Record counts displayed for review
@@ -343,7 +344,7 @@ Restore from backup when:
 
 **Step-by-step:**
 
-1. **Navigate to:** Settings → Database → Backup & Restore
+1. **Navigate to:** Administration → Settings → Database → Backup & Restore
 2. **Click:** "Available Backups" dropdown
 3. **Select** a backup file
 4. **Click:** "Restore from Backup" button
@@ -390,16 +391,16 @@ If the application won't start or database UI is unavailable:
 pkill Nine
 
 # Navigate to data directory
-cd ~/.config/Nine/Data/
+cd ~/.config/Nine/
 
 # Backup current (corrupted) database
-mv app_v1.0.0.db app_v1.0.0.db.corrupted
+mv app_v1.1.0.db app_v1.1.0.db.corrupted
 
 # Copy backup to main database
-cp Backups/backup_20260218_143022.db app_v1.0.0.db
+cp Backups/backup_20260218_143022.db app_v1.1.0.db
 
 # Restart application
-./Nine-1.0.0.AppImage
+./Nine-1.1.0-x86_64.AppImage
 ```
 
 **Windows:**
@@ -408,13 +409,13 @@ cp Backups/backup_20260218_143022.db app_v1.0.0.db
 # Stop the application first (close window or Task Manager)
 
 # Navigate to data directory
-cd $env:APPDATA\Nine\Data
+cd $env:APPDATA\Nine
 
 # Backup current (corrupted) database
-Move-Item app_v1.0.0.db app_v1.0.0.db.corrupted
+Move-Item app_v1.1.0.db app_v1.1.0.db.corrupted
 
 # Copy backup to main database
-Copy-Item Backups\backup_20260218_143022.db app_v1.0.0.db
+Copy-Item Backups\backup_20260218_143022.db app_v1.1.0.db
 
 # Restart application (Start Menu or double-click icon)
 ```
@@ -456,7 +457,7 @@ Reset the database when:
 
 **Step-by-step:**
 
-1. **Navigate to:** Settings → Database → Backup & Restore
+1. **Navigate to:** Administration → Settings → Database → Backup & Restore
 2. **Click:** "Advanced" tab
 3. **Click:** "Reset Database" button (red button at bottom)
 4. **Confirmation dialog** appears:
@@ -517,7 +518,7 @@ Nine monitors database health continuously:
 
 **Run a manual health check:**
 
-1. **Navigate to:** Settings → Database → Health & Monitoring
+1. **Navigate to:** Administration → Settings → Database → Health & Monitoring
 2. **Click:** "Run Health Check" button
 3. **Wait:** Health check runs (5-15 seconds)
 4. **Results displayed:**
@@ -525,9 +526,9 @@ Nine monitors database health continuously:
    ```
    ✅ Database Health Check: PASSED
 
-   Database file: app_v1.0.0.db
+   Database file: app_v1.1.0.db
    File size: 47.3 MB
-   Schema version: 1.0.0
+   Schema version: 1.1.0
    Connection status: Connected
    Integrity check: PASSED
 
@@ -548,7 +549,7 @@ Nine monitors database health continuously:
 
 - ✅ **Connection status: Connected** - Database accessible
 - ✅ **Integrity check: PASSED** - No corruption detected
-- ✅ **Schema version: 1.0.0** - Matches application version
+- ✅ **Schema version: 1.1.0** - Matches application version
 - ✅ **File accessible: Yes** - Database file readable and writable
 
 **Yellow indicators (warning):**
@@ -575,7 +576,7 @@ Nine monitors database health continuously:
 
 **Run optimization:**
 
-1. **Navigate to:** Settings → Database → Health & Monitoring
+1. **Navigate to:** Administration → Settings → Database → Health & Monitoring
 2. **Click:** "Optimize Database" button
 3. **Wait:** Optimization runs (30 seconds to 2 minutes)
 4. **Automatic steps:**
@@ -628,7 +629,7 @@ Nine monitors database health continuously:
    - Restart application
 
 2. **Wait for backup to complete:**
-   - Check if backup is running (Settings → Database)
+   - Check if backup is running (Administration → Settings → Database)
    - Wait 1-2 minutes for backup to finish
 
 3. **Close database tools:**
@@ -644,12 +645,12 @@ Nine monitors database health continuously:
    ```bash
    # Only if application is definitely closed
    # Linux
-   rm ~/.config/Nine/Data/app_v1.0.0.db-wal
-   rm ~/.config/Nine/Data/app_v1.0.0.db-shm
+   rm ~/.config/Nine/app_v1.1.0.db-wal
+   rm ~/.config/Nine/app_v1.1.0.db-shm
 
    # Windows
-   del %APPDATA%\Nine\Data\app_v1.0.0.db-wal
-   del %APPDATA%\Nine\Data\app_v1.0.0.db-shm
+   del %APPDATA%\Nine\app_v1.1.0.db-wal
+   del %APPDATA%\Nine\app_v1.1.0.db-shm
    ```
 
 ### Issue 2: Database Corruption
@@ -679,11 +680,11 @@ Nine monitors database health continuously:
 
    ```bash
    # Attempt to dump and rebuild database
-   sqlite3 app_v1.0.0.db ".dump" | sqlite3 app_v1.0.0_recovered.db
+   sqlite3 app_v1.1.0.db ".dump" | sqlite3 app_v1.1.0_recovered.db
 
    # Replace corrupted database with recovered one
-   mv app_v1.0.0.db app_v1.0.0.db.corrupted
-   mv app_v1.0.0_recovered.db app_v1.0.0.db
+   mv app_v1.1.0.db app_v1.1.0.db.corrupted
+   mv app_v1.1.0_recovered.db app_v1.1.0.db
    ```
 
 3. **Professional data recovery:**
@@ -714,10 +715,9 @@ Nine monitors database health continuously:
 
 **Solutions:**
 
-1. **Check logs:**
-   - Navigate to: `Data/Logs/`
-   - Open most recent log file
-   - Search for "migration" or "schema"
+1. **Check for error details:**
+   - Nine does not currently write a file-based log; review the terminal/console output if you launched it from a terminal
+   - Search for "migration" or "schema" in the output
    - Error details help diagnose issue
 
 2. **Rollback to previous version:**
@@ -762,7 +762,7 @@ Nine monitors database health continuously:
 **Solutions:**
 
 1. **Optimize database:**
-   - Settings → Database → Optimize
+   - Administration → Settings → Database → Optimize
    - Rebuilds indexes and reclaims space
 
 2. **Cleanup old data:**
@@ -776,7 +776,7 @@ Nine monitors database health continuously:
    - Use SSD instead of HDD for data folder
 
 4. **Split database (advanced):**
-   - Not officially supported in v1.0.0
+   - Not officially supported
    - Contact support for guidance if needed
 
 ### Issue 5: Cannot Find Database File
@@ -799,31 +799,31 @@ Nine monitors database health continuously:
 
    ```bash
    # Linux
-   ls -la ~/.config/Nine/Data/
+   ls -la ~/.config/Nine/
 
    # Windows
-   dir %APPDATA%\Nine\Data
+   dir %APPDATA%\Nine
    ```
 
 2. **Search for database file:**
 
    ```bash
    # Linux
-   find ~ -name "app_v1.0.0.db" 2>/dev/null
+   find ~ -name "app_v1.1.0.db" 2>/dev/null
 
    # Windows (PowerShell)
-   Get-ChildItem -Path C:\ -Filter "app_v1.0.0.db" -Recurse -ErrorAction SilentlyContinue
+   Get-ChildItem -Path C:\ -Filter "app_v1.1.0.db" -Recurse -ErrorAction SilentlyContinue
    ```
 
 3. **Restore from backup:**
    - If original database lost
    - Copy backup to correct location
-   - Rename to `app_v1.0.0.db`
+   - Rename to `app_v1.1.0.db`
 
 4. **Fix permissions (Linux):**
    ```bash
-   chmod 644 ~/.config/Nine/Data/app_v1.0.0.db
-   chown $USER:$USER ~/.config/Nine/Data/app_v1.0.0.db
+   chmod 644 ~/.config/Nine/app_v1.1.0.db
+   chown $USER:$USER ~/.config/Nine/app_v1.1.0.db
    ```
 
 ---
@@ -841,9 +841,9 @@ Nine monitors database health continuously:
 
 You may notice these files alongside the database:
 
-- `app_v1.0.0.db` - Main database file
-- `app_v1.0.0.db-wal` - Write-Ahead Log (temporary)
-- `app_v1.0.0.db-shm` - Shared Memory file (temporary)
+- `app_v1.1.0.db` - Main database file
+- `app_v1.1.0.db-wal` - Write-Ahead Log (temporary)
+- `app_v1.1.0.db-shm` - Shared Memory file (temporary)
 
 **WAL benefits:**
 
@@ -917,13 +917,13 @@ GROUP BY l.PropertyId, p.PropertyName;
 
 ### Database Encryption
 
-SQLite databases are **not encrypted** by default. Nine v1.0.0 includes database encryption options:
+SQLite databases are **not encrypted** by default. Nine includes database encryption options:
 
-**Option 1: SQLCipher (Included in v1.0.0)**
+**Option 1: SQLCipher**
 
-SQLCipher provides AES-256 encryption for database files. This is integrated into Nine v1.0.0:
+SQLCipher provides AES-256 encryption for database files. This is integrated into Nine:
 
-- **Enable encryption:** Settings → Database → Security → Enable Database Encryption
+- **Enable encryption:** Administration → Settings → Database → Security → Enable Database Encryption
 - **AES-256 encryption** of entire database file
 - **Master password** required to unlock database
 - **Encryption state** tracked in DatabaseSettings table
@@ -1040,7 +1040,7 @@ dotnet tool update dotnet-ef -g
 ### Weekly Maintenance
 
 1. **Verify backups**
-   - Check `Data/Backups/` folder
+   - Check the `Backups/` folder
    - Verify recent backup files exist
    - Spot-check a backup (staged restore preview)
 
@@ -1062,7 +1062,7 @@ dotnet tool update dotnet-ef -g
 ### Quarterly Maintenance
 
 1. **Optimize database**
-   - Settings → Database → Optimize
+   - Administration → Settings → Database → Optimize
    - Improves performance
 
 2. **Test restore procedure**
@@ -1076,7 +1076,7 @@ dotnet tool update dotnet-ef -g
 ### Before Major Updates
 
 1. **Create manual backup**
-   - Settings → Database → Create Backup
+   - Administration → Settings → Database → Create Backup
 
 2. **Copy backup to safe location**
    - USB drive or cloud storage
@@ -1105,8 +1105,8 @@ dotnet tool update dotnet-ef -g
 
 **A:**
 
-- **Linux:** `~/.config/Nine/Data/Backups/`
-- **Windows:** `%APPDATA%\Nine\Data\Backups\`
+- **Linux:** `~/.config/Nine/Backups/`
+- **Windows:** `%APPDATA%\Nine\Backups\`
 
 ### Q: Can I restore a backup from an older version?
 
@@ -1127,10 +1127,10 @@ dotnet tool update dotnet-ef -g
 1. On old computer: Create backup
 2. Copy backup file to new computer (USB drive, cloud)
 3. Install Nine on new computer
-4. Copy backup to: `Data/Backups/` folder on new computer
+4. Copy backup to: the `Backups/` folder on new computer
 5. Restore from backup
 
-Or simply copy the entire `Data/` folder to new computer.
+Or simply copy the entire Nine data folder (database + `Backups/`) to the new computer.
 
 ### Q: Can I use my database on both Windows and Linux?
 
@@ -1161,7 +1161,7 @@ Use application UI for all changes.
 
 ### Q: Can I have multiple databases?
 
-**A:** Not directly supported in v1.0.0. You can manually swap database files, but only one can be active at a time. For multi-organization use, wait for Nine Professional.
+**A:** Not directly supported. You can manually swap database files, but only one can be active at a time. For multi-organization use, wait for Nine Professional.
 
 ---
 
@@ -1176,10 +1176,10 @@ Need help with database management? We're here for you!
 
 1. **Exact error message** (copy full text)
 2. **Steps to reproduce** (what you were doing when error occurred)
-3. **Database size** (from Settings → Database)
+3. **Database size** (from Administration → Settings → Database)
 4. **Last successful backup** (date/time)
 5. **Recent changes** (upgrades, bulk operations, etc.)
-6. **Log files** (Settings → System → Export Logs)
+6. **Console output**, if launched from a terminal
 
 ---
 
@@ -1204,6 +1204,6 @@ Need help with database management? We're here for you!
 
 ---
 
-**Document Version:** 1.1  
-**Last Updated:** February 18, 2026  
+**Document Version:** 1.2  
+**Last Updated:** April 4, 2026  
 **Author:** CIS Guru with GitHub Copilot

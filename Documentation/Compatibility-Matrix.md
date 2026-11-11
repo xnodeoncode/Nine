@@ -1,8 +1,8 @@
 # Nine Compatibility Matrix
 
 **Last Updated:** March 1, 2026  
-**Current Release: v1.0.0
-**Next Release: v1.1.0 (planned)
+**Current Release:** v1.1.2  
+**Next Release:** v1.2.0 (in development)
 
 ---
 

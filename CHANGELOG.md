@@ -18,15 +18,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Default theme set to Obsidian
 - Notification Preferences: removed Email, SMS, and Daily Digest cards (channels not applicable to always-offline desktop app)
 - About page overhauled with updated content and layout
+- Property list replaced Active/Inactive tabs with Available/Occupied/Off-Market market-status tabs mapped to the existing Property.Status lifecycle
+- Leases list now defaults to the Active status filter instead of showing all statuses
+- Lease.IsActive is now synced from Lease.Status on creation so active-lease queries correctly exclude leases created with a non-active status
 
 ### Added
 
 - Paging for Outstanding Invoices on dashboard (5 per page)
+- Archive/delete workflow for Properties, Repairs, Leases, Invoices, Payments, Maintenance, and Tenants, with cascade summaries, a show-archived toggle, and restore support
+- Property expense tracking: recurring and one-time expenses with due-date generation, payment history, waive/skip handling, and lease type support
+- Repair supporting-document uploads (receipts, warranties, user guides, photos) via a new RepairDocumentsCard component
+- Repairs list status filter (All/Pending/Completed), combinable with the existing In-Progress-Only toggle
+- Dynamic port selection for the Electron desktop shell to prevent startup port conflicts
 
 ### Removed
 
 - SendGrid and Twilio packages, DI registrations, and appsettings entries removed from `4-Nine`; shared library implementations retained for Aquiis.Professional
 - Registration link hidden after first non-system user account exists
+- Lease.DocumentId / Document navigation property removed to break a circular FK cycle (Lease → Document → Lease); replaced with the Documents collection
 
 ### Fixed
 
@@ -35,6 +44,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Sidebar flex layout fix resolves scrollbar rendering issue
 - Disabled Electron auto-opening DevTools on startup
 - `IEmailService` / `ISMSService` DI registrations moved to Application layer; resolves startup crash after removing from product `Program.cs`
+- Inspection Edit page rebuilt — missing route parameter caused an exception when editing a saved inspection
+- Electron window now resolves its URL from `app.Urls` after Kestrel starts instead of a pre-captured port variable, fixing a blank/offline window on certain startup paths
+- RepairService.GetByIdAsync now explicitly includes Property, fixing a blank Property when navigating directly to a repair's URL
+- Cascade-delete support added with explicit transactions across LeaseService, TenantService, InvoiceService, MaintenanceService, InspectionService, and PropertyService
 
 ---
 
