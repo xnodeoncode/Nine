@@ -1,6 +1,5 @@
 using Nine.Shared.UI.Components.Common;
 using Bunit;
-using FluentAssertions;
 using Microsoft.AspNetCore.Components;
 using Xunit;
 
@@ -17,8 +16,8 @@ public class CardTests : BunitContext
         );
 
         // Assert
-        cut.Markup.Should().Contain("Test Card");
-        cut.Markup.Should().Contain("card-header");
+        Assert.Contains("Test Card", cut.Markup);
+        Assert.Contains("card-header", cut.Markup);
     }
 
     [Fact]
@@ -30,8 +29,8 @@ public class CardTests : BunitContext
         );
 
         // Assert
-        cut.Markup.Should().Contain("Body Content");
-        cut.Markup.Should().Contain("card-body");
+        Assert.Contains("Body Content", cut.Markup);
+        Assert.Contains("card-body", cut.Markup);
     }
 
     [Fact]
@@ -43,8 +42,8 @@ public class CardTests : BunitContext
         );
 
         // Assert
-        cut.Markup.Should().Contain("Custom Header");
-        cut.Markup.Should().Contain("card-header");
+        Assert.Contains("Custom Header", cut.Markup);
+        Assert.Contains("card-header", cut.Markup);
     }
 
     [Fact]
@@ -56,8 +55,8 @@ public class CardTests : BunitContext
         );
 
         // Assert
-        cut.Markup.Should().Contain("Footer Content");
-        cut.Markup.Should().Contain("card-footer");
+        Assert.Contains("Footer Content", cut.Markup);
+        Assert.Contains("card-footer", cut.Markup);
     }
 
     [Fact]
@@ -69,7 +68,7 @@ public class CardTests : BunitContext
         );
 
         // Assert
-        cut.Markup.Should().NotContain("card-header");
+        Assert.DoesNotContain("card-header", cut.Markup);
     }
 
     [Fact]
@@ -81,7 +80,7 @@ public class CardTests : BunitContext
         );
 
         // Assert
-        cut.Markup.Should().NotContain("card-footer");
+        Assert.DoesNotContain("card-footer", cut.Markup);
     }
 
     [Fact]
@@ -94,8 +93,8 @@ public class CardTests : BunitContext
         );
 
         // Assert
-        cut.Markup.Should().Contain("Custom Header");
-        cut.Markup.Should().NotContain("Title Text");
+        Assert.Contains("Custom Header", cut.Markup);
+        Assert.DoesNotContain("Title Text", cut.Markup);
     }
 
     [Fact]
@@ -108,7 +107,7 @@ public class CardTests : BunitContext
         );
 
         // Assert
-        cut.Markup.Should().Contain("custom-card-class");
+        Assert.Contains("custom-card-class", cut.Markup);
     }
 
     [Fact]
@@ -122,11 +121,11 @@ public class CardTests : BunitContext
         );
 
         // Assert
-        cut.Markup.Should().Contain("Card Title");
-        cut.Markup.Should().Contain("Body");
-        cut.Markup.Should().Contain("Footer");
-        cut.Markup.Should().Contain("card-header");
-        cut.Markup.Should().Contain("card-body");
-        cut.Markup.Should().Contain("card-footer");
+        Assert.Contains("Card Title", cut.Markup);
+        Assert.Contains("Body", cut.Markup);
+        Assert.Contains("Footer", cut.Markup);
+        Assert.Contains("card-header", cut.Markup);
+        Assert.Contains("card-body", cut.Markup);
+        Assert.Contains("card-footer", cut.Markup);
     }
 }

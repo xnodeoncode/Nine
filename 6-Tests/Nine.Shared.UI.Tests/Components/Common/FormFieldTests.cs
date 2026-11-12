@@ -1,6 +1,5 @@
 using Nine.Shared.UI.Components.Common;
 using Bunit;
-using FluentAssertions;
 using Microsoft.AspNetCore.Components;
 using Xunit;
 
@@ -17,8 +16,8 @@ public class FormFieldTests : BunitContext
         );
 
         // Assert
-        cut.Markup.Should().Contain("Test Label");
-        cut.Markup.Should().Contain("form-label");
+        Assert.Contains("Test Label", cut.Markup);
+        Assert.Contains("form-label", cut.Markup);
     }
 
     [Fact]
@@ -31,8 +30,8 @@ public class FormFieldTests : BunitContext
         );
 
         // Assert
-        cut.Markup.Should().Contain("input");
-        cut.Markup.Should().Contain("form-control");
+        Assert.Contains("input", cut.Markup);
+        Assert.Contains("form-control", cut.Markup);
     }
 
     [Fact]
@@ -45,8 +44,8 @@ public class FormFieldTests : BunitContext
         );
 
         // Assert
-        cut.Markup.Should().Contain("*");
-        cut.Markup.Should().Contain("text-danger");
+        Assert.Contains("*", cut.Markup);
+        Assert.Contains("text-danger", cut.Markup);
     }
 
     [Fact]
@@ -59,8 +58,8 @@ public class FormFieldTests : BunitContext
         );
 
         // Assert
-        cut.Markup.Should().Contain("Optional Field");
-        cut.Markup.Should().NotContain("text-danger");
+        Assert.Contains("Optional Field", cut.Markup);
+        Assert.DoesNotContain("text-danger", cut.Markup);
     }
 
     [Fact]
@@ -73,8 +72,8 @@ public class FormFieldTests : BunitContext
         );
 
         // Assert
-        cut.Markup.Should().Contain("This is help text");
-        cut.Markup.Should().Contain("form-text");
+        Assert.Contains("This is help text", cut.Markup);
+        Assert.Contains("form-text", cut.Markup);
     }
 
     [Fact]
@@ -86,7 +85,7 @@ public class FormFieldTests : BunitContext
         );
 
         // Assert
-        cut.Markup.Should().NotContain("form-text");
+        Assert.DoesNotContain("form-text", cut.Markup);
     }
 
     [Fact]
@@ -98,7 +97,7 @@ public class FormFieldTests : BunitContext
         );
 
         // Assert
-        cut.Markup.Should().Contain("mb-3");
+        Assert.Contains("mb-3", cut.Markup);
     }
 
     [Fact]
@@ -111,7 +110,7 @@ public class FormFieldTests : BunitContext
         );
 
         // Assert
-        cut.Markup.Should().Contain("custom-field");
+        Assert.Contains("custom-field", cut.Markup);
     }
 
     [Fact]
@@ -126,9 +125,9 @@ public class FormFieldTests : BunitContext
         );
 
         // Assert
-        cut.Markup.Should().Contain("Complete Field");
-        cut.Markup.Should().Contain("*");
-        cut.Markup.Should().Contain("Help text");
-        cut.Markup.Should().Contain("input");
+        Assert.Contains("Complete Field", cut.Markup);
+        Assert.Contains("*", cut.Markup);
+        Assert.Contains("Help text", cut.Markup);
+        Assert.Contains("input", cut.Markup);
     }
 }

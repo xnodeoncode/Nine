@@ -1,6 +1,5 @@
 using Nine.Shared.UI.Components.Notifications;
 using Bunit;
-using FluentAssertions;
 using Xunit;
 
 namespace Nine.Shared.UI.Tests.Features.Notifications;
@@ -19,8 +18,8 @@ public class NotificationBellTests : BunitContext
         // For now, we're just verifying the component exists and can be imported
         
         // Assert
-        typeof(NotificationBell).Should().NotBeNull();
-        typeof(NotificationBell).Name.Should().Be("NotificationBell");
+        Assert.NotNull(typeof(NotificationBell));
+        Assert.Equal("NotificationBell", typeof(NotificationBell).Name);
     }
 
     // Additional tests to be added when NotificationService is implemented:

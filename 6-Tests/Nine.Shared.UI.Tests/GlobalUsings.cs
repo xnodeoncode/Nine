@@ -1,6 +1,5 @@
 global using Xunit;
 global using Bunit;
-global using FluentAssertions;
 global using Microsoft.AspNetCore.Components;
 
 // Suppress bUnit migration warnings since we're using TestContext and RenderComponent
