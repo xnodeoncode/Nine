@@ -42,8 +42,16 @@ else if (viewedUser == null)
 else if (!canViewUser)
 {
     <div class="alert alert-danger">
-        <h4>Access Denied</h4>
-        <p>You don't have permission to view this user's account.</p>
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <h4>Unable to Load User</h4>
+            <p>@errorMessage</p>
+        }
+        else
+        {
+            <h4>Access Denied</h4>
+            <p>You don't have permission to view this user's account.</p>
+        }
         <a href="/admin/users" class="btn btn-primary">Back to User Management</a>
     </div>
 }
@@ -327,9 +335,15 @@ else
 
             // Check permissions
             var currentOrgId = await UserContext.GetActiveOrganizationIdAsync();
-            var currentUserRole = await OrganizationService.GetUserRoleForOrganizationAsync(currentUser.Id, currentOrgId.Value);
-            isCurrentUserAdmin = currentUserRole == ApplicationConstants.OrganizationRoles.Owner || 
-                                currentUserRole == ApplicationConstants.OrganizationRoles.Administrator;
+            if (!currentOrgId.HasValue)
+            {
+                errorMessage = "Unable to determine current organization context.";
+                return;
+            }
+
+            var actingUserRole = await OrganizationService.GetUserRoleForOrganizationAsync(currentUser.Id, currentOrgId.Value);
+            isCurrentUserAdmin = actingUserRole == ApplicationConstants.OrganizationRoles.Owner || 
+                                actingUserRole == ApplicationConstants.OrganizationRoles.Administrator;
             isViewingOwnAccount = currentUser.Id == viewedUser.Id;
             
             // Users can view their own account, admins can view any account in the same org
@@ -342,8 +356,8 @@ else
             // Load user's organization role
             var viewedUserRole = await OrganizationService.GetUserRoleForOrganizationAsync(viewedUser.Id, currentOrgId.Value);
             userRoles = viewedUserRole != null ? new List<string> { viewedUserRole } : new List<string>();
-            currentUserRole = viewedUserRole ?? "No Role";
-            selectedRole = currentUserRole;
+            currentUserRole = viewedUserRole ?? "No role found";
+            selectedRole = viewedUserRole ?? string.Empty;
             isLockedOut = await UserManager.IsLockedOutAsync(viewedUser);
 
             // Load available roles for admins
