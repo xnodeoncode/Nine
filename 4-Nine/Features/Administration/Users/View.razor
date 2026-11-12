@@ -341,9 +341,9 @@ else
                 return;
             }
 
-            var currentUserRole = await OrganizationService.GetUserRoleForOrganizationAsync(currentUser.Id, currentOrgId.Value);
-            isCurrentUserAdmin = currentUserRole == ApplicationConstants.OrganizationRoles.Owner || 
-                                currentUserRole == ApplicationConstants.OrganizationRoles.Administrator;
+            var actingUserRole = await OrganizationService.GetUserRoleForOrganizationAsync(currentUser.Id, currentOrgId.Value);
+            isCurrentUserAdmin = actingUserRole == ApplicationConstants.OrganizationRoles.Owner || 
+                                actingUserRole == ApplicationConstants.OrganizationRoles.Administrator;
             isViewingOwnAccount = currentUser.Id == viewedUser.Id;
             
             // Users can view their own account, admins can view any account in the same org
@@ -356,7 +356,7 @@ else
             // Load user's organization role
             var viewedUserRole = await OrganizationService.GetUserRoleForOrganizationAsync(viewedUser.Id, currentOrgId.Value);
             userRoles = viewedUserRole != null ? new List<string> { viewedUserRole } : new List<string>();
-            currentUserRole = viewedUserRole ?? "No Role";
+            currentUserRole = viewedUserRole ?? ApplicationConstants.OrganizationRoles.User;
             selectedRole = currentUserRole;
             isLockedOut = await UserManager.IsLockedOutAsync(viewedUser);
 
