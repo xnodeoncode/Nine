@@ -356,8 +356,8 @@ else
             // Load user's organization role
             var viewedUserRole = await OrganizationService.GetUserRoleForOrganizationAsync(viewedUser.Id, currentOrgId.Value);
             userRoles = viewedUserRole != null ? new List<string> { viewedUserRole } : new List<string>();
-            currentUserRole = viewedUserRole ?? ApplicationConstants.OrganizationRoles.User;
-            selectedRole = currentUserRole;
+            currentUserRole = viewedUserRole ?? "No role found";
+            selectedRole = viewedUserRole ?? string.Empty;
             isLockedOut = await UserManager.IsLockedOutAsync(viewedUser);
 
             // Load available roles for admins
