@@ -101,9 +101,12 @@
     Electron binary. This target auto-restores the binary from the npm cache after every build.
 
     Linux/macOS: npm's allow-scripts policy and extract-zip failures prevent automatic download,
-    so the cache (~/.cache/electron) is used directly via unzip.
+    so the cache (~/.cache/electron) is used directly.
 
-    Windows: PowerShell Expand-Archive extracts from %LOCALAPPDATA%\electron\Cache.
+    Windows: the cache is %LOCALAPPDATA%\electron\Cache.
+
+    The zip is located with an item glob and extracted with MSBuild's Unzip task on every OS,
+    so the result does not depend on which shell or PowerShell version launched the build.
 
     First-time setup (no cache): the build emits a warning with exact steps to seed the cache.
   -->
@@ -128,33 +131,30 @@
       <_ElectronZipName>electron-v$(ElectronVersion)-$(_ElectronPlatformArch).zip</_ElectronZipName>
     </PropertyGroup>
 
-    <!-- Locate zip in cache (Linux) — strip trailing newline with tr -->
-    <Exec Command="find &quot;$(_ElectronCacheDir)&quot; -name &quot;$(_ElectronZipName)&quot; -print -quit 2>/dev/null | tr -d '\n'"
-          ConsoleToMSBuild="true"
-          EchoOff="true"
-          Condition="!Exists('$(_ElectronBinaryPath)') And $([MSBuild]::IsOSPlatform('Linux'))">
-      <Output TaskParameter="ConsoleOutput" PropertyName="_ElectronZipPath" />
-    </Exec>
+    <!-- Locate zip in cache with an item glob (no shell involved, so PowerShell module-path issues cannot break it) -->
+    <ItemGroup Condition="!Exists('$(_ElectronBinaryPath)')">
+      <_ElectronZipCandidate Include="$(_ElectronCacheDir)/**/$(_ElectronZipName)" />
+    </ItemGroup>
 
-    <!-- Locate zip in cache (Windows) -->
-    <Exec Command="powershell -NoProfile -Command &quot;(Get-ChildItem -Path '$(_ElectronCacheDir)' -Filter '$(_ElectronZipName)' -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1).FullName&quot;"
-          ConsoleToMSBuild="true"
-          EchoOff="true"
-          Condition="!Exists('$(_ElectronBinaryPath)') And $([MSBuild]::IsOSPlatform('Windows'))">
-      <Output TaskParameter="ConsoleOutput" PropertyName="_ElectronZipPath" />
-    </Exec>
+    <!-- Keep only the first match; the cache can hold the same zip in several folders -->
+    <PropertyGroup Condition="!Exists('$(_ElectronBinaryPath)')">
+      <_ElectronZipPath>@(_ElectronZipCandidate)</_ElectronZipPath>
+      <_ElectronZipPath Condition="$(_ElectronZipPath.Contains(';'))">$(_ElectronZipPath.Substring(0, $(_ElectronZipPath.IndexOf(';'))))</_ElectronZipPath>
+    </PropertyGroup>
 
     <Message Text="[ElectronRestore] Binary missing — restoring from cache: $(_ElectronZipPath)"
              Importance="high"
              Condition="!Exists('$(_ElectronBinaryPath)') And '$(_ElectronZipPath)' != ''" />
 
-    <!-- Extract (Linux) -->
-    <Exec Command="rm -rf &quot;$(_ElectronDistPath)&quot; &amp;&amp; unzip -q &quot;$(_ElectronZipPath)&quot; -d &quot;$(_ElectronDistPath)&quot; &amp;&amp; chmod -R a+x &quot;$(_ElectronDistPath)&quot;"
-          Condition="!Exists('$(_ElectronBinaryPath)') And '$(_ElectronZipPath)' != '' And $([MSBuild]::IsOSPlatform('Linux'))" />
+    <!-- Extract with the built-in MSBuild task; overwrites any partial dist without deleting it first -->
+    <Unzip SourceFiles="$(_ElectronZipPath)"
+           DestinationFolder="$(_ElectronDistPath)"
+           OverwriteReadOnlyFiles="true"
+           Condition="!Exists('$(_ElectronBinaryPath)') And '$(_ElectronZipPath)' != ''" />
 
-    <!-- Extract (Windows) -->
-    <Exec Command="powershell -NoProfile -Command &quot;if (Test-Path '$(_ElectronDistPath)') { Remove-Item -Path '$(_ElectronDistPath)' -Recurse -Force }; Expand-Archive -Path '$(_ElectronZipPath)' -DestinationPath '$(_ElectronDistPath)' -Force&quot;"
-          Condition="!Exists('$(_ElectronBinaryPath)') And '$(_ElectronZipPath)' != '' And $([MSBuild]::IsOSPlatform('Windows'))" />
+    <!-- Linux: make sure the extracted binaries are executable -->
+    <Exec Command="chmod -R a+x &quot;$(_ElectronDistPath)&quot;"
+          Condition="'$(_ElectronZipPath)' != '' And Exists('$(_ElectronBinaryPath)') And $([MSBuild]::IsOSPlatform('Linux'))" />
 
     <!--
       No cache found — first-time setup. Instruct the developer to run npm install once
