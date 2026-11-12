@@ -1,8 +1,8 @@
 # Nine Compatibility Matrix
 
-**Last Updated:** March 1, 2026  
-**Current Release:** v1.1.2  
-**Next Release:** v1.2.0 (in development)
+**Last Updated:** November 11, 2026  
+**Current Release:** v1.2.0  
+**Next Release:** v1.3.0 (in development)
 
 ---
 
@@ -22,14 +22,14 @@ This matrix tracks version compatibility across Nine releases, enabling you to:
 
 ## Nine Version History
 
-| Release Date | App Version | Database Schema | .NET SDK | ElectronNET | Bootstrap | QuestPDF  | Migration Required | Breaking Changes | Status             | Download                                                           |
-| ------------ | ----------- | --------------- | -------- | ----------- | --------- | --------- | ------------------ | ---------------- | ------------------ | ------------------------------------------------------------------ |
-| TBD          | **1.2.0**   | v1.2.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | Yes (v1.1.0→1.2.0) | TBD              | **In Development** | -                                                                  |
-| 2026-03-01   | 1.1.2       | v1.1.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | No                 | No               | **Current**        | [Release](https://github.com/xnodeoncode/nine/releases/tag/v1.1.2) |
-| 2026-02-28   | 1.1.1       | v1.1.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | No                 | No               | Previous           | [Release](https://github.com/xnodeoncode/nine/releases/tag/v1.1.1) |
-| 2026-02-18   | 1.1.0       | v1.1.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | Yes (v1.0.0→1.1.0) | New tables/cols  | Superseded         | [Release](https://github.com/xnodeoncode/nine/releases/tag/v1.1.0) |
-| 2026-01-29   | 1.0.1       | v1.0.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | No                 | No               | Superseded         | [Release](https://github.com/xnodeoncode/nine/releases/tag/v1.0.1) |
-| 2026-01-28   | 1.0.0       | v1.0.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | No                 | No               | Superseded         | [Release](https://github.com/xnodeoncode/nine/releases/tag/v1.0.0) |
+| Release Date | App Version | Database Schema | .NET SDK | ElectronNET | Bootstrap | QuestPDF  | Migration Required | Breaking Changes | Status      | Download                                                           |
+| ------------ | ----------- | --------------- | -------- | ----------- | --------- | --------- | ------------------ | ---------------- | ----------- | ------------------------------------------------------------------ |
+| 2026-11-11   | **1.2.0**   | v1.1.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | No                 | No               | **Current** | [Release](https://github.com/xnodeoncode/nine/releases/tag/v1.2.0) |
+| 2026-03-01   | 1.1.2       | v1.1.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | No                 | No               | Previous    | [Release](https://github.com/xnodeoncode/nine/releases/tag/v1.1.2) |
+| 2026-02-28   | 1.1.1       | v1.1.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | No                 | No               | Superseded  | [Release](https://github.com/xnodeoncode/nine/releases/tag/v1.1.1) |
+| 2026-02-18   | 1.1.0       | v1.1.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | Yes (v1.0.0→1.1.0) | New tables/cols  | Superseded  | [Release](https://github.com/xnodeoncode/nine/releases/tag/v1.1.0) |
+| 2026-01-29   | 1.0.1       | v1.0.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | No                 | No               | Superseded  | [Release](https://github.com/xnodeoncode/nine/releases/tag/v1.0.1) |
+| 2026-01-28   | 1.0.0       | v1.0.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | No                 | No               | Superseded  | [Release](https://github.com/xnodeoncode/nine/releases/tag/v1.0.0) |
 
 ## Professional Version History
 

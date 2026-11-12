@@ -1,7 +1,7 @@
 # Nine - Database Management Guide
 
-**Version:** 1.1.0  
-**Last Updated:** April 4, 2026  
+**Version:** 1.2.0  
+**Last Updated:** November 11, 2026  
 **Audience:** Administrators and Power Users
 
 ---
