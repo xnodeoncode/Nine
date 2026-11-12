@@ -1,6 +1,5 @@
 using Nine.Shared.UI.Components.Common;
 using Bunit;
-using FluentAssertions;
 using Microsoft.AspNetCore.Components;
 using Xunit;
 
@@ -24,7 +23,7 @@ public class DataTableTests : BunitContext
         );
 
         // Assert
-        cut.Markup.Should().Contain("No data available");
+        Assert.Contains("No data available", cut.Markup);
     }
 
     [Fact]
@@ -36,7 +35,7 @@ public class DataTableTests : BunitContext
         );
 
         // Assert
-        cut.Markup.Should().Contain("No data available");
+        Assert.Contains("No data available", cut.Markup);
     }
 
     [Fact]
@@ -63,9 +62,9 @@ public class DataTableTests : BunitContext
         );
 
         // Assert
-        cut.Markup.Should().Contain("ID");
-        cut.Markup.Should().Contain("Name");
-        cut.Markup.Should().Contain("<thead>");
+        Assert.Contains("ID", cut.Markup);
+        Assert.Contains("Name", cut.Markup);
+        Assert.Contains("<thead>", cut.Markup);
     }
 
     [Fact]
@@ -93,9 +92,9 @@ public class DataTableTests : BunitContext
         );
 
         // Assert
-        cut.Markup.Should().Contain("Item 1");
-        cut.Markup.Should().Contain("Item 2");
-        cut.Markup.Should().Contain("<tbody>");
+        Assert.Contains("Item 1", cut.Markup);
+        Assert.Contains("Item 2", cut.Markup);
+        Assert.Contains("<tbody>", cut.Markup);
     }
 
     [Fact]
@@ -123,10 +122,10 @@ public class DataTableTests : BunitContext
         // Assert
         var tbody = cut.Find("tbody");
         var rows = tbody.QuerySelectorAll("tr");
-        rows.Length.Should().Be(3);
-        cut.Markup.Should().Contain("First");
-        cut.Markup.Should().Contain("Second");
-        cut.Markup.Should().Contain("Third");
+        Assert.Equal(3, rows.Length);
+        Assert.Contains("First", cut.Markup);
+        Assert.Contains("Second", cut.Markup);
+        Assert.Contains("Third", cut.Markup);
     }
 
     [Fact]
@@ -139,7 +138,7 @@ public class DataTableTests : BunitContext
         );
 
         // Assert
-        cut.Markup.Should().Contain("custom-table-class");
+        Assert.Contains("custom-table-class", cut.Markup);
     }
 
     [Fact]
@@ -152,8 +151,8 @@ public class DataTableTests : BunitContext
         );
 
         // Assert
-        cut.Markup.Should().Contain("Custom empty message");
-        cut.Markup.Should().NotContain("No data available");
+        Assert.Contains("Custom empty message", cut.Markup);
+        Assert.DoesNotContain("No data available", cut.Markup);
     }
 
     [Fact]
@@ -165,8 +164,8 @@ public class DataTableTests : BunitContext
         );
 
         // Assert
-        cut.Markup.Should().Contain("table");
-        cut.Markup.Should().Contain("table-striped");
-        cut.Markup.Should().Contain("table-hover");
+        Assert.Contains("table", cut.Markup);
+        Assert.Contains("table-striped", cut.Markup);
+        Assert.Contains("table-hover", cut.Markup);
     }
 }

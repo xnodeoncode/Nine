@@ -1,6 +1,5 @@
 using Nine.Shared.UI.Components.Common;
 using Bunit;
-using FluentAssertions;
 using Microsoft.AspNetCore.Components;
 using Xunit;
 
@@ -19,9 +18,9 @@ public class ModalTests : BunitContext
         );
 
         // Assert
-        cut.Markup.Should().Contain("Test Modal");
-        cut.Markup.Should().Contain("Test Content");
-        cut.Markup.Should().Contain("modal fade show d-block");
+        Assert.Contains("Test Modal", cut.Markup);
+        Assert.Contains("Test Content", cut.Markup);
+        Assert.Contains("modal fade show d-block", cut.Markup);
     }
 
     [Fact]
@@ -34,7 +33,7 @@ public class ModalTests : BunitContext
         );
 
         // Assert
-        cut.Markup.Should().BeNullOrWhiteSpace();
+        Assert.True(string.IsNullOrWhiteSpace(cut.Markup));
     }
 
     [Fact]
@@ -48,7 +47,7 @@ public class ModalTests : BunitContext
         );
 
         // Assert
-        cut.Markup.Should().Contain("modal-sm");
+        Assert.Contains("modal-sm", cut.Markup);
     }
 
     [Fact]
@@ -62,7 +61,7 @@ public class ModalTests : BunitContext
         );
 
         // Assert
-        cut.Markup.Should().Contain("modal-lg");
+        Assert.Contains("modal-lg", cut.Markup);
     }
 
     [Fact]
@@ -76,7 +75,7 @@ public class ModalTests : BunitContext
         );
 
         // Assert
-        cut.Markup.Should().Contain("modal-xl");
+        Assert.Contains("modal-xl", cut.Markup);
     }
 
     [Fact]
@@ -90,7 +89,7 @@ public class ModalTests : BunitContext
         );
 
         // Assert
-        cut.Markup.Should().Contain("modal-dialog-centered");
+        Assert.Contains("modal-dialog-centered", cut.Markup);
     }
 
     [Fact]
@@ -104,7 +103,7 @@ public class ModalTests : BunitContext
         );
 
         // Assert
-        cut.Markup.Should().Contain("rgba(0,0,0,0.5)");
+        Assert.Contains("rgba(0,0,0,0.5)", cut.Markup);
     }
 
     [Fact]
@@ -123,7 +122,7 @@ public class ModalTests : BunitContext
         closeButton.Click();
 
         // Assert
-        closeCalled.Should().BeTrue();
+        Assert.True(closeCalled);
     }
 
     [Fact]
@@ -137,8 +136,8 @@ public class ModalTests : BunitContext
         );
 
         // Assert
-        cut.Markup.Should().Contain("Footer Content");
-        cut.Markup.Should().Contain("modal-footer");
+        Assert.Contains("Footer Content", cut.Markup);
+        Assert.Contains("modal-footer", cut.Markup);
     }
 
     [Fact]
@@ -151,6 +150,6 @@ public class ModalTests : BunitContext
         );
 
         // Assert
-        cut.Markup.Should().NotContain("modal-footer");
+        Assert.DoesNotContain("modal-footer", cut.Markup);
     }
 }
