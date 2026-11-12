@@ -101,12 +101,11 @@
     Electron binary. This target auto-restores the binary from the npm cache after every build.
 
     Linux/macOS: npm's allow-scripts policy and extract-zip failures prevent automatic download,
-    so the cache (~/.cache/electron) is used directly.
+    so the cache (~/.cache/electron) is used directly via unzip.
 
-    Windows: the cache is %LOCALAPPDATA%\electron\Cache.
-
-    The zip is located with an item glob and extracted with MSBuild's Unzip task on every OS,
-    so the result does not depend on which shell or PowerShell version launched the build.
+    Windows: the zip is located with an item glob in %LOCALAPPDATA%\electron\Cache and extracted
+    with MSBuild's Unzip task. PowerShell is avoided because a Windows PowerShell 5.1 child
+    process can inherit a PowerShell 7 PSModulePath and fail in Expand-Archive.
 
     First-time setup (no cache): the build emits a warning with exact steps to seed the cache.
   -->
@@ -131,13 +130,21 @@
       <_ElectronZipName>electron-v$(ElectronVersion)-$(_ElectronPlatformArch).zip</_ElectronZipName>
     </PropertyGroup>
 
-    <!-- Locate zip in cache with an item glob (no shell involved, so PowerShell module-path issues cannot break it) -->
-    <ItemGroup Condition="!Exists('$(_ElectronBinaryPath)')">
-      <_ElectronZipCandidate Include="$(_ElectronCacheDir)/**/$(_ElectronZipName)" />
+    <!-- Locate zip in cache (Linux) — strip trailing newline with tr -->
+    <Exec Command="find &quot;$(_ElectronCacheDir)&quot; -name &quot;$(_ElectronZipName)&quot; -print -quit 2>/dev/null | tr -d '\n'"
+          ConsoleToMSBuild="true"
+          EchoOff="true"
+          Condition="!Exists('$(_ElectronBinaryPath)') And $([MSBuild]::IsOSPlatform('Linux'))">
+      <Output TaskParameter="ConsoleOutput" PropertyName="_ElectronZipPath" />
+    </Exec>
+
+    <!-- Locate zip in cache (Windows) with an item glob; no shell involved -->
+    <ItemGroup Condition="!Exists('$(_ElectronBinaryPath)') And $([MSBuild]::IsOSPlatform('Windows'))">
+      <_ElectronZipCandidate Include="$(_ElectronCacheDir)\**\$(_ElectronZipName)" />
     </ItemGroup>
 
     <!-- Keep only the first match; the cache can hold the same zip in several folders -->
-    <PropertyGroup Condition="!Exists('$(_ElectronBinaryPath)')">
+    <PropertyGroup Condition="!Exists('$(_ElectronBinaryPath)') And $([MSBuild]::IsOSPlatform('Windows'))">
       <_ElectronZipPath>@(_ElectronZipCandidate)</_ElectronZipPath>
       <_ElectronZipPath Condition="$(_ElectronZipPath.Contains(';'))">$(_ElectronZipPath.Substring(0, $(_ElectronZipPath.IndexOf(';'))))</_ElectronZipPath>
     </PropertyGroup>
@@ -146,15 +153,15 @@
              Importance="high"
              Condition="!Exists('$(_ElectronBinaryPath)') And '$(_ElectronZipPath)' != ''" />
 
-    <!-- Extract with the built-in MSBuild task; overwrites any partial dist without deleting it first -->
+    <!-- Extract (Linux) -->
+    <Exec Command="rm -rf &quot;$(_ElectronDistPath)&quot; &amp;&amp; unzip -q &quot;$(_ElectronZipPath)&quot; -d &quot;$(_ElectronDistPath)&quot; &amp;&amp; chmod -R a+x &quot;$(_ElectronDistPath)&quot;"
+          Condition="!Exists('$(_ElectronBinaryPath)') And '$(_ElectronZipPath)' != '' And $([MSBuild]::IsOSPlatform('Linux'))" />
+
+    <!-- Extract (Windows) — overwrites any partial dist without deleting it first -->
     <Unzip SourceFiles="$(_ElectronZipPath)"
            DestinationFolder="$(_ElectronDistPath)"
            OverwriteReadOnlyFiles="true"
-           Condition="!Exists('$(_ElectronBinaryPath)') And '$(_ElectronZipPath)' != ''" />
-
-    <!-- Linux: make sure the extracted binaries are executable -->
-    <Exec Command="chmod -R a+x &quot;$(_ElectronDistPath)&quot;"
-          Condition="'$(_ElectronZipPath)' != '' And Exists('$(_ElectronBinaryPath)') And $([MSBuild]::IsOSPlatform('Linux'))" />
+           Condition="!Exists('$(_ElectronBinaryPath)') And '$(_ElectronZipPath)' != '' And $([MSBuild]::IsOSPlatform('Windows'))" />
 
     <!--
       No cache found — first-time setup. Instruct the developer to run npm install once
