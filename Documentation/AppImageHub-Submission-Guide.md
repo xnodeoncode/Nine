@@ -147,9 +147,9 @@ Features:
 - Security deposit investment tracking
 - Multi-user support with role-based access
 
-Homepage: https://github.com/xnodeoncode/nine
+Homepage: https://github.com/xnodeoncode/Nine
 License: MIT
-AppImage: https://github.com/xnodeoncode/nine/releases/tag/v1.0.0"
+AppImage: https://github.com/xnodeoncode/Nine/releases/tag/v1.0.0"
 
 # Push to your fork
 git push origin add-aquiis-property-management
@@ -177,8 +177,8 @@ Add Nine Property Management
 **Name:** Nine Property Management  
 **Category:** Office, Finance  
 **License:** MIT  
-**Homepage:** https://github.com/xnodeoncode/nine  
-**Download:** https://github.com/xnodeoncode/nine/releases/tag/v1.0.0
+**Homepage:** https://github.com/xnodeoncode/Nine  
+**Download:** https://github.com/xnodeoncode/Nine/releases/tag/v1.0.0
 
 ## Description
 

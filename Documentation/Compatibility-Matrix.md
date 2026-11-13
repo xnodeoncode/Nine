@@ -24,12 +24,12 @@ This matrix tracks version compatibility across Nine releases, enabling you to:
 
 | Release Date | App Version | Database Schema | .NET SDK | ElectronNET | Bootstrap | QuestPDF  | Migration Required | Breaking Changes | Status      | Download                                                           |
 | ------------ | ----------- | --------------- | -------- | ----------- | --------- | --------- | ------------------ | ---------------- | ----------- | ------------------------------------------------------------------ |
-| 2026-11-11   | **1.2.0**   | v1.1.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | No                 | No               | **Current** | [Release](https://github.com/xnodeoncode/nine/releases/tag/v1.2.0) |
-| 2026-03-01   | 1.1.2       | v1.1.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | No                 | No               | Previous    | [Release](https://github.com/xnodeoncode/nine/releases/tag/v1.1.2) |
-| 2026-02-28   | 1.1.1       | v1.1.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | No                 | No               | Superseded  | [Release](https://github.com/xnodeoncode/nine/releases/tag/v1.1.1) |
-| 2026-02-18   | 1.1.0       | v1.1.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | Yes (v1.0.0→1.1.0) | New tables/cols  | Superseded  | [Release](https://github.com/xnodeoncode/nine/releases/tag/v1.1.0) |
-| 2026-01-29   | 1.0.1       | v1.0.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | No                 | No               | Superseded  | [Release](https://github.com/xnodeoncode/nine/releases/tag/v1.0.1) |
-| 2026-01-28   | 1.0.0       | v1.0.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | No                 | No               | Superseded  | [Release](https://github.com/xnodeoncode/nine/releases/tag/v1.0.0) |
+| 2026-11-11   | **1.2.0**   | v1.1.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | No                 | No               | **Current** | [Release](https://github.com/xnodeoncode/Nine/releases/tag/v1.2.0) |
+| 2026-03-01   | 1.1.2       | v1.1.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | No                 | No               | Previous    | [Release](https://github.com/xnodeoncode/Nine/releases/tag/v1.1.2) |
+| 2026-02-28   | 1.1.1       | v1.1.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | No                 | No               | Superseded  | [Release](https://github.com/xnodeoncode/Nine/releases/tag/v1.1.1) |
+| 2026-02-18   | 1.1.0       | v1.1.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | Yes (v1.0.0→1.1.0) | New tables/cols  | Superseded  | [Release](https://github.com/xnodeoncode/Nine/releases/tag/v1.1.0) |
+| 2026-01-29   | 1.0.1       | v1.0.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | No                 | No               | Superseded  | [Release](https://github.com/xnodeoncode/Nine/releases/tag/v1.0.1) |
+| 2026-01-28   | 1.0.0       | v1.0.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | No                 | No               | Superseded  | [Release](https://github.com/xnodeoncode/Nine/releases/tag/v1.0.0) |
 
 ## Professional Version History
 
@@ -260,10 +260,10 @@ This matrix tracks version compatibility across Nine releases, enabling you to:
 ### Getting Help
 
 - 📧 **Email:** cisguru@outlook.com
-- 🐛 **Bug Reports:** [GitHub Issues](https://github.com/xnodeoncode/nine/issues)
-- 💡 **Feature Requests:** [GitHub Discussions](https://github.com/xnodeoncode/nine/discussions)
-- 📖 **Documentation:** [/Documentation/](https://github.com/xnodeoncode/nine/tree/main/Documentation)
-- 🏛️ **Roadmap:** [/Documentation/Roadmap/](https://github.com/xnodeoncode/nine/tree/main/Documentation/Roadmap)
+- 🐛 **Bug Reports:** [GitHub Issues](https://github.com/xnodeoncode/Nine/issues)
+- 💡 **Feature Requests:** [GitHub Discussions](https://github.com/xnodeoncode/Nine/discussions)
+- 📖 **Documentation:** [/Documentation/](https://github.com/xnodeoncode/Nine/tree/main/Documentation)
+- 🏛️ **Roadmap:** [/Documentation/Roadmap/](https://github.com/xnodeoncode/Nine/tree/main/Documentation/Roadmap)
 
 ---
 

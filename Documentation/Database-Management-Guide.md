@@ -1170,7 +1170,7 @@ Use application UI for all changes.
 Need help with database management? We're here for you!
 
 **Email:** cisguru@outlook.com  
-**GitHub Issues:** [https://github.com/xnodeoncode/nine/issues](https://github.com/xnodeoncode/nine/issues)
+**GitHub Issues:** [https://github.com/xnodeoncode/Nine/issues](https://github.com/xnodeoncode/Nine/issues)
 
 **When contacting support about database issues, include:**
 
