@@ -1,6 +1,6 @@
 # Nine.
 
-[![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)](https://github.com/xnodeoncode/Nine/releases)
+[![Version](https://img.shields.io/badge/version-1.2.0-blue.svg)](https://github.com/xnodeoncode/Nine/releases)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![.NET](https://img.shields.io/badge/.NET-10.0-purple.svg)](https://dotnet.microsoft.com/)
 [![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20Windows-lightgrey.svg)](#installation)
@@ -72,12 +72,12 @@ Built with ASP.NET Core 10 and Blazor Server, wrapped in Electron for a native d
 
 ## 📥 Download
 
-**Latest Release: v1.1.0**
+**Latest Release: v1.2.0**
 
-[![Download for Linux](https://img.shields.io/badge/Download-Linux%20AppImage-blue.svg?style=for-the-badge&logo=linux)](https://github.com/xnodeoncode/Nine/releases/download/v1.1.0/Nine-1.1.0-x86_64.AppImage)
-[![Download for Windows](https://img.shields.io/badge/Download-Windows%20Setup-blue.svg?style=for-the-badge&logo=windows)](https://github.com/xnodeoncode/Nine/releases/download/v1.1.0/Nine-1.1.0-x64-Setup.exe)
+[![Download for Linux](https://img.shields.io/badge/Download-Linux%20AppImage-blue.svg?style=for-the-badge&logo=linux)](https://github.com/xnodeoncode/Nine/releases/download/v1.2.0/Nine-1.2.0-x86_64.AppImage)
+[![Download for Windows](https://img.shields.io/badge/Download-Windows%20Setup-blue.svg?style=for-the-badge&logo=windows)](https://github.com/xnodeoncode/Nine/releases/download/v1.2.0/Nine-1.2.0-x64-Setup.exe)
 
-**All Downloads:** [View v1.1.0 Release](https://github.com/xnodeoncode/Nine/releases/tag/v1.1.0)
+**All Downloads:** [View v1.2.0 Release](https://github.com/xnodeoncode/Nine/releases/tag/v1.2.0)
 
 ---
 
@@ -89,31 +89,31 @@ Built with ASP.NET Core 10 and Blazor Server, wrapped in Electron for a native d
 
 ```bash
 # Download from releases page or use wget
-wget https://github.com/xnodeoncode/Nine/releases/download/v1.1.0/Nine-1.1.0-x86_64.AppImage
+wget https://github.com/xnodeoncode/Nine/releases/download/v1.2.0/Nine-1.2.0-x86_64.AppImage
 
 # Make executable
-chmod +x Nine-1.1.0-x86_64.AppImage
+chmod +x Nine-1.2.0-x86_64.AppImage
 
 # Option 1: Desktop integration (recommended)
-wget https://github.com/xnodeoncode/Nine/releases/download/v1.1.0/install-desktop-integration.sh
+wget https://github.com/xnodeoncode/Nine/releases/download/v1.2.0/install-desktop-integration.sh
 chmod +x install-desktop-integration.sh
-./install-desktop-integration.sh Nine-1.1.0-x86_64.AppImage
+./install-desktop-integration.sh Nine-1.2.0-x86_64.AppImage
 
 # Option 2: Run directly
-./Nine-1.1.0-x86_64.AppImage
+./Nine-1.2.0-x86_64.AppImage
 ```
 
 #### Windows (Installer or Portable)
 
 **Option A: Installer (Recommended)**
 
-1. **Download** `Nine-1.1.0-x64-Setup.exe` from the [releases page](https://github.com/xnodeoncode/Nine/releases/tag/v1.1.0)
+1. **Download** `Nine-1.2.0-x64-Setup.exe` from the [releases page](https://github.com/xnodeoncode/Nine/releases/tag/v1.2.0)
 2. **Run installer** and follow the setup wizard
 3. **Launch** from Start Menu or Desktop shortcut
 
 **Option B: Portable Executable**
 
-1. **Download** `Nine-1.1.0-x64-Portable.exe` from the [releases page](https://github.com/xnodeoncode/Nine/releases/tag/v1.1.0)
+1. **Download** `Nine-1.2.0-x64-Portable.exe` from the [releases page](https://github.com/xnodeoncode/Nine/releases/tag/v1.2.0)
 2. **Move to permanent location** (e.g., `C:\Program Files\Nine\`)
    - ⚠️ Database and settings are stored relative to the .exe location
 3. **Double-click** to run
@@ -239,7 +239,7 @@ cd 4-Nine && dotnet watch
 - **MINOR** = new features
 - **PATCH** = bug fixes
 
-**Current version:** 1.1.0 · **Database schema:** 1.1.0
+**Current version:** 1.2.0 · **Database schema:** 1.2.0
 
 ---
 
