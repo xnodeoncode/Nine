@@ -20,7 +20,7 @@ This matrix tracks version compatibility across Nine releases, enabling you to:
 
 ---
 
-## Release History (Aquiis and Nine)
+## Version History
 
 | Release Date | Product | App Version | Database Schema | .NET SDK | ElectronNET | Bootstrap | QuestPDF  | Migration Required   | Breaking Changes | Status        | Download                                                               |
 | ------------ | ------- | ----------- | --------------- | -------- | ----------- | --------- | --------- | -------------------- | ---------------- | ------------- | ---------------------------------------------------------------------- |
@@ -34,12 +34,10 @@ This matrix tracks version compatibility across Nine releases, enabling you to:
 | 2026-01-29   | Aquiis  | 1.0.1       | v1.0.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | No                   | No               | Superseded    | [Release](https://github.com/xnodeoncode/Aquiis/releases/tag/v1.0.1)   |
 | 2026-01-28   | Aquiis  | 1.0.0       | v1.0.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | No                   | No               | Superseded    | [Release](https://github.com/xnodeoncode/Aquiis/releases/tag/v1.0.0)   |
 
-> **Note:** Nine began as **Aquiis** (SimpleStart). Aquiis releases 1.0.1 through 1.1.3 were published in the
-> [Aquiis repository](https://github.com/xnodeoncode/Aquiis/releases) to complete functionality for users who stay on Aquiis;
-> that application is no longer under active development, so those download links point there (the 1.1.1 release tag is named
-> `v1.1.1.0`). Nine 1.0.0 is a mirror of Aquiis 1.0.0. The **Product** column shows which application a release belongs to,
-> and the **Database Schema** column is what to check when importing data from an Aquiis version into Nine, because the
-> schemas differ between versions.
+> **Note:** Nine began as a fork of Aquiis at v1.0.0. Releases listed under the **Product** column as Aquiis were published in the
+> [Aquiis repository](https://github.com/xnodeoncode/Aquiis/releases) (the 1.1.1 release tag is named `v1.1.1.0`). Check the
+> **Database Schema** column when importing data from an Aquiis version into Nine, because the schemas differ between versions.
+> The database schema version is independent of the application version.
 
 ## Professional Version History
 
