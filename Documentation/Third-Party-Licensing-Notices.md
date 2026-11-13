@@ -148,7 +148,7 @@ FluentAssertions was removed from the test projects in favor of xUnit `Assert` b
 - [x] Confirm Electron / Chromium license files ship in the Linux AppImage. _Audited 2026-11-12: `LICENSE.electron.txt` and `LICENSES.chromium.html` are present in both `linux-unpacked/` and the extracted AppImage._
 - [ ] Confirm Electron / Chromium license files in any other packaged desktop build (Flatpak, Windows, macOS). _Only the Linux AppImage was found in the publish output._
 - [ ] Ship a `THIRD-PARTY-NOTICES` file and Nine's `LICENSE` in every package. _Build audit: neither is included in the AppImage, nor are the QuestPDF terms, the Skia/Lato licenses that come with QuestPDF (`libQuestPdfSkia.so` is bundled), or notices for the other NuGet packages._
-- [ ] Decide whether to bundle Bootstrap Icons locally instead of using the CDN.
+- [x] Bundle Bootstrap Icons locally instead of using the CDN. _Done on `feature/Bundle-Bootstrap-Icons`; icons confirmed served locally in DevTools._
 - [ ] Re-review this document whenever dependencies change (`dotnet list package` for each project).
 
 ## How to Refresh This List
