@@ -76,6 +76,23 @@ Licenses below were read from each package's `.nuspec` in the NuGet cache unless
 | ElectronNET.Core / ElectronNET.Core.AspNet           | 0.4.1       | MIT              | Desktop host                                                |
 | QuestPDF                                             | 2025.12.1   | See above        | **Action required — see QuestPDF section**                  |
 
+### Transitive dependencies (pulled in by the packages above)
+
+Found with `dotnet list Nine.sln package --include-transitive`; licenses read from each package's `.nuspec` (non-Microsoft packages only).
+
+| Component                                   | Version        | License    | Pulled in by                                              |
+| ------------------------------------------- | -------------- | ---------- | --------------------------------------------------------- |
+| ElectronNET.Core.API                        | 0.4.1          | MIT        | ElectronNET.Core                                          |
+| SocketIOClient, SocketIO.Core, SocketIO.Serializer.Core, SocketIO.Serializer.SystemTextJson | 3.1.2 | MIT | ElectronNET.Core (host/app communication) |
+| Newtonsoft.Json                             | 13.0.1 / 13.0.3 | MIT       | SendGrid / Twilio / ElectronNET                           |
+| starkbank-ecdsa                             | 1.3.3          | MIT        | SendGrid                                                  |
+| SQLitePCLRaw.core, .provider.e_sqlcipher, .lib.e_sqlcipher | 2.1.11 | Apache-2.0 | SQLitePCLRaw.bundle_e_sqlcipher       |
+| SQLitePCLRaw.bundle_e_sqlite3, .provider.e_sqlite3, .lib.e_sqlite3 | 2.1.11 | Apache-2.0 | Microsoft.EntityFrameworkCore.Sqlite |
+| Humanizer.Core                              | 2.14.1         | MIT        | Microsoft.EntityFrameworkCore.Design (design-time)        |
+| Mono.TextTemplating                         | 3.0.0          | MIT        | Microsoft.EntityFrameworkCore.Design (design-time)        |
+
+Transitive Microsoft packages (`Microsoft.*`, `System.*`) are omitted; they are MIT licensed. Twilio, SendGrid, Newtonsoft.Json (via SendGrid/Twilio) and starkbank-ecdsa will be removed when the SendGrid and Twilio integrations are phased out.
+
 ### SQLCipher (database encryption)
 
 `SQLitePCLRaw.bundle_e_sqlcipher` includes `SQLitePCLRaw.lib.e_sqlcipher`, which contains platform-specific native builds of **SQLCipher**. The NuGet package notes these are unofficial, unsupported builds. SQLCipher Community Edition is distributed by Zetetic under a BSD-style license that requires its copyright notice and license text to be reproduced in documentation or other materials supplied with binary distributions. **To do:** confirm the exact SQLCipher license text and add it to the notices that ship with binary packages.
@@ -94,8 +111,13 @@ Nine targets .NET 10. The .NET runtime and ASP.NET Core framework are MIT licens
 
 | Component         | Version | License | Source                                                                                         |
 | ----------------- | ------- | ------- | ---------------------------------------------------------------------------------------------- |
-| Bootstrap         | 5.3.3   | MIT     | Bundled in `4-Nine/wwwroot/lib/bootstrap`; license header in the CSS file                      |
+| Bootstrap         | 5.3.3   | MIT     | Referenced by the app: `4-Nine/wwwroot/lib/bootstrap/dist/css/` (license header in the CSS file) |
+| Bootstrap (libman copy) | 5.3.8 | MIT | `4-Nine/libman.json` restores `bootstrap@5.3.8` into `wwwroot/lib/bootstrap/css/`; not referenced by `App.razor` |
 | Bootstrap Icons   | 1.13.1  | MIT     | Loaded at runtime from the jsDelivr CDN (`cdn.jsdelivr.net`); not bundled in the repository    |
+
+> **Note:** There are two Bootstrap copies with different versions (5.3.3 in `dist/`, used by `App.razor`; 5.3.8 from `libman.json`). Consolidate them so the shipped version is clear.
+
+> **npm packages:** the repository has no `package.json` or lockfile, so there are no npm dependencies in the codebase itself. Front-end libraries are managed through LibMan (`libman.json`, cdnjs provider) and static files. The desktop build uses npm tooling (Electron, electron-builder) through ElectronNET.Core at build time; those are covered in the Electron section and are not listed by `dotnet list`.
 
 > **Note:** Bootstrap Icons is fetched from a public CDN at runtime, so the application needs internet access to display those icons and sends requests to a third party. If offline or privacy-preserving use matters, bundle the icon font locally (together with its license).
 
@@ -134,3 +156,5 @@ dotnet list Nine.sln package --include-transitive
 ```
 
 For each package, read the `license` element in its `.nuspec` under `~/.nuget/packages/<name>/<version>/`, and review any `LICENSE` / `ExternalDependencyLicenses` files in the package.
+
+`dotnet list` only covers NuGet packages. Also check `4-Nine/libman.json` (LibMan front-end libraries), the static files under `wwwroot/`, any external URLs in `4-Nine/Shared/App.razor`, and the Electron / electron-builder versions in `4-Nine/Nine.csproj`.
