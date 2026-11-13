@@ -37,7 +37,8 @@ This matrix tracks version compatibility across Nine releases, enabling you to:
 > **Note:** Nine began as a fork of Aquiis at v1.0.0. Releases listed under the **Product** column as Aquiis were published in the
 > [Aquiis repository](https://github.com/xnodeoncode/Aquiis/releases) (the 1.1.1 release tag is named `v1.1.1.0`). Check the
 > **Database Schema** column when importing data from an Aquiis version into Nine, because the schemas differ between versions.
-> The database schema version is independent of the application version.
+> Schema versions follow the application's MAJOR.MINOR version (`MAJOR.MINOR.0`), and patch releases never change the schema,
+> so app v1.1.x always uses schema v1.1.0.
 
 ## Professional Version History
 
