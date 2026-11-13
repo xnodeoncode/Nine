@@ -11,7 +11,7 @@
             <h1 class="display-4"><img src="@LogoSrc" width="90" alt="Nine." /></h1>
         </div>
         <div class="d-flex flex-wrap gap-2 my-3 align-items-center">
-            <a href="https://github.com/xnodeoncode/Nine/releases" target="_blank" class="text-decoration-none"
+            <a href="@ReleaseNotesUrl" target="_blank" class="text-decoration-none"
                title="Release notes (opens in your default browser)">
                 <span class="badge text-bg-primary">version @ApplicationService.ApplicationSettings.Version</span>
             </a>
@@ -80,6 +80,18 @@
 </div>
 
 @code {
+    // Release notes for the installed version (tag vX.Y.Z); opens in the default browser.
+    private string ReleaseNotesUrl
+    {
+        get
+        {
+            var repo = string.IsNullOrWhiteSpace(ApplicationService.ApplicationSettings.Repository)
+                ? "https://github.com/xnodeoncode/Nine"
+                : ApplicationService.ApplicationSettings.Repository.TrimEnd('/');
+            return $"{repo}/releases/tag/v{ApplicationService.ApplicationSettings.Version}";
+        }
+    }
+
     // Obsidian always uses the inverted logo. Bootstrap and Teal use inverted in dark mode only.
     private string LogoSrc => (ThemeService.CurrentTheme == "dark")
         ? "/assets/nine-logo-inverted.svg"
