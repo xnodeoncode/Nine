@@ -25,8 +25,9 @@ public static class NetworkLockdown
     }
 
     /// <summary>
-    /// Sends every Electron network request that is not to a loopback address into a dead proxy,
-    /// and returns the window to the app if it tries to navigate to a different origin.
+    /// Sends every Electron network request that is not to a loopback address into a dead proxy.
+    /// When the main window, or a window it opens, tries to go to another origin, the http(s) URL is
+    /// handed to the system browser (a user-initiated action outside the app) and the app stays put.
     /// </summary>
     public static async Task ApplyAsync(BrowserWindow window, string backendUrl, ILogger logger)
     {
@@ -38,14 +39,49 @@ public static class NetworkLockdown
 
         window.WebContents.OnDidStartNavigation += url =>
         {
-            if (IsExternalWebUrl(url, backendUrl))
+            if (!IsExternalWebUrl(url, backendUrl))
             {
-                logger.LogWarning("Blocked navigation to external URL: {Url}", url);
-                _ = window.WebContents.LoadURLAsync(backendUrl);
+                return;
             }
+
+            logger.LogInformation("Opening external URL in the system browser: {Url}", url);
+            _ = Electron.Shell.OpenExternalAsync(url);
+            _ = window.WebContents.LoadURLAsync(backendUrl);
         };
 
-        logger.LogInformation("Network lockdown applied; only {Url} is reachable", backendUrl);
+        logger.LogInformation("Network lockdown applied; only {Url} is reachable from the app", backendUrl);
+    }
+
+    /// <summary>
+    /// Endpoint used by externalLinks.js to hand a clicked http(s) link to the system browser.
+    /// Links with target="_blank" would otherwise open a new Electron window that cannot reach the network.
+    /// Only active in the Electron build; elsewhere it returns 404 and the script falls back to normal behaviour.
+    /// </summary>
+    public static void MapExternalLinkEndpoint(WebApplication app)
+    {
+        app.MapPost("/api/external/open", async (HttpContext context, OpenExternalRequest request) =>
+        {
+            if (!HybridSupport.IsElectronActive)
+            {
+                return Results.NotFound();
+            }
+
+            // Only requests made by the app's own pages (not other sites or local tools).
+            if (context.Request.Headers["Sec-Fetch-Site"] != "same-origin")
+            {
+                return Results.StatusCode(StatusCodes.Status403Forbidden);
+            }
+
+            if (!Uri.TryCreate(request.Url, UriKind.Absolute, out var target) ||
+                (target.Scheme != Uri.UriSchemeHttp && target.Scheme != Uri.UriSchemeHttps))
+            {
+                return Results.BadRequest();
+            }
+
+            app.Logger.LogInformation("Opening external URL in the system browser: {Url}", target);
+            var error = await Electron.Shell.OpenExternalAsync(target.AbsoluteUri);
+            return string.IsNullOrEmpty(error) ? Results.NoContent() : Results.Problem(error);
+        });
     }
 
     /// <summary>
@@ -70,3 +106,5 @@ public static class NetworkLockdown
                  target.Port == app.Port);
     }
 }
+
+public sealed record OpenExternalRequest(string? Url);

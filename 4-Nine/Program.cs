@@ -695,6 +695,8 @@ app.MapPost("/api/session/refresh", async (HttpContext context) =>
     return Results.Ok(new { success = true, timestamp = DateTime.UtcNow });
 }).RequireAuthorization();
 
+NetworkLockdown.MapExternalLinkEndpoint(app);
+
 // Create system service account for background jobs
 // Skip if database is locked
 using (var scope = app.Services.CreateScope())
