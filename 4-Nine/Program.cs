@@ -39,6 +39,7 @@ if (HybridSupport.IsElectronActive)
 {
     electronPort = GetFreePort();
     builder.WebHost.UseUrls($"http://localhost:{electronPort}");
+    NetworkLockdown.RestrictHostsToLoopback(builder.Configuration);
 }
 
 
@@ -789,6 +790,8 @@ async Task ElectronAppReady()
     }
     window.OnReadyToShow += () => window.Show();
     window.SetTitle("Nine Property Management");
+
+    await NetworkLockdown.ApplyAsync(window, backendUrl, app.Logger);
 
     if (!isBackendReady)
     {
