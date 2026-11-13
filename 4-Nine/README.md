@@ -109,7 +109,7 @@ Nine is designed to simplify property management operations through a centralize
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/xnodeoncode/nine.git
+git clone https://github.com/xnodeoncode/Nine.git
 cd Nine
 ```
 

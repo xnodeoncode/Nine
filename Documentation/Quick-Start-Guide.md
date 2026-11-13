@@ -33,7 +33,7 @@ Before you begin, ensure you have:
 - **Hardware:**
   - 2 GB RAM minimum (4 GB recommended)
   - 500 MB disk space
-- **Downloaded:** Nine v1.1.0 installer for your platform
+- **Downloaded:** Nine v1.2.0 installer for your platform
 
 ### Universal Linux Support:
 
@@ -53,20 +53,20 @@ Nine. is available as a portable Windows executable (.exe). No installation requ
 
 ```bash
 # 1. Download the file
-# File: Nine-1.1.0-x86_64.AppImage
+# File: Nine-1.2.0-x86_64.AppImage
 
 # 2. Make it executable
-chmod +x Nine-1.1.0-x86_64.AppImage
+chmod +x Nine-1.2.0-x86_64.AppImage
 
 # 3. Run the application
-./Nine-1.1.0-x86_64.AppImage
+./Nine-1.2.0-x86_64.AppImage
 ```
 
 ### Windows Installation
 
 **Option A: NSIS Installer (Recommended)**
 
-1. **Download** `Nine-1.1.0-x64-Setup.exe`
+1. **Download** `Nine-1.2.0-x64-Setup.exe`
 2. **Double-click** the installer
 3. **Follow the wizard:**
    - Click "Next" to begin
@@ -78,7 +78,7 @@ chmod +x Nine-1.1.0-x86_64.AppImage
 
 **Option B: Portable Executable (No installation)**
 
-1. **Download** `Nine-1.1.0-x64-Portable.exe`
+1. **Download** `Nine-1.2.0-x64-Portable.exe`
 2. **Place** in your desired folder (e.g., `C:\Nine\`)
 3. **Double-click** to run
 
@@ -527,8 +527,8 @@ In just 15 minutes, you've learned how to:
 **Support Channels:**
 
 - 📧 **Email Support:** cisguru@outlook.com
-- 🐛 **Report Bugs:** [GitHub Issues](https://github.com/xnodeoncode/nine/issues)
-- 💡 **Request Features:** [GitHub Discussions](https://github.com/xnodeoncode/nine/discussions)
+- 🐛 **Report Bugs:** [GitHub Issues](https://github.com/xnodeoncode/Nine/issues)
+- 💡 **Request Features:** [GitHub Discussions](https://github.com/xnodeoncode/Nine/discussions)
 - 📖 **Documentation:** [`/Documentation`](.)
 
 **Community:**
@@ -713,7 +713,7 @@ In just 15 minutes, you've learned how to:
 Need help? We're here for you!
 
 **Email:** cisguru@outlook.com  
-**GitHub:** [https://github.com/xnodeoncode/nine](https://github.com/xnodeoncode/nine)
+**GitHub:** [https://github.com/xnodeoncode/Nine](https://github.com/xnodeoncode/Nine)
 
 **When contacting support, please include:**
 
