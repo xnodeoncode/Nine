@@ -113,13 +113,13 @@ Nine targets .NET 10. The .NET runtime and ASP.NET Core framework are MIT licens
 | ----------------- | ------- | ------- | ---------------------------------------------------------------------------------------------- |
 | Bootstrap         | 5.3.3   | MIT     | Referenced by the app: `4-Nine/wwwroot/lib/bootstrap/dist/css/` (license header in the CSS file) |
 | Bootstrap (libman copy) | 5.3.8 | MIT | `4-Nine/libman.json` restores `bootstrap@5.3.8` into `wwwroot/lib/bootstrap/css/`; not referenced by `App.razor` |
-| Bootstrap Icons   | 1.13.1  | MIT     | Loaded at runtime from the jsDelivr CDN (`cdn.jsdelivr.net`); not bundled in the repository    |
+| Bootstrap Icons   | 1.13.1  | MIT     | Bundled locally via LibMan in `4-Nine/wwwroot/lib/bootstrap-icons` (CSS, woff, woff2 and the MIT `LICENSE`); no CDN request |
 
 > **Note:** There are two Bootstrap copies with different versions (5.3.3 in `dist/`, used by `App.razor`; 5.3.8 from `libman.json`). Consolidate them so the shipped version is clear.
 
 > **npm packages:** the repository has no `package.json` or lockfile, so there are no npm dependencies in the codebase itself. Front-end libraries are managed through LibMan (`libman.json`, cdnjs provider) and static files. The desktop build uses npm tooling (Electron, electron-builder) through ElectronNET.Core at build time; those are covered in the Electron section and are not listed by `dotnet list`.
 
-> **Note:** Bootstrap Icons is fetched from a public CDN at runtime, so the application needs internet access to display those icons and sends requests to a third party. If offline or privacy-preserving use matters, bundle the icon font locally (together with its license).
+> **Note:** Bootstrap Icons used to load from the jsDelivr CDN at runtime. It is now bundled locally and the Content-Security-Policy no longer allows `cdn.jsdelivr.net`, so any remaining CDN dependency is blocked rather than silently fetched.
 
 ---
 
@@ -148,7 +148,7 @@ FluentAssertions was removed from the test projects in favor of xUnit `Assert` b
 - [x] Confirm Electron / Chromium license files ship in the Linux AppImage. _Audited 2026-11-12: `LICENSE.electron.txt` and `LICENSES.chromium.html` are present in both `linux-unpacked/` and the extracted AppImage._
 - [ ] Confirm Electron / Chromium license files in any other packaged desktop build (Flatpak, Windows, macOS). _Only the Linux AppImage was found in the publish output._
 - [ ] Ship a `THIRD-PARTY-NOTICES` file and Nine's `LICENSE` in every package. _Build audit: neither is included in the AppImage, nor are the QuestPDF terms, the Skia/Lato licenses that come with QuestPDF (`libQuestPdfSkia.so` is bundled), or notices for the other NuGet packages._
-- [ ] Decide whether to bundle Bootstrap Icons locally instead of using the CDN.
+- [x] Bundle Bootstrap Icons locally instead of using the CDN. _Done on `feature/Bundle-Bootstrap-Icons`; icons confirmed served locally in DevTools._
 - [ ] Re-review this document whenever dependencies change (`dotnet list package` for each project).
 
 ## How to Refresh This List
