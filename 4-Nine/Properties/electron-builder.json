@@ -2,7 +2,7 @@
   "appId": "co.nineapp.nine",
   "productName": "Nine",
   "copyright": "Copyright © 2026",
-  "buildVersion": "1.0.0",
+  "buildVersion": "1.2.0",
   "compression": "normal",
   "files": ["**/*"],
   "mac": {

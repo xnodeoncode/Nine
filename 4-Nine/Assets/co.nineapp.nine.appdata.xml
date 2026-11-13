@@ -71,7 +71,7 @@
   </provides>
   
   <releases>
-    <release version="1.0.0" date="2026-03-02">
+    <release version="1.2.0" date="2026-11-11">
       <description>
         <p>Initial release of Nine. — property management desktop application.</p>
         <ul>

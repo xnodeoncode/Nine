@@ -6,13 +6,13 @@
 [Desktop Entry]
 Name=Nine
 Comment=Property management desktop application.
-Exec=Nine-1.0.0-x86_64.AppImage
+Exec=Nine-1.2.0-x86_64.AppImage
 Icon=Nine
 Type=Application
 Categories=Office;Finance;
 Terminal=false
 StartupWMClass=Nine
-X-AppImage-Version=1.0.0
+X-AppImage-Version=1.2.0
 X-AppImage-Name=Nine
 X-AppImage-Arch=x86_64
 X-AppImage-Payload-License=MIT
