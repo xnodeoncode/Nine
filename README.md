@@ -175,7 +175,7 @@ Nine. is intentionally constrained for an optimal user experience:
 - **Framework:** ASP.NET Core 10.0 + Blazor Server
 - **Desktop:** ElectronNET.Core 0.4.1
 - **Database:** SQLite with SQLCipher AES-256 encryption
-- **PDF Generation:** QuestPDF (<a href='https://www.questpdf.com/license/community.html' target='_blank'>Community License</a>)
+- **PDF Generation:** QuestPDF, used under its own license (not Nine's MIT license) — see [Third-Party Licenses](#third-party-licenses)
 - **UI:** Bootstrap 5.3, Material Design Icons
 
 ---
@@ -246,6 +246,22 @@ cd 4-Nine && dotnet watch
 ## License
 
 Copyright © 2026 CIS Guru. Licensed under the **MIT License** — see [LICENSE](LICENSE) for details.
+
+### Third-Party Licenses
+
+Nine includes third-party components that are licensed separately. The full list, with the license text for each
+component, is in [Documentation/Third-Party-Licensing-Notices.md](Documentation/Third-Party-Licensing-Notices.md), and the
+license texts are also installed with the application (see the About page, "Third-Party Licenses").
+
+**QuestPDF (PDF generation).** Nine uses [QuestPDF](https://www.questpdf.com) to generate its PDF documents (leases,
+invoices, receipts, inspections, checklists and reports). QuestPDF is not covered by Nine's MIT license and has its own
+[license terms](https://www.questpdf.com/license/community.html). In summary, QuestPDF is free for organizations and
+individuals with annual gross revenue under USD 1,000,000, for charitable and qualifying academic organizations, and for
+open-source projects. Government and public-sector organizations and publicly traded companies require a paid QuestPDF
+license.
+
+**You are responsible for confirming that you are eligible to use QuestPDF before installing or operating Nine.** If you
+are not eligible, obtain a license from QuestPDF or do not use Nine. This notice is informational and is not legal advice.
 
 ---
 

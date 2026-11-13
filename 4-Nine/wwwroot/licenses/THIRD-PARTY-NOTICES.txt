@@ -1,0 +1,70 @@
+NINE - THIRD-PARTY NOTICES
+==========================
+
+Nine is licensed under the MIT License (see Nine-LICENSE.txt). Nine includes
+third-party software that is licensed separately. This file lists those
+components and points to the license text for each one. All license texts are
+included with the application; nothing is downloaded.
+
+This notice is informational and is not legal advice.
+
+
+QUESTPDF - ACTION REQUIRED
+--------------------------
+Nine uses QuestPDF to generate its PDF documents (leases, renewals, invoices,
+receipts, inspections, checklists and reports). QuestPDF is NOT covered by
+Nine's MIT license. It is used under QuestPDF's own license terms, and YOU ARE
+RESPONSIBLE FOR CONFIRMING THAT YOU ARE ELIGIBLE TO USE IT.
+
+In summary, the QuestPDF Community License is free for:
+  - individuals and organizations with annual gross revenue under USD 1,000,000
+  - charitable organizations and qualifying academic institutions
+  - open-source projects distributed under an OSI-approved license
+Government and public-sector organizations and publicly traded companies
+require a paid QuestPDF license.
+
+  Bundled version:      QuestPDF 2025.12.1
+  License text (local): questpdf/QuestPDF-PackageLicense.txt
+  Current terms:        https://www.questpdf.com/license/community.html
+  Selection guide:      https://www.questpdf.com/license/guide.html
+
+The license shipped with a release governs that release; the website may show
+newer terms. Review both before relying on them.
+
+QuestPDF includes additional components under their own licenses. Their texts
+are in the questpdf folder: Skia, HarfBuzz, ICU, libjpeg-turbo, libpng,
+libwebp, zlib, expat, qpdf, wuffs and others (third-party-*.txt), and the Lato
+font (Lato-OFL.txt, SIL Open Font License).
+
+
+COMPONENTS AND LICENSES
+-----------------------
+Component                                   License       License text
+------------------------------------------  ------------  ----------------------------------
+Nine                                        MIT           Nine-LICENSE.txt
+.NET runtime and ASP.NET Core               MIT           dotnet/LICENSE.txt
+  (bundled third-party notices)                           dotnet/THIRD-PARTY-NOTICES-NETCore.txt
+                                                          dotnet/THIRD-PARTY-NOTICES-AspNetCore.txt
+Microsoft.AspNetCore.*, Microsoft.EntityFrameworkCore.*,
+  Microsoft.Data.Sqlite, Microsoft.Extensions.*,
+  System.Security.Cryptography.*             MIT           dotnet/LICENSE.txt
+SQLCipher (database encryption)             BSD-style     SQLCipher-LICENSE.txt
+SQLitePCLRaw (SQLite/SQLCipher bindings)    Apache-2.0    SQLitePCLRaw-LICENSE.txt
+Electron.NET (ElectronNET.Core)             MIT           ElectronNET-LICENSE.txt
+SocketIOClient                              MIT           SocketIOClient-LICENSE.txt
+Newtonsoft.Json                             MIT           Newtonsoft.Json-LICENSE.txt
+SendGrid                                    MIT           SendGrid-LICENSE.txt
+Twilio                                      MIT           Twilio-LICENSE.txt
+starkbank-ecdsa                             MIT           starkbank-ecdsa-LICENSE.txt
+Bootstrap 5                                 MIT           Bootstrap-LICENSE.txt
+Bootstrap Icons                             MIT           BootstrapIcons-LICENSE.txt
+QuestPDF                                    See above     questpdf/QuestPDF-PackageLicense.txt
+
+Electron and Chromium: the desktop shell is built on Electron (MIT) and
+Chromium and their bundled components. Their license texts are installed with
+the application as LICENSE.electron.txt and LICENSES.chromium.html in the
+application folder.
+
+SendGrid, Twilio and starkbank-ecdsa are present only for integrations that
+are being phased out; the application does not make outbound internet
+connections.
