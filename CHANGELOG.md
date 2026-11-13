@@ -68,7 +68,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.0.0] - 2026-03-01
 
-### 🎉 Initial Release
+### Initial Release
 
 **Nine.** v1.0.0 is the first production release — property management perfected for up to nine properties.
 

@@ -6,7 +6,7 @@
 
 ---
 
-## 📖 Table of Contents
+## Table of Contents
 
 1. [Overview](#overview)
 2. [Database Location & Structure](#database-location--structure)
@@ -22,7 +22,7 @@
 
 ---
 
-## 📋 Overview
+## Overview
 
 Nine uses **SQLite** as its database engine - a lightweight, file-based database that requires no server installation or configuration. This guide covers everything you need to know about managing your database, protecting your data, and recovering from issues.
 
@@ -56,7 +56,7 @@ Your database contains **all your property management data:**
 
 ---
 
-## 💾 Database Location & Structure
+## Database Location & Structure
 
 ### Database File Location
 
@@ -161,7 +161,7 @@ See the **[Compatibility Matrix](Compatibility-Matrix.md)** for detailed informa
 
 ---
 
-## 🔐 Backup Procedures
+## Backup Procedures
 
 ### Why Back Up?
 
@@ -289,7 +289,7 @@ Many cloud services offer **folder sync** - configure your cloud client to sync 
 
 ---
 
-## 🔄 Restore Procedures
+## Restore Procedures
 
 ### When to Restore
 
@@ -429,7 +429,7 @@ Copy-Item Backups\backup_20260218_143022.db app_v1.1.0.db
 
 ---
 
-## 🔄 Database Reset
+## Database Reset
 
 ### What is Database Reset?
 
@@ -503,7 +503,7 @@ If you reset by mistake, **immediately restore** from the pre-reset backup:
 
 ---
 
-## 🏥 Database Health Checks
+## Database Health Checks
 
 ### Automatic Health Monitoring
 
@@ -596,7 +596,7 @@ Nine monitors database health continuously:
 
 ---
 
-## 🔧 Troubleshooting
+## Troubleshooting
 
 ### Issue 1: Database Locked
 
@@ -828,7 +828,7 @@ Nine monitors database health continuously:
 
 ---
 
-## 🎓 Advanced Topics
+## Advanced Topics
 
 ### Database File Format
 
@@ -1021,7 +1021,7 @@ dotnet tool update dotnet-ef -g
 
 ---
 
-## 📌 Best Practices
+## Best Practices
 
 ### Daily Operations
 
@@ -1091,7 +1091,7 @@ dotnet tool update dotnet-ef -g
 
 ---
 
-## ❓ FAQ
+## FAQ
 
 ### Q: How often should I back up my database?
 
@@ -1165,7 +1165,7 @@ Use application UI for all changes.
 
 ---
 
-## 📞 Support
+## Support
 
 Need help with database management? We're here for you!
 
@@ -1183,7 +1183,7 @@ Need help with database management? We're here for you!
 
 ---
 
-## 🎓 Summary
+## Summary
 
 **Key takeaways:**
 

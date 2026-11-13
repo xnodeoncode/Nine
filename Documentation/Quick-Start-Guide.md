@@ -6,7 +6,7 @@
 
 ---
 
-## 📖 Welcome!
+## Welcome!
 
 This guide will help you get started with Nine in just 15 minutes. By the end, you'll have:
 
@@ -23,7 +23,7 @@ Let's get started!
 
 ---
 
-## 📋 Prerequisites
+## Prerequisites
 
 Before you begin, ensure you have:
 
@@ -45,7 +45,7 @@ Nine. is available as a portable Windows executable (.exe). No installation requ
 
 ---
 
-## 🚀 Step 1: Installation (5 minutes)
+## Step 1: Installation (5 minutes)
 
 ### Linux Installation
 
@@ -86,7 +86,7 @@ chmod +x Nine-1.2.0-x86_64.AppImage
 
 ---
 
-## 🏢 Step 2: Create Your Organization (2 minutes)
+## Step 2: Create Your Organization (2 minutes)
 
 When you first launch Nine, the **New Setup Wizard** guides you through initial setup.
 
@@ -112,7 +112,7 @@ When you first launch Nine, the **New Setup Wizard** guides you through initial 
 
 ---
 
-## 👤 Step 3: Register Your User Account (2 minutes)
+## Step 3: Register Your User Account (2 minutes)
 
 **On the "Register User" screen:**
 
@@ -145,7 +145,7 @@ After registration, you'll see the main dashboard with:
 
 ---
 
-## 🏠 Step 4: Add Your First Property (3 minutes)
+## Step 4: Add Your First Property (3 minutes)
 
 Let's add a rental property to your portfolio.
 
@@ -201,7 +201,7 @@ Let's add a rental property to your portfolio.
 
 ---
 
-## 👥 Step 5: Add a Tenant (2 minutes)
+## Step 5: Add a Tenant (2 minutes)
 
 Now let's add a tenant who will rent this property.
 
@@ -244,7 +244,7 @@ Now let's add a tenant who will rent this property.
 
 ---
 
-## 📄 Step 6: Create a Lease (2 minutes)
+## Step 6: Create a Lease (2 minutes)
 
 Let's create a lease agreement between your property and tenant.
 
@@ -298,7 +298,7 @@ Let's create a lease agreement between your property and tenant.
 
 ---
 
-## 💰 Step 7: Generate a Rent Invoice (1 minute)
+## Step 7: Generate a Rent Invoice (1 minute)
 
 Let's create the first month's rent invoice.
 
@@ -337,7 +337,7 @@ Let's create the first month's rent invoice.
 
 ---
 
-## 🏦 Step 8: Record a Payment (1 minute)
+## Step 8: Record a Payment (1 minute)
 
 Now let's record that the tenant paid their rent.
 
@@ -381,7 +381,7 @@ Now let's record that the tenant paid their rent.
 
 ---
 
-## 🔍 Step 9: Schedule an Inspection (1 minute)
+## Step 9: Schedule an Inspection (1 minute)
 
 Let's schedule a move-in inspection for the property.
 
@@ -433,7 +433,7 @@ Later, when you perform the inspection:
 
 ---
 
-## 🎉 Congratulations!
+## Congratulations!
 
 **You've successfully completed the Quick Start Guide!**
 
@@ -451,7 +451,7 @@ In just 15 minutes, you've learned how to:
 
 ---
 
-## 🧭 What's Next?
+## What's Next?
 
 ### Explore More Features
 
@@ -514,7 +514,7 @@ In just 15 minutes, you've learned how to:
 
 ---
 
-## 📚 Additional Resources
+## Additional Resources
 
 ### Documentation
 
@@ -539,7 +539,7 @@ In just 15 minutes, you've learned how to:
 
 ---
 
-## ⚙️ Settings & Configuration
+## Settings & Configuration
 
 ### Essential Settings to Configure
 
@@ -581,7 +581,7 @@ In just 15 minutes, you've learned how to:
 
 ---
 
-## 🔒 Security & Data Protection
+## Security & Data Protection
 
 ### Best Practices
 
@@ -610,7 +610,7 @@ In just 15 minutes, you've learned how to:
 
 ---
 
-## ❓ Common Questions
+## Common Questions
 
 ### Q: Can I import data from another property management system?
 
@@ -662,7 +662,7 @@ In just 15 minutes, you've learned how to:
 
 ---
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Application won't start
 
@@ -708,7 +708,7 @@ In just 15 minutes, you've learned how to:
 
 ---
 
-## 📞 Support
+## Support
 
 Need help? We're here for you!
 
@@ -726,7 +726,7 @@ Need help? We're here for you!
 
 ---
 
-## 🎓 Next Steps
+## Next Steps
 
 **Ready to dive deeper?**
 
