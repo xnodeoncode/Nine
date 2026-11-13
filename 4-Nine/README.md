@@ -8,13 +8,13 @@
 
 A comprehensive web-based property management system built with ASP.NET Core 10.0 and Blazor Server. Nine streamlines rental property management for property owners and managers with an intuitive interface and robust feature set.
 
-## 🏢 Overview
+## Overview
 
 Nine is designed to simplify property management operations through a centralized platform that handles everything from property, tenant, and lease tracking to document storage and rental invoice and expense tracking. Built with modern web technologies including AI (GitHub Copilot and Claude Sonnet), it provides a responsive, secure, and scalable solution for DIY landlords and property managers.
 
-## ✨ Key Features
+## Key Features
 
-### 🏠 Property Management
+### Property Management
 
 - **Property Portfolio** - Comprehensive property listings with detailed information
 - **Property Details** - Address, type, rent, bedrooms, bathrooms, square footage
@@ -23,14 +23,14 @@ Nine is designed to simplify property management operations through a centralize
 - **Search & Filter** - Advanced property search and filtering capabilities
 - **Property Analytics** - Dashboard with property performance metrics
 
-### 👥 Tenant Management
+### Tenant Management
 
 - **Tenant Profiles** - Complete tenant information management
 - **Contact Management** - Phone, email, emergency contacts
 - **Tenant History** - Track tenant interactions and lease history
 - **Communication Tools** - Built-in messaging and notification system
 
-### 📄 Lease Management
+### Lease Management
 
 - **Lease Creation** - Digital lease agreement generation
 - **Lease Tracking** - Active, pending, expired, and terminated lease monitoring
@@ -39,7 +39,7 @@ Nine is designed to simplify property management operations through a centralize
 - **Lease Renewals** - Manual lease renewal tracking
 - **Terms Management** - Flexible lease terms and conditions
 
-### 💰 Financial Management
+### Financial Management
 
 - **Payment Tracking** - Rent payment monitoring and history
 - **Invoice Generation** - Automated invoice creation and delivery
@@ -48,12 +48,12 @@ Nine is designed to simplify property management operations through a centralize
 - **Late Fee Management** - Automatic late fee calculation and tracking
 - **Security Deposit Tracking** - Deposit handling and return processing
 
-### 📁 Document Management
+### Document Management
 
 - **File Storage** - Secure document upload and storage
 - **Document Categories** - Organized by type (leases, receipts, photos, etc.)
 
-### 🔐 User Management & Security
+### User Management & Security
 
 - **Role-Based Access** - Administrator and Property Manager roles
 - **Authentication** - Secure login with ASP.NET Core Identity
@@ -62,7 +62,7 @@ Nine is designed to simplify property management operations through a centralize
 - **Activity Tracking** - User login and activity monitoring
 - **Data Security** - Encrypted data storage and transmission
 
-### 🎛️ Administration Features
+### Administration Features
 
 - **User Administration** - Complete user account management
 - **System Configuration** - Application settings and preferences
@@ -70,7 +70,7 @@ Nine is designed to simplify property management operations through a centralize
 - **Backup Management** - Data backup and recovery tools
 - **Audit Logging** - Comprehensive activity and change tracking
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 ### Backend
 
@@ -97,14 +97,14 @@ Nine is designed to simplify property management operations through a centralize
 - **Build System**: .NET SDK build system
 - **AI Assisted Coding**: GitHub Copilot, Claude Sonnet, GPT
 
-## 📋 Prerequisites
+## Prerequisites
 
 - [.NET 10.0 SDK](https://dotnet.microsoft.com/download/dotnet/10.0)
 - [Git](https://git-scm.com/)
 - [Visual Studio Code](https://code.visualstudio.com/) (recommended) or Visual Studio 2022
 - [C# Dev Kit Extension](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csdevkit) for VS Code
 
-## 🚀 Quick Start
+## Quick Start
 
 ### 1. Clone the Repository
 
@@ -139,7 +139,7 @@ Open your browser and navigate to:
 - **HTTPS**: https://localhost:7244
 - **HTTP**: http://localhost:5244
 
-## 🔧 Development Setup
+## Development Setup
 
 ### Visual Studio Code Setup
 
@@ -184,7 +184,7 @@ dotnet ef database update
 dotnet ef migrations remove
 ```
 
-## 📁 Project Structure
+## Project Structure
 
 The application follows Clean Architecture principles with clear separation of concerns:
 
@@ -311,7 +311,7 @@ Shared → Core
 - **Scalability**: Simple to add new features as vertical slices
 - **Reusability**: Domain and application layers can be shared across projects
 
-## 🔑 Default User Roles
+## Default User Roles
 
 The system includes two primary user roles:
 
@@ -330,7 +330,7 @@ The system includes two primary user roles:
 - Financial tracking
 - Document management
 
-## 🎯 Key Components
+## Key Components
 
 ### Property Management Service
 
@@ -359,7 +359,7 @@ Core business logic service in the Application layer:
 - Foreign key constraints
 - Soft delete patterns
 
-## 📊 Dashboard Features
+## Dashboard Features
 
 ### Property Manager Dashboard
 
@@ -378,7 +378,7 @@ Core business logic service in the Application layer:
 - Administrative quick actions
 - Recent system activity
 
-## 🔧 Configuration
+## Configuration
 
 ### Application Settings
 
@@ -397,7 +397,7 @@ Configuration is managed through:
 - Email service settings
 - Application-specific settings
 
-## 🚀 Deployment
+## Deployment
 
 ### Prerequisites for Production
 
@@ -422,7 +422,7 @@ ASPNETCORE_URLS=https://+:443;http://+:80
 ConnectionStrings__DefaultConnection=[your-connection-string]
 ```
 
-## 🤝 Contributing
+## Contributing
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
@@ -438,11 +438,11 @@ ConnectionStrings__DefaultConnection=[your-connection-string]
 - Add unit tests for new functionality
 - Ensure responsive design compatibility
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🆘 Support
+## Support
 
 ### Documentation
 
@@ -464,7 +464,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Review the project documentation
 - Contact the development team
 
-## 🏗️ Roadmap
+## Roadmap
 
 ### Upcoming Features via Nine Professional
 

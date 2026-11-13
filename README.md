@@ -19,7 +19,7 @@ Built with ASP.NET Core 10 and Blazor Server, wrapped in Electron for a native d
 - New Real Estate investors building their portfolio
 - Anyone seeking focused, no-subscription, property management software
 
-## ✨ Key Features
+## Key Features
 
 ### Property Management
 
@@ -70,7 +70,7 @@ Built with ASP.NET Core 10 and Blazor Server, wrapped in Electron for a native d
 
 ---
 
-## 📥 Download
+## Download
 
 **Latest Release: v1.2.0**
 
@@ -81,7 +81,7 @@ Built with ASP.NET Core 10 and Blazor Server, wrapped in Electron for a native d
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Installation
 
@@ -131,7 +131,7 @@ chmod +x install-desktop-integration.sh
 
 ---
 
-## 📋 System Requirements
+## System Requirements
 
 |             | Minimum                                       | Recommended     |
 | ----------- | --------------------------------------------- | --------------- |
@@ -147,7 +147,7 @@ Optional: SendGrid (email) and Twilio (SMS) accounts for notifications.
 
 ---
 
-## 📚 Documentation
+## Documentation
 
 - 🚀 **[Quick Start Guide](Documentation/Quick-Start-Guide.md)** — Get up and running in 15 minutes
 - 💾 **[Database Management Guide](Documentation/Database-Management-Guide.md)** — Backup, restore, troubleshooting
@@ -157,7 +157,7 @@ Optional: SendGrid (email) and Twilio (SMS) accounts for notifications.
 
 ---
 
-## ⚠️ Application Limits
+## Application Limits
 
 Nine. is intentionally constrained for an optimal user experience:
 
@@ -170,7 +170,7 @@ Nine. is intentionally constrained for an optimal user experience:
 
 ---
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 - **Framework:** ASP.NET Core 10.0 + Blazor Server
 - **Desktop:** ElectronNET.Core 0.4.1
@@ -180,7 +180,7 @@ Nine. is intentionally constrained for an optimal user experience:
 
 ---
 
-## 🏗️ Project Structure
+## Project Structure
 
 ```
 Nine/
@@ -194,7 +194,7 @@ Nine/
 
 ---
 
-## 🧪 Testing
+## Testing
 
 ```bash
 dotnet test Nine.sln
@@ -202,7 +202,7 @@ dotnet test Nine.sln
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 1. **Fork** the repository
 2. **Create a feature branch** from `development`:
@@ -231,7 +231,7 @@ cd 4-Nine && dotnet watch
 
 ---
 
-## 📊 Versioning
+## Versioning
 
 [Semantic Versioning](https://semver.org/):
 
@@ -249,7 +249,7 @@ Copyright © 2026 CIS Guru. Licensed under the **MIT License** — see [LICENSE]
 
 ---
 
-## 📞 Support
+## Support
 
 - 🌐 **Website:** [nineapp.co](https://nineapp.co/)
 - 🐛 **Bug Reports:** [GitHub Issues](https://github.com/xnodeoncode/Nine/issues)
