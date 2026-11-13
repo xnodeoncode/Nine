@@ -154,7 +154,10 @@ FluentAssertions was removed from the test projects in favor of xUnit `Assert` b
 ## Where the Shipped License Files Live
 
 `4-Nine/wwwroot/licenses/` is served by the app (no internet needed) and packaged under `resources/bin/wwwroot/licenses/`.
-The About page links to it. These are static copies; update them when a dependency or runtime is upgraded:
+The in-app page `/licenses` ([Licenses.razor](../4-Nine/Features/Administration/Settings/Pages/Licenses.razor)) lists each component with its version and links to
+these files; it is linked from the About page and from Application Settings. The files are a snapshot: they are the licenses that
+came with the component versions in this release. **When a component or the .NET runtime is upgraded, verify the license, replace
+the file here, and update the version in `Licenses.razor`** (and `THIRD-PARTY-NOTICES.txt`):
 
 - `questpdf/` is copied from the QuestPDF NuGet package (`PackageLicense.md`, `ExternalDependencyLicenses/`, `LatoFont/OFL.txt`).
 - `dotnet/` is copied from the `microsoft.netcore.app.runtime.*` and `microsoft.aspnetcore.app.runtime.*` packages (`LICENSE`, `THIRD-PARTY-NOTICES`).
