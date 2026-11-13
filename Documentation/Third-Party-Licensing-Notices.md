@@ -144,8 +144,10 @@ FluentAssertions was removed from the test projects in favor of xUnit `Assert` b
 
 - [ ] Hear back from QuestPDF about distributing Nine with QuestPDF and downstream business use (see the PDF license plan).
 - [ ] Surface the QuestPDF notice in the README, public information pages, and the in-app About page.
-- [ ] Add the SQLCipher license text to binary distributions.
-- [ ] Confirm Electron / Chromium license files ship in every packaged desktop build.
+- [ ] Add the SQLCipher license text to binary distributions. _Build audit (Linux AppImage `Nine-1.2.0-x86_64.AppImage`): not present, although `libe_sqlcipher.so` and `SQLitePCLRaw.provider.e_sqlcipher.dll` are bundled under `resources/bin/`. The license text must be copied into the package, not just linked._
+- [x] Confirm Electron / Chromium license files ship in the Linux AppImage. _Audited 2026-11-12: `LICENSE.electron.txt` and `LICENSES.chromium.html` are present in both `linux-unpacked/` and the extracted AppImage._
+- [ ] Confirm Electron / Chromium license files in any other packaged desktop build (Flatpak, Windows, macOS). _Only the Linux AppImage was found in the publish output._
+- [ ] Ship a `THIRD-PARTY-NOTICES` file and Nine's `LICENSE` in every package. _Build audit: neither is included in the AppImage, nor are the QuestPDF terms, the Skia/Lato licenses that come with QuestPDF (`libQuestPdfSkia.so` is bundled), or notices for the other NuGet packages._
 - [ ] Decide whether to bundle Bootstrap Icons locally instead of using the CDN.
 - [ ] Re-review this document whenever dependencies change (`dotnet list package` for each project).
 
