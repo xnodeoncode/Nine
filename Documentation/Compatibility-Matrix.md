@@ -20,18 +20,26 @@ This matrix tracks version compatibility across Nine releases, enabling you to:
 
 ---
 
-## Nine Version History
+## Release History (Aquiis and Nine)
 
-| Release Date | App Version | Database Schema | .NET SDK | ElectronNET | Bootstrap | QuestPDF  | Migration Required | Breaking Changes | Status      | Download                                                           |
-| ------------ | ----------- | --------------- | -------- | ----------- | --------- | --------- | ------------------ | ---------------- | ----------- | ------------------------------------------------------------------ |
-| 2026-11-11   | **1.2.0**   | v1.1.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | No                 | No               | **Current** | [Release](https://github.com/xnodeoncode/Nine/releases/tag/v1.2.0) |
-| 2026-03-01   | 1.1.2       | v1.1.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | No                 | No               | Previous    | [Release](https://github.com/xnodeoncode/Aquiis/releases/tag/v1.1.2) |
-| 2026-02-28   | 1.1.1       | v1.1.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | No                 | No               | Superseded  | [Release](https://github.com/xnodeoncode/Aquiis/releases/tag/v1.1.1.0) |
-| 2026-02-18   | 1.1.0       | v1.1.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | Yes (v1.0.0→1.1.0) | New tables/cols  | Superseded  | [Release](https://github.com/xnodeoncode/Aquiis/releases/tag/v1.1.0) |
-| 2026-01-29   | 1.0.1       | v1.0.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | No                 | No               | Superseded  | [Release](https://github.com/xnodeoncode/Aquiis/releases/tag/v1.0.1) |
-| 2026-01-28   | 1.0.0       | v1.0.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | No                 | No               | Superseded  | [Release](https://github.com/xnodeoncode/Nine/releases/tag/v1.0.0) |
+| Release Date | Product | App Version | Database Schema | .NET SDK | ElectronNET | Bootstrap | QuestPDF  | Migration Required   | Breaking Changes | Status        | Download                                                               |
+| ------------ | ------- | ----------- | --------------- | -------- | ----------- | --------- | --------- | -------------------- | ---------------- | ------------- | ---------------------------------------------------------------------- |
+| 2026-11-11   | Nine    | **1.2.0**   | v1.2.0          | 10.0.1   | Core 0.4.1  | 5.3.3     | 2025.12.1 | Yes (v1.1.0→1.2.0)   | New tables/cols  | **Current**   | [Release](https://github.com/xnodeoncode/Nine/releases/tag/v1.2.0)     |
+| 2026-04-04   | Nine    | 1.1.0       | v1.1.0          | 10.0.1   | Core 0.4.1  | 5.3.3     | 2025.12.1 | Auto (EF migrations) | No               | Previous      | [Release](https://github.com/xnodeoncode/Nine/releases/tag/v1.1.0)     |
+| 2026-03-17   | Aquiis  | 1.1.3       | v1.1.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | No                   | No               | Latest Aquiis | [Release](https://github.com/xnodeoncode/Aquiis/releases/tag/v1.1.3)   |
+| 2026-03-02   | Nine    | 1.0.0       | v1.0.0          | 10.0.1   | Core 0.4.1  | 5.3.3     | 2025.12.1 | No                   | No               | Superseded    | [Release](https://github.com/xnodeoncode/Nine/releases/tag/v1.0.0)     |
+| 2026-03-01   | Aquiis  | 1.1.2       | v1.1.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | No                   | No               | Superseded    | [Release](https://github.com/xnodeoncode/Aquiis/releases/tag/v1.1.2)   |
+| 2026-02-28   | Aquiis  | 1.1.1       | v1.1.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | No                   | No               | Superseded    | [Release](https://github.com/xnodeoncode/Aquiis/releases/tag/v1.1.1.0) |
+| 2026-02-18   | Aquiis  | 1.1.0       | v1.1.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | Yes (v1.0.0→1.1.0)   | New tables/cols  | Superseded    | [Release](https://github.com/xnodeoncode/Aquiis/releases/tag/v1.1.0)   |
+| 2026-01-29   | Aquiis  | 1.0.1       | v1.0.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | No                   | No               | Superseded    | [Release](https://github.com/xnodeoncode/Aquiis/releases/tag/v1.0.1)   |
+| 2026-01-28   | Aquiis  | 1.0.0       | v1.0.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | No                   | No               | Superseded    | [Release](https://github.com/xnodeoncode/Aquiis/releases/tag/v1.0.0)   |
 
-> **Note:** Nine began as Aquiis. Releases 1.0.1 through 1.1.2 were published in the [Aquiis repository](https://github.com/xnodeoncode/Aquiis/releases), which is no longer under active development, so their download links point there (the 1.1.1 tag is named `v1.1.1.0`). Nine 1.0.0 is a mirror of Aquiis 1.0.0.
+> **Note:** Nine began as **Aquiis** (SimpleStart). Aquiis releases 1.0.1 through 1.1.3 were published in the
+> [Aquiis repository](https://github.com/xnodeoncode/Aquiis/releases) to complete functionality for users who stay on Aquiis;
+> that application is no longer under active development, so those download links point there (the 1.1.1 release tag is named
+> `v1.1.1.0`). Nine 1.0.0 is a mirror of Aquiis 1.0.0. The **Product** column shows which application a release belongs to,
+> and the **Database Schema** column is what to check when importing data from an Aquiis version into Nine, because the
+> schemas differ between versions.
 
 ## Professional Version History
 
