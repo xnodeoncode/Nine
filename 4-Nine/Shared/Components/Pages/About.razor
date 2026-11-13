@@ -1,5 +1,6 @@
 @page "/about"
 @inject ThemeService ThemeService
+@inject ApplicationService ApplicationService
 @attribute [AllowAnonymous]
 @rendermode InteractiveServer
 @implements IDisposable
@@ -9,19 +10,19 @@
         <div class="text-start">
             <h1 class="display-4"><img src="@LogoSrc" width="90" alt="Nine." /></h1>
         </div>
-        <div class="d-flex flex-wrap gap-2 my-3">
-            <a href="https://github.com/xnodeoncode/Nine/releases" target="_blank">
-                <img src="https://img.shields.io/badge/version-1.1.0-blue.svg" alt="Version" />
+        <div class="d-flex flex-wrap gap-2 my-3 align-items-center">
+            <a href="https://github.com/xnodeoncode/Nine/releases" target="_blank" class="text-decoration-none"
+               title="Release notes (opens in your default browser)">
+                <span class="badge text-bg-primary">version @ApplicationService.ApplicationSettings.Version</span>
             </a>
-            <a href="https://github.com/xnodeoncode/Nine/blob/main/LICENSE" target="_blank">
-                <img src="https://img.shields.io/badge/license-MIT-green.svg" alt="License" />
+            <a href="licenses/Nine-LICENSE.txt" target="_blank" class="text-decoration-none" title="Nine license">
+                <span class="badge text-bg-success">license MIT</span>
             </a>
-            <a href="https://dotnet.microsoft.com/" target="_blank">
-                <img src="https://img.shields.io/badge/.NET-10.0-purple.svg" alt=".NET" />
-            </a>
-            <img src="https://img.shields.io/badge/platform-Linux%20%7C%20Windows-lightgrey.svg" alt="Platform" />
-            <a href="https://nineapp.co/" target="_blank">
-                <img src="https://img.shields.io/badge/website-nineapp.co-blue.svg" alt="Website" />
+            <span class="badge text-bg-secondary">.NET @Environment.Version.Major.@Environment.Version.Minor</span>
+            <span class="badge text-bg-light border">platform Linux | Windows</span>
+            <a href="@ApplicationService.ApplicationSettings.Website" target="_blank" class="text-decoration-none"
+               title="Opens in your default browser">
+                <span class="badge text-bg-info">website nineapp.co</span>
             </a>
         </div>
 
