@@ -152,6 +152,7 @@ Optional: SendGrid (email) and Twilio (SMS) accounts for notifications.
 - 🚀 **[Quick Start Guide](Documentation/Quick-Start-Guide.md)** — Get up and running in 15 minutes
 - 💾 **[Database Management Guide](Documentation/Database-Management-Guide.md)** — Backup, restore, troubleshooting
 - 📊 **[Compatibility Matrix](Documentation/Compatibility-Matrix.md)** — Version compatibility and upgrade paths
+- 🔒 **[Privacy Statement](Documentation/Privacy.md)** — What Nine stores and what it does not collect
 - 📝 **[Copilot Instructions](.github/copilot-instructions.md)** — Architecture and development guidelines
 - 🔄 **[CHANGELOG](CHANGELOG.md)** — Version history
 
