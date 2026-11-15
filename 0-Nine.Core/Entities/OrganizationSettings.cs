@@ -46,7 +46,7 @@ namespace Nine.Core.Entities
         [Required]
         [Range(1, 30)]
         [Display(Name = "Send Reminder (Days Before Due)")]
-        public int PaymentReminderDaysBefore { get; set; } = 3;
+        public int PaymentReminderDaysBefore { get; set; } = 10;
 
         #endregion
 

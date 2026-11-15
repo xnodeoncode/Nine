@@ -10,14 +10,15 @@
 
 This guide gets you from a fresh install to your first invoice and payment. By the end you will have:
 
-- Installed the application
-- Created your account and organization
-- Added a property
-- Added a tenant
-- Created a lease
-- Created an invoice
-- Recorded a payment
-- Recorded a property inspection
+- [Installing the application](#step-1-installation-5-minutes)
+- [Create an account and organization](#step-2-create-your-account-and-organization-2-minutes)
+- [Add a property](#step-3-add-your-first-property-3-minutes)
+- [Add a tenant](#step-4-add-a-tenant-2-minutes)
+- [Create a lease](#step-5-create-a-lease-2-minutes)
+- [Create an invoice](#step-6-create-an-invoice-1-minute)
+- [Record a payment](#step-7-record-a-payment-1-minute)
+- [Record a property inspection](#step-8-record-an-inspection-3-minutes)
+- [Uninstalling Nine](#uninstalling-nine)
 
 Let's get started.
 
@@ -28,26 +29,30 @@ Let's get started.
 Before you begin, ensure you have:
 
 - **Operating System:**
-  - Linux (Ubuntu 20.04+, Debian 11+, Fedora 35+), OR
+  - Linux (RHEL 10, Ubuntu 20.04+, Debian 11+, Fedora 35+), OR
   - Windows 10/11 (64-bit)
 - **Hardware:**
-  - 2 GB RAM minimum (4 GB recommended)
-  - 500 MB disk space
-- **Downloaded:** Nine v1.2.0 for your platform
+  - 8 GB RAM minimum (16 GB recommended)
+  - 2 GB disk space
+- **Download:** [Nine v1.2.0](https://github.com/xnodeoncode/Nine/releases/tag/v1.2.0) for your platform
 
-### Universal Linux Support
+### AppImage for Universal Linux Support
 
-Nine is distributed as an AppImage, which runs on all major Linux distributions, including Ubuntu, Debian, Fedora, Red Hat, Arch and openSUSE. No installation is required: download, make executable, and run.
+**Nine as an AppImage.** The Nine appimage file has been tested to run on Red Hat Enterprise Linux 10. However, AppImage as a format runs on all major Linux distributions, including Ubuntu, Debian, Fedora, Red Hat, Arch and openSUSE. No installation is required: download, make executable (using the chmod +x Nine...appimage), and run.
 
-### Windows Portable Version
+### Windows Portable
 
-Nine is also available as a portable Windows executable (.exe). No installation is required. All application data is stored locally in the same folder, so you can run Nine from a USB drive or move between systems.
+**Nine as a portable Windows executable (.exe).** The Nine portable exe file has been tested to run on Windows 11. No installation is required. Download the portable exe file, store it in a location of choice on your Windows 11 computer, and double-click the file to run.
 
----
+### Windows Installer
+
+**Using Windows Installer.** Nine can be installed using the Windows installer. This adds the application to the Windows Add/Remove programs list of programs and the Windows Start Menu. Optional desktop and task bar shortcuts can be created for ease of access.
 
 ## Step 1: Installation (5 minutes)
 
-### Linux
+### Linux Installation Steps
+
+**Option A: Manual AppImage copy**
 
 ```bash
 # 1. Download the file
@@ -60,7 +65,33 @@ chmod +x Nine-1.2.0-x86_64.AppImage
 ./Nine-1.2.0-x86_64.AppImage
 ```
 
-### Windows
+The application start-up displaying the start-up log in the terminal.
+
+**Option B: Desktop Integration Option**
+
+Nine can be integrated into your GNOME desktop environment.
+
+1. Download the file: currently Nine-1.2.0-x86_64.AppImage
+2. Download the installer script: install-desktop-integration.sh
+3. Make both files executable
+
+```bash
+chmod +x Nine-1.2.0-x86_64.AppImage
+chmod +x install-desktop-integration.sh
+```
+
+4. Execute the script
+
+```bash
+./install-desktop-integration.sh Nine-1.2.0-x86_64.AppImage
+```
+
+The install script is expected to:
+
+1. Copy the AppImage to the ~/Applications/Nine directory (it will create it if it doesn't exist).
+2. Create a desktop entry file which adds Nine to the Launch Menu.
+
+### Windows Installation Steps
 
 **Option A: Installer (recommended)**
 
@@ -81,7 +112,7 @@ chmod +x Nine-1.2.0-x86_64.AppImage
 
 ---
 
-## Step 2: Create Your Account and Organization (2 minutes)
+## Step 2: Create an Account and Organization (2 minutes)
 
 The first time Nine starts, there are no accounts, so the **Register** page shows a single form that creates both your organization and your account. Registration is only available for this first account.
 
@@ -91,17 +122,17 @@ The first time Nine starts, there are no accounts, so the **Register** page show
 4. Enter and confirm a **Password**. It must be at least **12 characters** and include an uppercase letter, a lowercase letter, a number and a special character.
 5. Click **Register**.
 
-You are the organization owner with full administrative privileges. The account is confirmed automatically; there is no email verification step.
+You are the organization's owner with full administrative privileges. The account is confirmed automatically; there is no email verification step.
 
-**Checkpoint:** You are signed in and see the **Property Management Dashboard**.
+**Checkpoint:** You are signed in and see the **Property Management Dashboard**. If not, click Log-In in the left navigation or Sign-In in the center of the page and log in to the application.
 
 ### The Dashboard
 
-The left navigation menu contains **Dashboard, Calendar, Properties, Tenants, Leases, Inspections, Repairs, Documents** and **Reports**. Administrators also see **Application** and **Organization**.
+The left navigation menu contains **Dashboard, Calendar, Properties, Tenants, Leases, Inspections, Repairs, Documents** and **Reports**. Owners and Administrators also see **Application** and **Organization** as two top-most navigation links.
 
 The dashboard shows property metrics, **Outstanding Invoices**, **Outstanding Repairs**, **Upcoming Lease Renewals** and **Available Properties**.
 
-<!-- VERIFY: first-run message wording and whether the dashboard shows a sample-data option on a new database. -->
+<!-- VERIFY: first-run message wording and whether the dashboard shows a sample-data option on a new database. NO SAMPLE DATA IS EXPLICITLY ADDED VIA ORGANIZATION SETTINGS-->
 
 ---
 
@@ -145,11 +176,11 @@ You can record expenses for a property from the panel beside the form (or later 
 2. Click **Add Lease**.
 3. Fill in the form:
    - **Property** and **Tenant** (select from the dropdowns)
-   - **Start Date** and **End Date**
+   - **Start Date** and **End Date** (defaulted to current date and 12 months later respectively.)
    - **Monthly Rent** and **Security Deposit**
-   - **Lease Type:** Term, Month-to-Month, Sublease or Other
-   - **Status:** new leases default to **Pending**; choose **Active** if the lease is already in force
-   - Optional: **Lease Terms** and **Notes**
+   - **Lease Type:** Term, Month-to-Month
+   - **Status:** new leases default to **Pending**; choose **Active** if the lease is ready to start.
+   - Optional: **Lease Terms** and **Notes** (add the terms of the lease and any additional notes. Lease term regulations can differ from region to region so enter the text relevant for your state, county, region, etc.)
 4. Click **Create Lease**.
 
 You are taken to the property page. Open the lease from **Leases** to see its details.
@@ -175,14 +206,14 @@ The lease page also lets you **Edit Lease**, **Create Invoice**, **View Invoices
 Invoices and payments do not appear in the left menu. Start from the lease:
 
 1. Open the lease.
-2. Click **Create Invoice** (this opens the invoice form with the lease selected).
+2. Click **Create Invoice** (this opens the invoice form with the lease selected and fields populated by default using lease details).
 3. Fill in the form:
-   - **Invoice Number** and **Invoice Date**
-   - **Due Date**
+   - **Invoice Number** and **Invoice Date** (Invoice number is autogenerated and should not be modified. Invoice date defaults to current date, but can be modifed as needed.)
+   - **Due Date** (keep the default, five days from current date or enter a new due date)
    - **Lease** (already selected)
-   - **Description** (for example "First month's rent")
-   - **Amount**
-   - **Status:** Pending (default), Paid or Cancelled
+   - **Description** (for example "First month's rent" or keep the default)
+   - **Amount** (enter amount or keep the default which is based on the lease agreement)
+   - **Status:** Pending (A new invoice is pending by default. When a payment is recorded, the invoice's payment status is updated)
    - Optional: **Notes**
 4. Click **Create Invoice**.
 
@@ -190,7 +221,7 @@ You can find all invoices later from the lease's **View Invoices** button, from 
 
 **Checkpoint:** The invoice shows status **Pending** with your due date.
 
-<!-- VERIFY: whether Invoice Number is auto-generated, and how the Amount is filled in when the lease is selected. -->
+<!-- VERIFY: whether Invoice Number is auto-generated, and how the Amount is filled in when the lease is selected. INVOICE NUMBER IS AUTOGENERATED AND THE INVOICE AMOUNT IS PULLED FROM THE LEASE AGREEMENT MONTHLY RENT AMOUNT-->
 
 ---
 
@@ -200,15 +231,15 @@ You can find all invoices later from the lease's **View Invoices** button, from 
 2. Click **Record Payment**.
 3. Fill in the form:
    - **Invoice** (already selected)
-   - **Payment Date**
-   - **Amount**
-   - **Payment Method:** Online Payment, Debit Card, Credit Card, Check, Cash, Bank Transfer or Other
+   - **Payment Date** (defaults to current date)
+   - **Amount** (defaults to the invoice amount. Partial payments may be accepted.)
+   - **Payment Method:** Online Payment, Debit Card, Credit Card, Check, Cash, Bank Transfer or Other (Online payment is the default)
    - Optional: **Notes**
 4. Click **Record Payment**.
 
 **Checkpoint:** Open the invoice again; it should show the payment.
 
-<!-- VERIFY: that recording a full payment changes the invoice status to Paid and updates the paid amount. -->
+<!-- VERIFY: that recording a full payment changes the invoice status to Paid and updates the paid amount. VERIFIED-->
 
 ### Payment receipt (optional)
 
@@ -218,7 +249,7 @@ Open the payment and use **Generate Receipt**, then **View Receipt** or **Downlo
 
 ## Step 8: Record an Inspection (3 minutes)
 
-The **Inspections** page is a routine inspection schedule by property: it shows which properties are scheduled, due soon, overdue or not yet scheduled.
+The **Inspections** page is a routine inspection schedule by property: it shows which properties are scheduled, due soon, overdue or not yet scheduled. When a property is created, a routine inspection is automatically scheduled due within the first 90 days. Completion of an inspections automatically schedules another inspection for 12 months later. In essence, routine inspections are auto-generated and scheduled annually.
 
 1. Click **Inspections** in the left menu.
 2. On the property you want, click the clipboard icon (**Create Inspection**). You can also start from the property's own page.
@@ -269,20 +300,113 @@ You have completed the Quick Start Guide. You have:
 
 ---
 
+## Uninstalling Nine
+
+**IMPORTANT: BEFORE GETTING STARTED CREATE A DATABASE BACKUP AND DOWNLOAD/COPY IT TO A LOCATION OUTSIDE OF THE APPLICATION.**
+
+An encrypted or an unencrypted backup can be generated and downloaded to the local hard drive, a USB drive, or a cloud storage location.
+
+**SEE THE [Database Management Guide](https://github.com/xnodeoncode/Nine/blob/main/Documentation/Database-Management-Guide.md)**
+
+**BEFORE YOU BEGIN, CLOSE ALL RUNNING INSTANCES OF NINE.**
+
+### Linux
+
+You can use the removal script (recommended) or follow the manual steps below it.
+
+#### Using the removal script
+
+`nine-removal.sh` is in the `Install` folder of the Linux download, next to `install-desktop-integration.sh`. It undoes what the desktop integration script did, and removes your data and encryption key only when you ask it to.
+
+```bash
+chmod +x nine-removal.sh
+
+# Preview what would be removed; nothing is changed
+./nine-removal.sh --dry-run
+
+# Remove one version only (Option 1 below); data and encryption key are kept
+./nine-removal.sh --only Nine-1.2.0-x86_64.AppImage
+
+# Remove the launcher entry, icon and AppImages; data and encryption key are kept
+./nine-removal.sh
+
+# Remove everything, including all data and the encryption key (Option 2 below)
+./nine-removal.sh --remove-data --remove-keychain
+```
+
+- The script asks before it removes anything. Removing the data or the encryption key also requires typing `DELETE`.
+- It will not run while Nine is open.
+- It only knows about AppImages in `~/Applications/Nine`. Delete any AppImage stored elsewhere yourself.
+- Run `./nine-removal.sh --help` for all options.
+
+#### Manual steps
+
+Choose the option that matches what you want to remove.
+
+#### Option 1: Remove one version only
+
+Use this when you keep another version of Nine installed. Your data stays in place.
+
+1. Delete that version's AppImage: in your file manager, right-click it and choose "Delete", "Delete Permanently", or "Move to Trash". If the desktop integration script was used, the AppImages are in `~/Applications/Nine`. From the terminal:
+
+```bash
+rm ~/Applications/Nine/<appimage-name>   # for example Nine-1.2.0-x86_64.AppImage
+```
+
+2. If the Nine launcher entry pointed to the version you removed, it no longer works. Run `install-desktop-integration.sh` again with the version you kept to fix it.
+
+**Do not delete `~/.config/Nine` or the keychain entry in this case.** They hold the databases and the database encryption key for **every** version of Nine on this computer.
+
+#### Option 2: Remove Nine completely
+
+Use this when you no longer need Nine or any of its data. **This permanently deletes the databases and backups of all versions.**
+
+1. Delete the AppImage files. Delete them in your file manager if they are stored somewhere other than `~/Applications/Nine`.
+
+2. Open the terminal and run the commands below.
+
+```bash
+# Remove application support, configuration, resource and database files
+# (the default location; it is $XDG_CONFIG_HOME/Nine if that variable is set)
+rm -rf ~/.config/Nine
+
+# RUN THESE COMMANDS IF THE DESKTOP INTEGRATION SCRIPT WAS USED.
+
+# Remove all installed releases
+rm -rf ~/Applications/Nine
+
+# Remove the desktop integration entry (GNOME)
+rm ~/.local/share/applications/nine.desktop
+
+# Remove the desktop icon file
+rm ~/.local/share/icons/hicolor/512x512/apps/nine.png
+
+# Refresh the desktop database
+update-desktop-database ~/.local/share/applications
+```
+
+3. Only if you ever turned on database encryption, remove the stored encryption key. This key is shared by every version of Nine on this account. Run the command only when you no longer need any encrypted database or encrypted backup, because they cannot be opened without it.
+
+```bash
+secret-tool clear key-type database-encryption-Nine-Electron
+```
+
+### Windows
+
 ## Additional Resources
 
 ### Documentation
 
-- **[CHANGELOG](../CHANGELOG.md)** - What's new in each release
-- **[Database Management Guide](Database-Management-Guide.md)** - Backup, restore and troubleshooting
-- **[Compatibility Matrix](Compatibility-Matrix.md)** - Version compatibility and upgrade paths
+- **[CHANGELOG](https://github.com/xnodeoncode/Nine/blob/main/CHANGELOG.md)** - What's new in each release
+- **[Database Management Guide](https://github.com/xnodeoncode/Nine/blob/main/Documentation/Database-Management-Guide.md)** - Backup, restore and troubleshooting
+- **[Compatibility Matrix](https://github.com/xnodeoncode/Nine/blob/main/Documentation/Compatibility-Matrix.md)** - Version compatibility and upgrade paths
 
 ### Getting Help
 
-- **Email Support:** cisguru@outlook.com
+- **Email Support:** [cisguru@outlook.com](mailto:cisguru@outlook.com?subject=Nine%20Support%20-%20Quick%20Start%20Guide)
 - **Report Bugs:** [GitHub Issues](https://github.com/xnodeoncode/Nine/issues)
 - **Request Features:** [GitHub Discussions](https://github.com/xnodeoncode/Nine/discussions)
-- **Documentation:** [`/Documentation`](.)
+- **Documentation:** [Documentation](https://github.com/xnodeoncode/Nine/tree/main/Documentation)
 
 ---
 
@@ -290,7 +414,7 @@ You have completed the Quick Start Guide. You have:
 
 **Organization:** click **Organization** in the left menu (administrators) to edit your organization's details.
 
-**Your account:** click your name or email in the navigation to open **Account → Manage**. From there you can update your profile, change your password, and set up two-factor authentication.
+**Your account:** click your name or email in the navigation to open **Account → Manage**. From there you can update your profile and change your password.
 
 **Notifications:** open **Notifications → Preferences** to choose which in-app notifications you receive.
 
@@ -389,7 +513,7 @@ Not yet.
 
 - Verify your email and password and check Caps Lock.
 - After repeated failed attempts the account can be locked temporarily; wait and try again.
-- If you forgot your password, use the **Forgot your password?** link on the login page.
+- If you forgot your password, work with an administrator who has access to unlock your account.
 
 <!-- VERIFY: that the login page has a forgot-password link in the Electron build and that account lockout applies. Also confirm where application logs are stored so a logs entry can be added. -->
 
@@ -397,7 +521,7 @@ Not yet.
 
 ## Support
 
-**Email:** cisguru@outlook.com  
+**Email:** [cisguru@outlook.com](mailto:cisguru@outlook.com?subject=Nine%20Support%20-%20Quick%20Start%20Guide)  
 **GitHub:** [https://github.com/xnodeoncode/Nine](https://github.com/xnodeoncode/Nine)
 
 When contacting support, please include:
