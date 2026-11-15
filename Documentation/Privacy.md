@@ -7,11 +7,13 @@
 
 ## Summary
 
-Nine is a desktop application that runs entirely on your computer. Your data stays on your computer. Nine does not collect
-it, transmit it, or share it with anyone, and it has no accounts, servers or services of its own.
+Nine is a desktop application that runs entirely on your computer. It stores the information you enter on your computer, and
+that information stays there. Nine does not transmit it or share it with anyone, and it has no accounts, servers or
+services of its own.
 
 - **Your data is stored locally** in a database file on your computer. You can encrypt it.
-- **Nine collects nothing.** It has no analytics, telemetry, advertising or crash-reporting code.
+- **Nine shares nothing.** It does not send your information anywhere, and it has no analytics, telemetry, advertising or
+  crash-reporting code. The only information it holds is what you enter.
 - **Nine makes no outbound network connections.** It works fully offline.
 - **You are in control.** You decide what to enter, back up, export or delete.
 
@@ -59,7 +61,8 @@ forms from forged requests. They stay on your computer and are not used for trac
 
 ## What Nine Does Not Do
 
-- It does not collect usage data, analytics or diagnostics.
+- It does not collect anything about you or how you use it, such as usage data, analytics or diagnostics. The only
+  information it holds is what you enter.
 - It does not contain advertising or third-party tracking.
 - It does not send crash reports.
 - It does not send email or text messages. No email or SMS provider is configured in Nine, and it has no screens for
@@ -71,8 +74,9 @@ forms from forged requests. They stay on your computer and are not used for trac
 
 ## Network Access
 
-Nine runs a small web server that is used only by the Nine window on your computer. It listens on your local machine only
-(`localhost`) and is not reachable from other computers. Requests from Nine to anything outside your computer are blocked.
+Nine runs a small web server that the Nine window uses on your computer. It listens on your local machine only
+(`localhost`) and is not reachable from other computers. As with any local service, other programs running on your
+computer can reach it. The Nine window is set to block its own requests to anything outside your computer.
 
 Links to external websites, such as release notes and documentation, are handed to your **default web browser**. When you
 open one, that is your browser connecting to the website, not Nine, and the website's and your browser's own privacy

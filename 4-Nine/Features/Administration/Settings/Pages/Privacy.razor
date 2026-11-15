@@ -16,12 +16,16 @@
     <div class="alert alert-success" role="alert">
         <h5 class="alert-heading">Summary</h5>
         <p class="mb-2">
-            Nine runs entirely on your computer. Your data stays on your computer. Nine does not collect it, transmit it,
-            or share it with anyone, and it has no accounts, servers or services of its own.
+            Nine runs entirely on your computer. It stores the information you enter on your computer, and that
+            information stays there. Nine does not transmit it or share it with anyone, and it has no accounts, servers
+            or services of its own.
         </p>
         <ul class="mb-0">
             <li><strong>Your data is stored locally</strong> in a database file on your computer. You can encrypt it.</li>
-            <li><strong>Nine collects nothing.</strong> It has no analytics, telemetry, advertising or crash-reporting code.</li>
+            <li>
+                <strong>Nine shares nothing.</strong> It does not send your information anywhere, and it has no analytics,
+                telemetry, advertising or crash-reporting code. The only information it holds is what you enter.
+            </li>
             <li><strong>Nine makes no outbound network connections.</strong> It works fully offline.</li>
             <li><strong>You are in control.</strong> You decide what to enter, back up, export or delete.</li>
         </ul>
@@ -76,7 +80,10 @@
 
     <h2 class="h4 mt-4">What Nine does not do</h2>
     <ul>
-        <li>It does not collect usage data, analytics or diagnostics.</li>
+        <li>
+            It does not collect anything about you or how you use it, such as usage data, analytics or diagnostics. The
+            only information it holds is what you enter.
+        </li>
         <li>It does not contain advertising or third-party tracking.</li>
         <li>It does not send crash reports.</li>
         <li>
@@ -89,9 +96,10 @@
 
     <h2 class="h4 mt-4">Network access</h2>
     <p>
-        Nine runs a small web server that is used only by the Nine window on your computer. It listens on your local
-        machine only (<code>localhost</code>) and is not reachable from other computers. Requests from Nine to anything
-        outside your computer are blocked.
+        Nine runs a small web server that the Nine window uses on your computer. It listens on your local machine only
+        (<code>localhost</code>) and is not reachable from other computers. As with any local service, other programs
+        running on your computer can reach it. The Nine window is set to block its own requests to anything outside
+        your computer.
     </p>
     <p>
         Links to external websites, such as release notes and documentation, are handed to your <strong>default web
