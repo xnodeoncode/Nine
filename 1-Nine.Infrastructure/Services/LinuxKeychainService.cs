@@ -1,5 +1,7 @@
 using System.Runtime.InteropServices;
 using System.Text;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Nine.Infrastructure.Interfaces;
 
 namespace Nine.Infrastructure.Services;
@@ -13,16 +15,19 @@ public class LinuxKeychainService : IKeychainService
     private const string Schema = "co.nineapp.database";
     private const string KeyAttribute = "key-type";
     private readonly string _keyValue;
+    private readonly ILogger _logger;
     
     /// <summary>
     /// Initialize keychain service with app-specific identifier
     /// </summary>
     /// <param name="appName">Application name (e.g., "Nine-Web", "Nine-Electron", "Professional-Web") to prevent keychain conflicts</param>
-    public LinuxKeychainService(string appName = "Nine-Electron")
+    /// <param name="logger">Optional logger for routine diagnostics (written at Debug level). Omit during startup, before DI is available.</param>
+    public LinuxKeychainService(string appName = "Nine-Electron", ILogger? logger = null)
     {
+        _logger = logger ?? NullLogger.Instance;
         // Make keychain entry unique per application to prevent password conflicts
         _keyValue = $"database-encryption-{appName}";
-        Console.WriteLine($"[LinuxKeychainService] Initialized with key attribute value: {_keyValue}");
+        _logger.LogDebug("Keychain initialized with key attribute value {KeyValue}", _keyValue);
     }
     
     /// <summary>
@@ -79,7 +84,7 @@ public class LinuxKeychainService : IKeychainService
         
         try
         {
-            Console.WriteLine($"[LinuxKeychainService] Retrieving key with attribute value: {_keyValue}");
+            _logger.LogDebug("Retrieving key with attribute value {KeyValue}", _keyValue);
             var process = new System.Diagnostics.Process
             {
                 StartInfo = new System.Diagnostics.ProcessStartInfo
@@ -101,8 +106,8 @@ public class LinuxKeychainService : IKeychainService
             
             process.WaitForExit(5000);
             
-            Console.WriteLine($"[LinuxKeychainService] secret-tool exit code: {process.ExitCode}");
-            Console.WriteLine($"[LinuxKeychainService] secret-tool output: [{(string.IsNullOrWhiteSpace(output) ? "empty" : "received")}]");
+            _logger.LogDebug("secret-tool exit code {ExitCode}", process.ExitCode);
+            _logger.LogDebug("secret-tool output status: {Status}", string.IsNullOrWhiteSpace(output) ? "empty" : "received");
             if (!string.IsNullOrWhiteSpace(error))
             {
                 Console.WriteLine($"[LinuxKeychainService] secret-tool error: {error}");

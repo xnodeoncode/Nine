@@ -172,9 +172,10 @@ builder.Services.AddScoped<PasswordDerivationService>();
 builder.Services.AddScoped<IKeychainService>(sp =>
 {
     var appName = "Nine-Electron";
+    var loggerFactory = sp.GetRequiredService<ILoggerFactory>();
     if (OperatingSystem.IsWindows())
-        return new WindowsKeychainService(appName);
-    return new LinuxKeychainService(appName);
+        return new WindowsKeychainService(appName, loggerFactory.CreateLogger<WindowsKeychainService>());
+    return new LinuxKeychainService(appName, loggerFactory.CreateLogger<LinuxKeychainService>());
 });
 builder.Services.AddScoped<DatabaseEncryptionService>();
 builder.Services.AddScoped<DatabasePasswordService>();
