@@ -144,6 +144,15 @@ public static class ElectronServiceExtensions
             // Ensure cookie is persisted (not session-only)
             options.Cookie.MaxAge = TimeSpan.FromDays(30);
             options.Cookie.IsEssential = true;
+
+            // Cookies are not separated by port, so versions run side by side share one
+            // localhost cookie jar. Naming the cookie after the schema version keeps each
+            // version's sign-in from overwriting the other's.
+            var schemaVersion = configuration["ApplicationSettings:SchemaVersion"];
+            if (!string.IsNullOrWhiteSpace(schemaVersion))
+            {
+                options.Cookie.Name = $".Nine.Auth.{schemaVersion}";
+            }
             
             // For localhost Electron app, allow non-HTTPS cookies
             options.Cookie.SecurePolicy = Microsoft.AspNetCore.Http.CookieSecurePolicy.SameAsRequest;
