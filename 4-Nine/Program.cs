@@ -164,6 +164,7 @@ builder.Services.AddScoped<NineFinancialReportService>(); // Nine uses Repairs f
 builder.Services.AddScoped<FinancialReportPdfGenerator>();
 builder.Services.AddScoped<ChecklistPdfGenerator>();
 builder.Services.AddScoped<DatabaseBackupService>();
+builder.Services.AddScoped<DatabaseHealthService>();
 builder.Services.AddScoped<SchemaValidationService>();
 builder.Services.AddScoped<LeaseWorkflowService>();
 

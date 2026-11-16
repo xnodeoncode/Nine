@@ -428,8 +428,8 @@ Nine monitors database health continuously:
 **Run a manual health check:**
 
 1. **Navigate to:** Application → Manage Database → Database Health Pane
-2. **Click:** "Check Health" button
-3. **Wait:** Health check runs (5-15 seconds)
+2. **Click:** "Check Health" button (the check also runs automatically when the page opens)
+3. **Wait:** Health check runs (a few seconds)
 4. **Results displayed:**
 
    ```
@@ -441,16 +441,20 @@ Nine monitors database health continuously:
    Connection status: Connected
    Integrity check: PASSED
 
-   Record counts:
+   Active record counts:
    - Properties: 9
    - Tenants: 12
    - Leases: 8
    - Invoices: 96
    - Payments: 89
 
-   Last backup: February 18, 2026 2:00 AM
-   Next scheduled backup: February 19, 2026 2:00 AM
+   Last backup: Wednesday, February 18, 2026 2:00 PM
    ```
+
+   **Notes:**
+
+   - Record counts are for the active organization only. Properties, tenants and leases count active, non-deleted records; invoices and payments count non-deleted, non-archived records.
+   - **Last backup** is the newest file in the Backups folder, based on the timestamp in the backup file name (falling back to the file's modified time).
 
 ### Health Indicators
 
@@ -459,20 +463,18 @@ Nine monitors database health continuously:
 - ✅ **Connection status: Connected** - Database accessible
 - ✅ **Integrity check: PASSED** - No corruption detected
 - ✅ **Schema version: 1.1.0** - Matches application version
-- ✅ **File accessible: Yes** - Database file readable and writable
 
 **Yellow indicators (warning):**
 
 - ⚠️ **File size large** - Database over 500 MB (consider cleanup)
-- ⚠️ **No recent backup** - Last backup over 7 days ago
-- ⚠️ **Slow queries** - Database performance degraded
+- ⚠️ **No recent backup** - Last backup over 7 days ago, or no backups found
 
 **Red indicators (critical):**
 
 - ❌ **Connection failed** - Cannot connect to database
 - ❌ **Integrity check: FAILED** - Corruption detected
 - ❌ **Schema mismatch** - Version incompatibility
-- ❌ **File locked** - Another process using database
+- ❌ **File locked** - Another process using the database (reported as a connection failure)
 
 ---
 
