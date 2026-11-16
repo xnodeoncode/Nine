@@ -454,7 +454,8 @@ Nine monitors database health continuously:
 
    **Notes:**
 
-   - Record counts are for the active organization only (not deleted, not archived). Counts include records that are not deleted and not archived.
+   - **Location** is the full path of the active database file (on Linux typically under `~/.config/Nine/`, on Windows under `%APPDATA%\Nine\`).
+   - Record counts are for the active organization only and include records that are not deleted and not archived. The `IsActive` flag is not used.
    - **Last backup** is the newest file in the Backups folder, based on the timestamp in the backup file name (falling back to the file's modified time).
 
 ### Health Indicators
