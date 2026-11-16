@@ -46,7 +46,7 @@
     },
     "extraFiles": [
       {
-        "from": "Assets/co.nineapp.nine.appdata.xml",
+        "from": "bin/Assets/co.nineapp.nine.appdata.xml",
         "to": "usr/share/metainfo/co.nineapp.nine.appdata.xml"
       }
     ]
