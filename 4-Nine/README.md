@@ -190,6 +190,8 @@ Nine/
 │   │
 │   ├── Assets/                        # Artifacts need to support the Electron build process
 │   │   └── ...
+│   ├── Utilities/                     # Install, removal, diagnostic and verification scripts (bash and PowerShell)
+│   │   └── ...
 │   ├── Data/                          # Database context, creation and migration scripts
 │   │   └── ...
 │   ├── Entities/                      # Local application specific entities
@@ -200,7 +202,7 @@ Nine/
 │   │   ├── Administration/            # Admin features
 │   │   │   ├── Application/           # Daily report and schema management
 │   │   │   ├── Organizations/         # Organization information and settings
-│   │   │   ├── Settings/              # Application settings and database managment
+│   │   │   ├── Settings/              # Application settings and database management
 │   │   │   ├── Users/                 # User management
 │   │   │   └── Dashboard.razor
 │   │   ├── Calendar/                  # Calendar grid and list views
@@ -218,7 +220,7 @@ Nine/
 │   │   │   ├── Repairs/               # Repair CRUD & management
 │   │   │   ├── Reports/               # Financial & operational reports
 │   │   │   └── SecurityDeposits/      # Security deposit management
-│   │   │   └── Tenants/               # Tenant CRUD & managment
+│   │   │   └── Tenants/               # Tenant CRUD & management
 │   │   └── ...
 │   │   │
 │   ├── Fonts/                         # Licensed fonts for use in the UI
