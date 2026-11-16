@@ -164,6 +164,7 @@ builder.Services.AddScoped<NineFinancialReportService>(); // Nine uses Repairs f
 builder.Services.AddScoped<FinancialReportPdfGenerator>();
 builder.Services.AddScoped<ChecklistPdfGenerator>();
 builder.Services.AddScoped<DatabaseBackupService>();
+builder.Services.AddScoped<DatabaseHealthService>();
 builder.Services.AddScoped<SchemaValidationService>();
 builder.Services.AddScoped<LeaseWorkflowService>();
 
@@ -172,9 +173,10 @@ builder.Services.AddScoped<PasswordDerivationService>();
 builder.Services.AddScoped<IKeychainService>(sp =>
 {
     var appName = "Nine-Electron";
+    var loggerFactory = sp.GetRequiredService<ILoggerFactory>();
     if (OperatingSystem.IsWindows())
-        return new WindowsKeychainService(appName);
-    return new LinuxKeychainService(appName);
+        return new WindowsKeychainService(appName, loggerFactory.CreateLogger<WindowsKeychainService>());
+    return new LinuxKeychainService(appName, loggerFactory.CreateLogger<LinuxKeychainService>());
 });
 builder.Services.AddScoped<DatabaseEncryptionService>();
 builder.Services.AddScoped<DatabasePasswordService>();
@@ -776,6 +778,11 @@ async Task ElectronAppReady()
         app.Logger.LogWarning(ex, "Backend health check failed, will show offline page");
     }
 
+    // Packaged builds get their icon from electron-builder; in development the window would show
+    // Electron's default icon, so point it at the app icon copied next to the binaries.
+    var iconPath = Path.Combine(AppContext.BaseDirectory, "Assets",
+        OperatingSystem.IsWindows() ? "icon.ico" : "icon.png");
+
     var window = await Electron.WindowManager.CreateWindowAsync(new ElectronNET.API.Entities.BrowserWindowOptions
     {
         Width = 1600,
@@ -783,6 +790,7 @@ async Task ElectronAppReady()
         MinWidth = 800,
         MinHeight = 600,
         Show = false,
+        Icon = File.Exists(iconPath) ? iconPath : null,
     });
 
     if (OperatingSystem.IsLinux() || OperatingSystem.IsWindows())

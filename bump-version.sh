@@ -18,6 +18,7 @@ for arg in "$@"; do
 done
 CSPROJ_FILE="4-Nine/Nine.csproj"
 APPSETTINGS_FILE="4-Nine/appsettings.json"
+ELECTRON_BUILDER_FILE="4-Nine/Properties/electron-builder.json"
 
 # Colors for output
 RED='\033[0;31m'
@@ -89,6 +90,15 @@ sed -i "s|<InformationalVersion>$CURRENT_VERSION</InformationalVersion>|<Informa
 # Update appsettings.json
 echo -e "${YELLOW}📝 Updating $APPSETTINGS_FILE...${NC}"
 sed -i "s|\"Version\": \"$CURRENT_VERSION\"|\"Version\": \"$NEW_VERSION\"|g" "$APPSETTINGS_FILE"
+
+# Update electron-builder buildVersion (AppImageHub requires it to match the app version).
+# Matches any existing value so it also corrects a value that has drifted.
+echo -e "${YELLOW}📝 Updating $ELECTRON_BUILDER_FILE...${NC}"
+if grep -q '"buildVersion"' "$ELECTRON_BUILDER_FILE"; then
+    sed -i "s|\"buildVersion\": \"[^\"]*\"|\"buildVersion\": \"$NEW_VERSION\"|" "$ELECTRON_BUILDER_FILE"
+else
+    echo -e "${RED}⚠️  No buildVersion found in $ELECTRON_BUILDER_FILE - add it manually${NC}"
+fi
 
 # Update database settings only when --bump-db is explicitly passed
 if [ "$BUMP_DB" == "true" ]; then

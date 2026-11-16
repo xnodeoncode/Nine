@@ -1,0 +1,185 @@
+@page "/licenses"
+@inject ApplicationService ApplicationService
+@attribute [AllowAnonymous]
+@rendermode InteractiveServer
+
+@namespace Nine.Features.Administration.Settings.Pages
+
+<PageTitle>Third-Party Licenses</PageTitle>
+
+<div class="container py-4">
+    <h1 class="mb-3"><i class="bi bi-file-earmark-text me-2"></i>Third-Party Licenses</h1>
+
+    <p>
+        Nine is licensed under the MIT License
+        (<a href="licenses/Nine-LICENSE.txt" target="_blank">view</a>). Nine includes third-party software that is
+        licensed separately. This page lists the components included in Nine @ApplicationService.ApplicationSettings.Version
+        and the license that applies to each. The license texts are stored with the application, so they are available
+        without an internet connection. They are the licenses that came with the versions of the components listed here.
+    </p>
+    <p class="text-muted small">This notice is informational and is not legal advice.</p>
+
+    <div class="alert alert-warning" role="alert">
+        <h5 class="alert-heading"><i class="bi bi-exclamation-triangle me-2"></i>QuestPDF (PDF generation)</h5>
+        <p class="mb-2">
+            Nine uses QuestPDF to generate its documents (leases, renewals, invoices, receipts, inspections, checklists
+            and reports). QuestPDF is <strong>not</strong> covered by Nine's MIT license. It is used under QuestPDF's own
+            license terms:
+        </p>
+        <ul class="mb-2">
+            <li>Free for individuals and organizations with annual gross revenue under USD 1,000,000.</li>
+            <li>Free for charitable organizations, qualifying academic institutions and open-source projects.</li>
+            <li>
+                Government and public-sector organizations and publicly traded companies require a paid QuestPDF
+                license.
+            </li>
+        </ul>
+        <p class="mb-2">
+            <strong>You are responsible for confirming that you are eligible to use QuestPDF.</strong>
+        </p>
+        <p class="mb-0">
+            <a href="licenses/questpdf/QuestPDF-PackageLicense.txt" target="_blank">QuestPDF license (version @QuestPdfVersion)</a>
+            &middot;
+            <a href="https://www.questpdf.com/license/community.html" target="_blank">Current terms on questpdf.com</a>
+            (opens in your default browser)
+        </p>
+    </div>
+
+    <h2 class="h4 mt-4">Components</h2>
+    <div class="table-responsive">
+        <table class="table table-sm align-middle">
+            <thead>
+                <tr>
+                    <th>Component</th>
+                    <th>Version</th>
+                    <th>License</th>
+                    <th>Used for</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Components)
+                {
+                    <tr>
+                        <td>@item.Name</td>
+                        <td>@item.Version</td>
+                        <td>
+                            @for (var i = 0; i < item.Texts.Count; i++)
+                            {
+                                if (i > 0)
+                                {
+                                    <text>, </text>
+                                }
+                                <a href="@item.Texts[i].Path" target="_blank">@item.Texts[i].Label</a>
+                            }
+                            @if (item.Texts.Count == 0)
+                            {
+                                <span>@item.License</span>
+                            }
+                            else if (!string.IsNullOrEmpty(item.License))
+                            {
+                                <span class="text-muted">(@item.License)</span>
+                            }
+                        </td>
+                        <td class="text-muted small">@item.Purpose</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <h2 class="h4 mt-4">Components bundled with QuestPDF</h2>
+    <p>
+        QuestPDF includes the following components, each under its own license:
+        @for (var i = 0; i < QuestPdfBundled.Count; i++)
+        {
+            if (i > 0)
+            {
+                <text>, </text>
+            }
+            <a href="@QuestPdfBundled[i].Path" target="_blank">@QuestPdfBundled[i].Label</a>
+        }.
+    </p>
+
+    <h2 class="h4 mt-4">Electron and Chromium</h2>
+    <p>
+        The desktop application is built on Electron (MIT) and Chromium, which include many third-party components.
+        Their license texts are installed with the application, in the application's installation folder
+        (<code>LICENSE.electron.txt</code> and <code>LICENSES.chromium.html</code>).
+    </p>
+
+    <p class="mt-4">
+        <a href="licenses/THIRD-PARTY-NOTICES.txt" target="_blank"><i class="bi bi-file-earmark-text me-1"></i>Plain-text version of this notice</a>
+    </p>
+</div>
+
+@code {
+    private const string QuestPdfVersion = "2025.12.1";
+
+    private record LicenseText(string Label, string Path);
+
+    private record ComponentLicense(
+        string Name,
+        string Version,
+        string License,
+        string Purpose,
+        IReadOnlyList<LicenseText> Texts);
+
+    // Snapshot of the components in this release and the license text that came with each version.
+    // When a component or the .NET runtime is upgraded, verify the license and update the files in
+    // wwwroot/licenses and this list (see Documentation/Third-Party-Licensing-Notices.md).
+    private IReadOnlyList<ComponentLicense> Components => new List<ComponentLicense>
+    {
+        new("Nine", ApplicationService.ApplicationSettings.Version, "MIT", "This application",
+            new[] { new LicenseText("MIT License", "licenses/Nine-LICENSE.txt") }),
+        new(".NET runtime and ASP.NET Core", "10.0.12", "MIT", "Application runtime",
+            new[]
+            {
+                new LicenseText("License", "licenses/dotnet/LICENSE.txt"),
+                new LicenseText(".NET notices", "licenses/dotnet/THIRD-PARTY-NOTICES-NETCore.txt"),
+                new LicenseText("ASP.NET Core notices", "licenses/dotnet/THIRD-PARTY-NOTICES-AspNetCore.txt")
+            }),
+        new("ASP.NET Core Identity, Entity Framework Core, Microsoft.Data.Sqlite, Microsoft.Extensions.*, System.Security.Cryptography.*",
+            "9.0 - 10.0", "MIT", "Accounts, data access, logging and security",
+            new[] { new LicenseText("License", "licenses/dotnet/LICENSE.txt") }),
+        new("SQLCipher", "via SQLitePCLRaw 2.1.11", "BSD-style", "Database encryption",
+            new[] { new LicenseText("License", "licenses/SQLCipher-LICENSE.txt") }),
+        new("SQLitePCLRaw", "2.1.11", "Apache-2.0", "SQLite / SQLCipher bindings",
+            new[] { new LicenseText("License", "licenses/SQLitePCLRaw-LICENSE.txt") }),
+        new("Electron", "30.4.0", "MIT", "Desktop shell (with Chromium)", Array.Empty<LicenseText>()),
+        new("Electron.NET (ElectronNET.Core)", "0.4.1", "MIT", "Connects the application to Electron",
+            new[] { new LicenseText("License", "licenses/ElectronNET-LICENSE.txt") }),
+        new("SocketIOClient", "3.1.2", "MIT", "Used by Electron.NET",
+            new[] { new LicenseText("License", "licenses/SocketIOClient-LICENSE.txt") }),
+        new("Newtonsoft.Json", "13.0.3", "MIT", "JSON handling",
+            new[] { new LicenseText("License", "licenses/Newtonsoft.Json-LICENSE.txt") }),
+        new("SendGrid", "9.29.3", "MIT", "Email integration (being phased out)",
+            new[] { new LicenseText("License", "licenses/SendGrid-LICENSE.txt") }),
+        new("Twilio", "7.14.0", "MIT", "SMS integration (being phased out)",
+            new[] { new LicenseText("License", "licenses/Twilio-LICENSE.txt") }),
+        new("starkbank-ecdsa", "1.3.3", "MIT", "Used by SendGrid",
+            new[] { new LicenseText("License", "licenses/starkbank-ecdsa-LICENSE.txt") }),
+        new("Bootstrap", "5.3.3", "MIT", "User interface styling",
+            new[] { new LicenseText("License", "licenses/Bootstrap-LICENSE.txt") }),
+        new("Bootstrap Icons", "1.13.1", "MIT", "User interface icons",
+            new[] { new LicenseText("License", "licenses/BootstrapIcons-LICENSE.txt") }),
+        new("QuestPDF", QuestPdfVersion, "See notice above", "PDF generation",
+            new[] { new LicenseText("License", "licenses/questpdf/QuestPDF-PackageLicense.txt") })
+    };
+
+    private static readonly IReadOnlyList<LicenseText> QuestPdfBundled = new List<LicenseText>
+    {
+        new("Skia", "licenses/questpdf/third-party-skia.txt"),
+        new("HarfBuzz", "licenses/questpdf/third-party-harfbuzz.txt"),
+        new("ICU", "licenses/questpdf/third-party-icu.txt"),
+        new("libjpeg-turbo", "licenses/questpdf/third-party-libjpeg-turbo.txt"),
+        new("libpng", "licenses/questpdf/third-party-libpng.txt"),
+        new("libwebp", "licenses/questpdf/third-party-libwebp.txt"),
+        new("zlib", "licenses/questpdf/third-party-zlib.txt"),
+        new("expat", "licenses/questpdf/third-party-expat.txt"),
+        new("qpdf", "licenses/questpdf/third-party-qpdf.txt"),
+        new("wuffs", "licenses/questpdf/third-party-wuffs.txt"),
+        new("emsdk", "licenses/questpdf/third-party-emsdk.txt"),
+        new("ninja-build", "licenses/questpdf/third-party-ninja-build.txt"),
+        new("Lato font (SIL Open Font License)", "licenses/questpdf/Lato-OFL.txt")
+    };
+}

@@ -321,10 +321,27 @@
                                 <dt class="col-sm-5">License</dt>
                                 <dd class="col-sm-7">
                                     MIT License 
-                                    <a href="https://github.com/xnodeoncode/Nine/blob/main/LICENSE" 
+                                    <a href="licenses/Nine-LICENSE.txt" 
                                        target="_blank" 
                                        class="ms-2">
                                         <i class="bi bi-box-arrow-up-right"></i> View
+                                    </a>
+                                </dd>
+
+                                <dt class="col-sm-5">Third-Party Licenses</dt>
+                                <dd class="col-sm-7">
+                                    <a href="licenses">
+                                        <i class="bi bi-file-earmark-text me-1"></i>View third-party licenses
+                                    </a>
+                                    <a href="about#third-party-licenses" class="ms-3">
+                                        <i class="bi bi-info-circle me-1"></i>About Nine
+                                    </a>
+                                </dd>
+
+                                <dt class="col-sm-5">Privacy</dt>
+                                <dd class="col-sm-7">
+                                    <a href="privacy">
+                                        <i class="bi bi-shield-lock me-1"></i>View privacy statement
                                     </a>
                                 </dd>
 
@@ -370,19 +387,19 @@
                         </div>
                         <div class="card-body">
                             <div class="list-group list-group-flush">
-                                <a href="https://github.com/xnodeoncode/Nine/blob/main/Documentation/Quick-Start-Guide.md" 
+                                <a href="@($"{DocsBlobBase}/Quick-Start-Guide.md")" 
                                    target="_blank" 
                                    class="list-group-item list-group-item-action">
                                     <i class="bi bi-rocket-takeoff me-2"></i>Quick Start Guide
                                     <i class="bi bi-box-arrow-up-right ms-2 small text-muted"></i>
                                 </a>
-                                <a href="https://github.com/xnodeoncode/Nine/blob/main/Documentation/Database-Management-Guide.md" 
+                                <a href="@($"{DocsBlobBase}/Database-Management-Guide.md")" 
                                    target="_blank" 
                                    class="list-group-item list-group-item-action">
                                     <i class="bi bi-database-gear me-2"></i>Database Management Guide
                                     <i class="bi bi-box-arrow-up-right ms-2 small text-muted"></i>
                                 </a>
-                                <a href="https://github.com/xnodeoncode/Nine/tree/main/Documentation" 
+                                <a href="@DocsTreeUrl" 
                                    target="_blank" 
                                    class="list-group-item list-group-item-action">
                                     <i class="bi bi-collection me-2"></i>All Documentation
@@ -400,6 +417,15 @@
 </div>
 
 @code {
+    // Documentation links are pinned to the tag for the installed version (vX.Y.Z), so users read the
+    // guides that match the version they are running. They open in the default browser.
+    private string RepositoryUrl => string.IsNullOrWhiteSpace(ApplicationService.ApplicationSettings.Repository)
+        ? "https://github.com/xnodeoncode/Nine"
+        : ApplicationService.ApplicationSettings.Repository.TrimEnd('/');
+    private string VersionTag => $"v{ApplicationService.ApplicationSettings.Version}";
+    private string DocsBlobBase => $"{RepositoryUrl}/blob/{VersionTag}/Documentation";
+    private string DocsTreeUrl => $"{RepositoryUrl}/tree/{VersionTag}/Documentation";
+
     private OrganizationSettingsEntity? settings;
     private OrganizationSettingsModel settingsModel = new();
     private bool isLoading = true;
@@ -471,7 +497,7 @@
                 OrganizationId = organizationId,
                 LateFeeEnabled = true,
                 LateFeeAutoApply = true,
-                LateFeeGracePeriodDays = 3,
+                LateFeeGracePeriodDays = 5,
                 LateFeePercentage = 0.05m,
                 MaxLateFeeAmount = 50.00m,
                 CreatedOn = DateTime.UtcNow,
@@ -666,7 +692,7 @@
 
         [Required]
         [Range(0, 30, ErrorMessage = "Grace period must be between 0 and 30 days")]
-        public int LateFeeGracePeriodDays { get; set; } = 3;
+        public int LateFeeGracePeriodDays { get; set; } = 5;
 
         [Required]
         [Range(0, 1, ErrorMessage = "Late fee percentage must be between 0% and 100%")]

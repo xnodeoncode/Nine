@@ -1,4 +1,11 @@
-# Third-Party Licensing Notices
+# Nine. - Third-Party Licensing Notices
+
+---
+
+**Version:** 1.2.0  
+**Last Updated:** November 16, 2026
+
+---
 
 Nine is licensed under the [MIT License](../LICENSE). Nine depends on third-party software that is licensed separately. This document lists those components and their licenses so that people who install, operate, or redistribute Nine can review the terms that apply to them.
 
@@ -12,12 +19,12 @@ _Last reviewed: 2026-11-12 (Nine dependency versions as listed below)._
 
 Nine uses **QuestPDF** to generate its PDF documents (leases, lease renewals, invoices, payment receipts, inspections, checklists, and financial reports). QuestPDF is **not** covered by Nine's MIT license. It has its own license terms, and **you are responsible for confirming that you are eligible to use it.**
 
-| Item                       | Detail                                                                                    |
-| -------------------------- | ----------------------------------------------------------------------------------------- |
-| Package / version          | `QuestPDF` 2025.12.1 (referenced in `1-Nine.Infrastructure` and `4-Nine`)                 |
-| Vendor                     | Marcin Ziąbek (QuestPDF), <https://www.questpdf.com>                                      |
-| License selection in code  | Each PDF generator sets `QuestPDF.Settings.License = LicenseType.Community`               |
-| Use in Nine                | Only for documents Nine itself creates. Nine does not expose general-purpose PDF generation. |
+| Item                      | Detail                                                                                       |
+| ------------------------- | -------------------------------------------------------------------------------------------- |
+| Package / version         | `QuestPDF` 2025.12.1 (referenced in `1-Nine.Infrastructure` and `4-Nine`)                    |
+| Vendor                    | Marcin Ziąbek (QuestPDF), <https://www.questpdf.com>                                         |
+| License selection in code | Each PDF generator sets `QuestPDF.Settings.License = LicenseType.Community`                  |
+| Use in Nine               | Only for documents Nine itself creates. Nine does not expose general-purpose PDF generation. |
 
 ### Eligibility summary (verify with QuestPDF)
 
@@ -57,39 +64,39 @@ The QuestPDF package ships additional components under their own licenses (licen
 
 Licenses below were read from each package's `.nuspec` in the NuGet cache unless noted.
 
-| Component                                            | Version     | License          | Notes                                                       |
-| ---------------------------------------------------- | ----------- | ---------------- | ----------------------------------------------------------- |
-| Microsoft.AspNetCore.Identity.EntityFrameworkCore    | 10.0.1      | MIT              | Authentication / user management                            |
-| Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore | 10.0.1      | MIT              |                                                             |
-| Microsoft.AspNetCore.Components.Web                  | 10.0.1      | MIT              | Blazor components                                           |
-| Microsoft.AspNetCore.SignalR.Client                  | 10.0.1      | MIT              |                                                             |
-| Microsoft.EntityFrameworkCore                        | 10.0.1      | MIT              |                                                             |
-| Microsoft.EntityFrameworkCore.Sqlite                 | 10.0.1      | MIT              |                                                             |
-| Microsoft.Data.Sqlite.Core                           | 10.0.9      | MIT              |                                                             |
-| Microsoft.Extensions.Logging.Abstractions            | 10.0.1      | MIT              |                                                             |
-| Microsoft.Extensions.Options                         | 10.0.1      | MIT              |                                                             |
-| System.Security.Cryptography.ProtectedData           | 9.0.0       | MIT              |                                                             |
-| System.Security.Cryptography.Pkcs                    | 9.0.21      | MIT              |                                                             |
-| SQLitePCLRaw.bundle_e_sqlcipher                      | 2.1.11      | Apache-2.0       | SourceGear. Bundles native SQLCipher builds (see below)     |
-| SendGrid                                             | 9.29.3      | MIT              | Email delivery client                                       |
-| Twilio                                               | 7.14.0      | MIT              | SMS client. License file at the project's GitHub repository |
-| ElectronNET.Core / ElectronNET.Core.AspNet           | 0.4.1       | MIT              | Desktop host                                                |
-| QuestPDF                                             | 2025.12.1   | See above        | **Action required — see QuestPDF section**                  |
+| Component                                            | Version   | License    | Notes                                                       |
+| ---------------------------------------------------- | --------- | ---------- | ----------------------------------------------------------- |
+| Microsoft.AspNetCore.Identity.EntityFrameworkCore    | 10.0.1    | MIT        | Authentication / user management                            |
+| Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore | 10.0.1    | MIT        |                                                             |
+| Microsoft.AspNetCore.Components.Web                  | 10.0.1    | MIT        | Blazor components                                           |
+| Microsoft.AspNetCore.SignalR.Client                  | 10.0.1    | MIT        |                                                             |
+| Microsoft.EntityFrameworkCore                        | 10.0.1    | MIT        |                                                             |
+| Microsoft.EntityFrameworkCore.Sqlite                 | 10.0.1    | MIT        |                                                             |
+| Microsoft.Data.Sqlite.Core                           | 10.0.9    | MIT        |                                                             |
+| Microsoft.Extensions.Logging.Abstractions            | 10.0.1    | MIT        |                                                             |
+| Microsoft.Extensions.Options                         | 10.0.1    | MIT        |                                                             |
+| System.Security.Cryptography.ProtectedData           | 9.0.0     | MIT        |                                                             |
+| System.Security.Cryptography.Pkcs                    | 9.0.21    | MIT        |                                                             |
+| SQLitePCLRaw.bundle_e_sqlcipher                      | 2.1.11    | Apache-2.0 | SourceGear. Bundles native SQLCipher builds (see below)     |
+| SendGrid                                             | 9.29.3    | MIT        | Email delivery client                                       |
+| Twilio                                               | 7.14.0    | MIT        | SMS client. License file at the project's GitHub repository |
+| ElectronNET.Core / ElectronNET.Core.AspNet           | 0.4.1     | MIT        | Desktop host                                                |
+| QuestPDF                                             | 2025.12.1 | See above  | **Action required — see QuestPDF section**                  |
 
 ### Transitive dependencies (pulled in by the packages above)
 
 Found with `dotnet list Nine.sln package --include-transitive`; licenses read from each package's `.nuspec` (non-Microsoft packages only).
 
-| Component                                   | Version        | License    | Pulled in by                                              |
-| ------------------------------------------- | -------------- | ---------- | --------------------------------------------------------- |
-| ElectronNET.Core.API                        | 0.4.1          | MIT        | ElectronNET.Core                                          |
-| SocketIOClient, SocketIO.Core, SocketIO.Serializer.Core, SocketIO.Serializer.SystemTextJson | 3.1.2 | MIT | ElectronNET.Core (host/app communication) |
-| Newtonsoft.Json                             | 13.0.1 / 13.0.3 | MIT       | SendGrid / Twilio / ElectronNET                           |
-| starkbank-ecdsa                             | 1.3.3          | MIT        | SendGrid                                                  |
-| SQLitePCLRaw.core, .provider.e_sqlcipher, .lib.e_sqlcipher | 2.1.11 | Apache-2.0 | SQLitePCLRaw.bundle_e_sqlcipher       |
-| SQLitePCLRaw.bundle_e_sqlite3, .provider.e_sqlite3, .lib.e_sqlite3 | 2.1.11 | Apache-2.0 | Microsoft.EntityFrameworkCore.Sqlite |
-| Humanizer.Core                              | 2.14.1         | MIT        | Microsoft.EntityFrameworkCore.Design (design-time)        |
-| Mono.TextTemplating                         | 3.0.0          | MIT        | Microsoft.EntityFrameworkCore.Design (design-time)        |
+| Component                                                                                   | Version         | License    | Pulled in by                                       |
+| ------------------------------------------------------------------------------------------- | --------------- | ---------- | -------------------------------------------------- |
+| ElectronNET.Core.API                                                                        | 0.4.1           | MIT        | ElectronNET.Core                                   |
+| SocketIOClient, SocketIO.Core, SocketIO.Serializer.Core, SocketIO.Serializer.SystemTextJson | 3.1.2           | MIT        | ElectronNET.Core (host/app communication)          |
+| Newtonsoft.Json                                                                             | 13.0.1 / 13.0.3 | MIT        | SendGrid / Twilio / ElectronNET                    |
+| starkbank-ecdsa                                                                             | 1.3.3           | MIT        | SendGrid                                           |
+| SQLitePCLRaw.core, .provider.e_sqlcipher, .lib.e_sqlcipher                                  | 2.1.11          | Apache-2.0 | SQLitePCLRaw.bundle_e_sqlcipher                    |
+| SQLitePCLRaw.bundle_e_sqlite3, .provider.e_sqlite3, .lib.e_sqlite3                          | 2.1.11          | Apache-2.0 | Microsoft.EntityFrameworkCore.Sqlite               |
+| Humanizer.Core                                                                              | 2.14.1          | MIT        | Microsoft.EntityFrameworkCore.Design (design-time) |
+| Mono.TextTemplating                                                                         | 3.0.0           | MIT        | Microsoft.EntityFrameworkCore.Design (design-time) |
 
 Transitive Microsoft packages (`Microsoft.*`, `System.*`) are omitted; they are MIT licensed. Twilio, SendGrid, Newtonsoft.Json (via SendGrid/Twilio) and starkbank-ecdsa will be removed when the SendGrid and Twilio integrations are phased out.
 
@@ -109,11 +116,11 @@ Nine targets .NET 10. The .NET runtime and ASP.NET Core framework are MIT licens
 
 ## Front-End Assets
 
-| Component         | Version | License | Source                                                                                         |
-| ----------------- | ------- | ------- | ---------------------------------------------------------------------------------------------- |
-| Bootstrap         | 5.3.3   | MIT     | Referenced by the app: `4-Nine/wwwroot/lib/bootstrap/dist/css/` (license header in the CSS file) |
-| Bootstrap (libman copy) | 5.3.8 | MIT | `4-Nine/libman.json` restores `bootstrap@5.3.8` into `wwwroot/lib/bootstrap/css/`; not referenced by `App.razor` |
-| Bootstrap Icons   | 1.13.1  | MIT     | Bundled locally via LibMan in `4-Nine/wwwroot/lib/bootstrap-icons` (CSS, woff, woff2 and the MIT `LICENSE`); no CDN request |
+| Component               | Version | License | Source                                                                                                                      |
+| ----------------------- | ------- | ------- | --------------------------------------------------------------------------------------------------------------------------- |
+| Bootstrap               | 5.3.3   | MIT     | Referenced by the app: `4-Nine/wwwroot/lib/bootstrap/dist/css/` (license header in the CSS file)                            |
+| Bootstrap (libman copy) | 5.3.8   | MIT     | `4-Nine/libman.json` restores `bootstrap@5.3.8` into `wwwroot/lib/bootstrap/css/`; not referenced by `App.razor`            |
+| Bootstrap Icons         | 1.13.1  | MIT     | Bundled locally via LibMan in `4-Nine/wwwroot/lib/bootstrap-icons` (CSS, woff, woff2 and the MIT `LICENSE`); no CDN request |
 
 > **Note:** There are two Bootstrap copies with different versions (5.3.3 in `dist/`, used by `App.razor`; 5.3.8 from `libman.json`). Consolidate them so the shipped version is clear.
 
@@ -125,16 +132,16 @@ Nine targets .NET 10. The .NET runtime and ASP.NET Core framework are MIT licens
 
 ## Development and Test Dependencies (not shipped to end users)
 
-| Component                          | Version  | License    |
-| ---------------------------------- | -------- | ---------- |
-| bUnit                              | 2.7.2    | MIT        |
-| AngleSharp                         | 1.5.0    | MIT        |
-| xUnit                              | 2.9.3    | Apache-2.0 |
-| xunit.runner.visualstudio          | 3.1.4    | Apache-2.0 |
-| Microsoft.NET.Test.Sdk             | 17.14.1  | MIT        |
-| coverlet.collector                 | 6.0.4    | MIT        |
-| Microsoft.EntityFrameworkCore.Design | 10.0.1 | MIT        |
-| Microsoft.EntityFrameworkCore.Tools  | 10.0.1 | MIT        |
+| Component                            | Version | License    |
+| ------------------------------------ | ------- | ---------- |
+| bUnit                                | 2.7.2   | MIT        |
+| AngleSharp                           | 1.5.0   | MIT        |
+| xUnit                                | 2.9.3   | Apache-2.0 |
+| xunit.runner.visualstudio            | 3.1.4   | Apache-2.0 |
+| Microsoft.NET.Test.Sdk               | 17.14.1 | MIT        |
+| coverlet.collector                   | 6.0.4   | MIT        |
+| Microsoft.EntityFrameworkCore.Design | 10.0.1  | MIT        |
+| Microsoft.EntityFrameworkCore.Tools  | 10.0.1  | MIT        |
 
 FluentAssertions was removed from the test projects in favor of xUnit `Assert` because FluentAssertions 8.x is under the Xceed commercial license (free for non-commercial use only).
 
@@ -143,13 +150,25 @@ FluentAssertions was removed from the test projects in favor of xUnit `Assert` b
 ## Items to Complete
 
 - [ ] Hear back from QuestPDF about distributing Nine with QuestPDF and downstream business use (see the PDF license plan).
-- [ ] Surface the QuestPDF notice in the README, public information pages, and the in-app About page.
-- [ ] Add the SQLCipher license text to binary distributions. _Build audit (Linux AppImage `Nine-1.2.0-x86_64.AppImage`): not present, although `libe_sqlcipher.so` and `SQLitePCLRaw.provider.e_sqlcipher.dll` are bundled under `resources/bin/`. The license text must be copied into the package, not just linked._
+- [x] Surface the QuestPDF notice in the README and the in-app About page. _Done on `feature/Release-Readiness-1.2.0`._ Still to do: public information pages / website.
+- [x] Add the SQLCipher license text to binary distributions. _Done: `4-Nine/wwwroot/licenses/SQLCipher-LICENSE.txt` ships with the app (static web asset under `resources/bin/wwwroot/licenses`). Verify in the rebuilt Linux and Windows packages._
 - [x] Confirm Electron / Chromium license files ship in the Linux AppImage. _Audited 2026-11-12: `LICENSE.electron.txt` and `LICENSES.chromium.html` are present in both `linux-unpacked/` and the extracted AppImage._
 - [ ] Confirm Electron / Chromium license files in any other packaged desktop build (Flatpak, Windows, macOS). _Only the Linux AppImage was found in the publish output._
-- [ ] Ship a `THIRD-PARTY-NOTICES` file and Nine's `LICENSE` in every package. _Build audit: neither is included in the AppImage, nor are the QuestPDF terms, the Skia/Lato licenses that come with QuestPDF (`libQuestPdfSkia.so` is bundled), or notices for the other NuGet packages._
+- [x] Ship a notices file and Nine's `LICENSE` in every package. _Done: `4-Nine/wwwroot/licenses/` contains `THIRD-PARTY-NOTICES.txt`, `Nine-LICENSE.txt`, the .NET, SQLitePCLRaw, ElectronNET, SocketIOClient, Newtonsoft.Json, SendGrid, Twilio, starkbank-ecdsa, Bootstrap and Bootstrap Icons licenses, and QuestPDF's own license plus its bundled Skia/HarfBuzz/ICU/etc. and Lato font licenses. Verify in the rebuilt packages._
 - [x] Bundle Bootstrap Icons locally instead of using the CDN. _Done on `feature/Bundle-Bootstrap-Icons`; icons confirmed served locally in DevTools._
 - [ ] Re-review this document whenever dependencies change (`dotnet list package` for each project).
+
+## Where the Shipped License Files Live
+
+`4-Nine/wwwroot/licenses/` is served by the app (no internet needed) and packaged under `resources/bin/wwwroot/licenses/`.
+The in-app page `/licenses` ([Licenses.razor](../4-Nine/Features/Administration/Settings/Pages/Licenses.razor)) lists each component with its version and links to
+these files; it is linked from the About page and from Application Settings. The files are a snapshot: they are the licenses that
+came with the component versions in this release. **When a component or the .NET runtime is upgraded, verify the license, replace
+the file here, and update the version in `Licenses.razor`** (and `THIRD-PARTY-NOTICES.txt`):
+
+- `questpdf/` is copied from the QuestPDF NuGet package (`PackageLicense.md`, `ExternalDependencyLicenses/`, `LatoFont/OFL.txt`).
+- `dotnet/` is copied from the `microsoft.netcore.app.runtime.*` and `microsoft.aspnetcore.app.runtime.*` packages (`LICENSE`, `THIRD-PARTY-NOTICES`).
+- The remaining files are the upstream license files for each package (see `THIRD-PARTY-NOTICES.txt`).
 
 ## How to Refresh This List
 

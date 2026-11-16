@@ -49,6 +49,23 @@
     <None Update="Assets\icon.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <!-- Ship the Nine scripts (bash and PowerShell: install, removal, tool, diagnostics and build
+         verification) inside the package so it is self-contained. Normal installs use the copies
+         distributed alongside the release. Only scripts in the Utilities folder are packaged;
+         maintainer tools such as Assets\prepare-appimage-hub-submission.sh stay out. -->
+    <None Update="Utilities\*.sh">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Utilities\*.ps1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <!-- AppImageHub artifacts: desktop-entry template and appdata XML -->
+    <None Update="Assets\nine.desktop">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\co.nineapp.nine.appdata.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <!-- Copy DejaVu fonts to output directory -->
     <None Update="Fonts\DejaVu\*.ttf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

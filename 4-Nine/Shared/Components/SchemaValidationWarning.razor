@@ -2,6 +2,7 @@
 @using Nine.Shared.Services
 @using Nine.Application.Services.PdfGenerators
 @inject SchemaValidationService SchemaService
+@inject ApplicationService ApplicationService
 @inject NavigationManager Navigation
 @rendermode InteractiveServer
 
@@ -33,14 +34,14 @@
 }
 
 @code {
-    [Parameter]
-    public string ExpectedVersion { get; set; } = "1.0.0";
-
     private bool isValid = true;
     private bool showWarning = true;
     private string validationMessage = string.Empty;
     private string? databaseVersion;
-    private string expectedVersion = "1.0.0";
+
+    // The version this release expects, read from application settings so it always matches
+    // what SchemaValidationService compares against.
+    private string expectedVersion => ApplicationService.ApplicationSettings.SchemaVersion;
 
     protected override async Task OnInitializedAsync()
     {
@@ -55,7 +56,6 @@
             isValid = valid;
             validationMessage = message;
             databaseVersion = dbVersion;
-            expectedVersion = ExpectedVersion;
         }
         catch (Exception ex)
         {

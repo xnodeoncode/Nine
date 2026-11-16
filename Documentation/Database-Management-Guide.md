@@ -1,7 +1,7 @@
-# Nine - Database Management Guide
+# Nine. - Database Management Guide
 
 **Version:** 1.2.0  
-**Last Updated:** November 11, 2026  
+**Last Updated:** November 16, 2026  
 **Audience:** Administrators and Power Users
 
 ---
@@ -28,12 +28,11 @@ Nine uses **SQLite** as its database engine - a lightweight, file-based database
 
 ### What You'll Learn
 
-- ✅ How to back up your database (manual and automatic)
-- ✅ How to restore from a backup
-- ✅ How to check database health
-- ✅ How to troubleshoot common database issues
-- ✅ How to optimize database performance
-- ✅ Best practices for data protection
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> How to back up your database
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> How to restore from a backup
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> How to check database health
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> How to troubleshoot common database issues
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> Best practices for data protection
 
 ### Why Database Management Matters
 
@@ -42,7 +41,7 @@ Your database contains **all your property management data:**
 - Properties and tenants
 - Leases and financial records
 - Invoices and payments
-- Maintenance requests and inspections
+- Repairs and inspections
 - Documents and photos
 - User accounts and settings
 
@@ -63,19 +62,19 @@ Your database contains **all your property management data:**
 **Linux:**
 
 ```bash
-~/.config/Nine/app_v1.1.0.db
+~/.config/Nine/app_v1.2.0.db
 ```
 
 **Windows:**
 
 ```
-%APPDATA%\Nine\app_v1.1.0.db
+%APPDATA%\Nine\app_v1.2.0.db
 ```
 
 **Full path examples:**
 
-- **Linux:** `/home/username/.config/Nine/app_v1.1.0.db`
-- **Windows:** `C:\Users\YourName\AppData\Roaming\Nine\app_v1.1.0.db`
+- **Linux:** `/home/username/.config/Nine/app_v1.2.0.db`
+- **Windows:** `C:\Users\YourName\AppData\Roaming\Nine\app_v1.2.0.db`
 
 ### Database Structure
 
@@ -94,70 +93,30 @@ The database file is a **single SQLite file** containing:
 
 ### Schema Version
 
-Nine v1.1.0 uses schema version `1.1.0`. This tracks the database structure and ensures compatibility.
+Nine v1.2.0 uses schema version `1.2.0`. This tracks the database structure and ensures compatibility.
 
 **Check your schema version:**
 
-1. Navigate to **Administration** → **Settings** → **Database**
+1. Navigate to **Application**
 2. View **"Database Information"** panel
-3. See **"Schema Version: 1.1.0"**
+3. See **"Schema Version: 1.2.0"**
 
-### Auto-Migration System
+### Auto-Migration/Upgrade
 
 When you upgrade Nine to a new version:
 
 1. Application detects current schema version
 2. Compares with required schema version
-3. Automatically applies migrations if needed
-4. Updates schema version in database
-5. Application starts normally
+3. Creates a backup of the existing database if needed
+4. Automatically applies migrations/upgrade if needed
+5. Updates schema version in database
+6. Application starts normally
+7. All data is preserved
 
 **No manual intervention required** - migrations are automatic and seamless!
 
 **Version Upgrade Compatibility:**  
-Not all version upgrades are supported automatically. Check the **[Compatibility Matrix](Compatibility-Matrix.md)** before upgrading to see if your current version can auto-migrate to the target version, or if manual steps are required.
-
-#### Migration to v1.0.0
-
-The v1.0.0 release introduced the following schema changes:
-
-> **Note:** For complete version compatibility information and upgrade paths, see the **[Compatibility Matrix](Compatibility-Matrix.md)**.
-
-**New Tables:**
-
-- **DatabaseSettings** - Tracks encryption state and configuration
-  - DatabaseEncryptionEnabled (boolean)
-  - EncryptionChangedOn (datetime)
-  - Other security settings
-
-**New Columns:**
-
-- **IsSampleData** - Boolean flag added to 30+ tables to identify sample/demo data
-  - Default value: false
-  - Helps distinguish real data from system-generated examples
-
-**Index Changes:**
-
-- **Invoice/Payment unique indexes** - Now composite indexes including OrganizationId
-  - Ensures multi-tenant data integrity
-  - Prevents number conflicts across organizations
-
-**Other Enhancements:**
-
-- **EncryptionSalt** column added (nullable) for future encryption support
-
-**Breaking Change - No Automatic Migration:**
-
-- This was a **breaking schema change** - there is no automatic migration path from pre-v1.0.0 databases
-- Pre-v1.0.0 data is **not carried forward**; upgrading requires starting with a fresh v1.0.0 database
-- If you need pre-v1.0.0 data, export it manually before upgrading (see [Data Export](#data-export))
-- This is why the **[Compatibility Matrix](Compatibility-Matrix.md)** exists - to track which version transitions support automatic migration and which require manual steps
-- This limitation is specific to the initial pre-v1.0.0 → v1.0.0 transition - releases from v1.0.0 onward use the additive, automatic migration process described above
-
-**Important:** v1.0.0 application **requires** v1.0.0 database schema - the DatabaseSettings table is queried on startup. Running v1.0.0 app against a pre-v1.0.0 database will result in an error; there is no automatic migration for this transition.
-
-**Version Compatibility:**  
-See the **[Compatibility Matrix](Compatibility-Matrix.md)** for detailed information about which app versions work with which database versions, and whether automatic migration is available.
+Not all version upgrades are supported automatically. Check the **[Compatibility Matrix](https://github.com/xnodeoncode/Nine/blob/main/Documentation/Compatibility-Matrix.md)** before upgrading to see if your current version can auto-migrate to the target version, or if manual steps are required.
 
 ---
 
@@ -184,20 +143,20 @@ See the **[Compatibility Matrix](Compatibility-Matrix.md)** for detailed informa
 **Step-by-step:**
 
 1. **Open Nine**
-2. **Navigate to:** Administration → Settings → Database
-3. **Click:** "Backup & Restore" tab
-4. **Click:** "Create Backup" button
-5. **Wait:** Progress indicator shows backup creation
-6. **Confirmation:** "Backup created successfully!" message appears
+2. **Navigate to:** Application → Manage Database
+3. **Click:** "Create Manual Backup" in the Backup Actions pane
+4. **Wait:** A progress indicator shows backup creation
+5. **Confirmation:** A "Backup created successfully" message appears and the new file is listed in **Available Backups**
 
 **Backup details:**
 
-- **Filename:** `backup_YYYYMMDD_HHMMSS.db`
-  - Example: `backup_20260218_143022.db` (February 18, 2026 at 2:30:22 PM)
+- **Filename:** `Nine_Backup_<Reason>_YYYYMMDD_HHMMSS.db`
+  - Example: `Nine_Backup_Manual_20260218_143022.db` (February 18, 2026 at 2:30:22 PM)
 - **Location:** `Backups/` folder
   - Linux: `~/.config/Nine/Backups/`
   - Windows: `%APPDATA%\Nine\Backups\`
 - **Size:** Same as database file (~5-200 MB)
+- **Retention:** Nine keeps the **10 most recent** backups and deletes older ones automatically. Copy backups you want to keep elsewhere (see Method 3).
 
 **Best practice:** Create a manual backup **before**:
 
@@ -206,54 +165,41 @@ See the **[Compatibility Matrix](Compatibility-Matrix.md)** for detailed informa
 - Making bulk changes (e.g., deleting multiple records)
 - Testing new features
 
-### Method 2: Scheduled Automatic Backups (Recommended for Daily Use)
+### Method 2: Automatic Backups
 
-Set up automatic backups that run on a schedule:
+Nine does **not** run scheduled backups. It creates a backup automatically only at these events:
 
-**Configuration:**
+| Event                       | Filename contains         |
+| --------------------------- | ------------------------- |
+| Before applying migrations  | `PreMigration_<n>Pending` |
+| Initial setup               | `InitialSetup`            |
+| Before enabling encryption  | `BeforeEncryption`        |
+| Before disabling encryption | `BeforeDecryption`        |
+| Before a database reset     | `BeforeReset`             |
 
-1. **Navigate to:** Administration → Settings → Database → Backup & Restore
-2. **Enable:** "Schedule Automatic Backups" toggle (turn ON)
-3. **Choose frequency:**
-   - Daily (recommended)
-   - Weekly
-   - Monthly
-4. **Set backup time:**
-   - Default: 2:00 AM (when computer is idle)
-   - Choose a time when application is running
-5. **Set retention policy:**
-   - Keep backups for: 7 days, 30 days, 90 days, Forever
-   - Older backups automatically deleted to save space
-6. **Click:** "Save Settings"
+To see them, go to **Application → Manage Database** and look in the **Available Backups** list.
 
-**Important notes:**
+### Method 3: External Backup (USB Drive)
 
-- ⚠️ **Computer must be on** for scheduled backups to run
-- ⚠️ **Application must be running** (can be minimized)
-- ✅ Backups run in background (no interruption to your work)
-- ✅ Failed backups logged and retried next scheduled time
+For **maximum protection**, copy backups to multiple locations.
 
-**Verify automatic backups are working:**
+**Note:** Nine never uploads your backups. Where you store them (USB drive, external disk, cloud storage service) and who can access that storage is your decision and your responsibility. See [Your Responsibilities](https://github.com/xnodeoncode/Nine/blob/main/Documentation/Privacy.md#your-responsibilities) in the Privacy Statement. Consider enabling database encryption (Application → Manage Database → Database Encryption) before copying backups to storage you don't physically control.
 
-1. Check the "Last Backup" timestamp in Database settings
-2. Browse to the `Backups/` folder
-3. Verify recent backup files exist
-4. Check file dates match your schedule
+**Within the application (recommended):**
 
-### Method 3: External Backup (Cloud or USB Drive)
+1. **Navigate to:** Application → Manage Database
+2. **Click** **Create Manual Backup** in the **Backup Actions** pane, or use an existing backup in the **Available Backups** list.
+3. **Click** **Copy To** next to the backup you want to copy.
+4. In the Save dialog, choose a location and click **Save**.
 
-For **maximum protection**, copy backups to multiple locations:
+**Note:** If the database is encrypted, you need the password to open the backup. You can create an unencrypted copy if needed:
 
-**Cloud storage examples:**
+1. **Navigate to:** Application → Manage Database
+2. **Click** **Export Unencrypted Backup** in the **Database Encryption** pane.
+3. A new `Nine_Unencrypted_Backup_...db` file appears in the **Available Backups** list.
+4. **Click** **Copy To** next to it and save it to your chosen location.
 
-- Google Drive
-- Dropbox
-- OneDrive
-- iCloud Drive
-- Backblaze
-- AWS S3
-
-**USB/External drive backup:**
+**From the command line (USB/external drive):**
 
 **Linux:**
 
@@ -268,24 +214,10 @@ rsync -av ~/.config/Nine/Backups/ /media/usb/NineBackups/
 **Windows:**
 
 ```powershell
-# Copy all backups to USB drive
+# Copy all backups to USB drive at drive letter E:
+# Replace E: with the actual drive letter for your USB drive.
 Copy-Item "$env:APPDATA\Nine\Backups\*.db" "E:\NineBackups\" -Recurse
 ```
-
-**Automated cloud sync:**
-
-Many cloud services offer **folder sync** - configure your cloud client to sync the Backups folder:
-
-1. Install cloud storage client (e.g., Dropbox, Google Drive)
-2. Configure sync for: the `Backups/` folder
-3. Backups automatically uploaded to cloud
-4. Access your backups from anywhere
-
-**Best practice:** Use the **3-2-1 backup rule**:
-
-- **3** copies of your data (original + 2 backups)
-- **2** different storage types (local SSD + external USB)
-- **1** off-site backup (cloud storage)
 
 ---
 
@@ -301,42 +233,23 @@ Restore from backup when:
 - Migrating to new computer
 - Testing or training scenarios
 
-### Method 1: Staged Restore (Preview Before Committing)
+**Backup from another computer or a USB drive?** On the Manage Database page, click **Upload Backup File** and choose the `.db` file. Nine copies it into the `Backups/` folder and lists it in **Available Backups**, where you can use the methods below. You don't need to copy it into the folder yourself.
 
-**Staged restore** lets you preview a backup before fully restoring it:
+### Method 1: Import (Preview Before Committing)
+
+**Import All Data** lets you preview a backup before importing:
 
 **Step-by-step:**
 
-1. **Navigate to:** Administration → Settings → Database → Backup & Restore
-2. **Click:** "Available Backups" dropdown
-3. **Select** a backup from the list:
+1. **Navigate to:** Application → Manage Database
+2. **Locate** the **Available Backups** pane
+3. **Choose** a backup from the list
    - Shows filename and date
-   - Example: `backup_20260218_143022.db (Feb 18, 2026 2:30 PM)`
-4. **Click:** "Staged Restore" button
-5. **Wait:** System creates temporary copy and validates backup
-6. **Preview:** Backup information shown:
-   - Backup date and time
-   - Database size
-   - Schema version
-   - Record counts (properties, tenants, leases)
-7. **Decision point:**
-   - If backup looks correct: **Click "Confirm Restore"**
-   - If backup is wrong: **Click "Cancel"** (no changes made)
-
-**What happens during staged restore:**
-
-1. Backup file copied to a staging area
-2. Backup validated (integrity check)
-3. Schema version verified
-4. Record counts displayed for review
-5. Original database **NOT modified** until you confirm
-
-**Advantages:**
-
-- ✅ Safe - preview before committing
-- ✅ Verify backup integrity before restore
-- ✅ See what data will be restored
-- ✅ Can cancel without risk
+   - Example: `Nine_Backup_Manual_20260218_143022.db`
+4. **Click:** "Preview" button to see the records in the database
+5. On the Preview Database page, click the tabs at the bottom to preview the data in each table.
+6. **Import:** If the data is correct, click **Import All Data**.
+7. Importing the data preserves the data that is already in the existing database that is running **including your log-in information**.
 
 ### Method 2: Full Restore (Direct Restore with Restart)
 
@@ -344,41 +257,39 @@ Restore from backup when:
 
 **Step-by-step:**
 
-1. **Navigate to:** Administration → Settings → Database → Backup & Restore
-2. **Click:** "Available Backups" dropdown
+1. **Navigate to:** Application → Manage Database
+2. **Find:** "Available Backups" panel
 3. **Select** a backup file
-4. **Click:** "Restore from Backup" button
+4. **Click:** "Restore" button
 5. **Confirmation dialog** appears:
 
    ```
-   ⚠️ Warning: This will replace your current database
+   Are you sure you want to restore from '<backup file name>'?
 
-   Current database will be backed up automatically before restore.
-   Application will restart after restore completes.
+   This will replace your current database and the application will restart automatically.
 
-   Are you sure you want to continue?
+   Current database will be saved as .beforeRestore backup.
    ```
 
-6. **Click:** "Yes, Restore" to proceed (or "Cancel" to abort)
+6. **Click:** "OK" to proceed (or "Cancel" to abort)
 7. **Automatic steps:**
-   - Current database backed up (safety backup)
-   - Selected backup validated
-   - Current database replaced with backup
-   - Application restarts automatically
-8. **Verification:** After restart, check data to ensure correct
+   - The selected backup is staged for restore
+   - The application restarts
+   - On startup, the current database is renamed to `<database>.beforeRestore.<timestamp>` (in the same folder as the database)
+   - The selected backup is moved into place
+8. **Verification:** After restart, check your data
 
 **Safety features:**
 
-- ✅ Current database automatically backed up before restore
-- ✅ Restore can be undone (restore the safety backup)
-- ✅ Validation prevents corrupted backup from being used
-- ✅ Application restart ensures clean state
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> Current database is kept as a `.beforeRestore` file before it is replaced
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> Restore can be undone by renaming that file back to the database name
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> Application restart ensures a clean state
 
 **Important notes:**
 
-- ⚠️ **All users logged out** during restore
-- ⚠️ **Unsaved work will be lost** - save everything first
-- ⚠️ **Takes 10-30 seconds** depending on database size
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/exclamation-triangle-fill.svg" width="16" height="16" alt=""> **All users are disconnected** during restart
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/exclamation-triangle-fill.svg" width="16" height="16" alt=""> **Unsaved work will be lost** - save everything first
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/exclamation-triangle-fill.svg" width="16" height="16" alt=""> A restore is a **snapshot**: anything entered after the backup was made is not included
 
 ### Method 3: Manual Restore (Advanced Users)
 
@@ -394,13 +305,13 @@ pkill Nine
 cd ~/.config/Nine/
 
 # Backup current (corrupted) database
-mv app_v1.1.0.db app_v1.1.0.db.corrupted
+mv app_v1.2.0.db app_v1.2.0.db.corrupted
 
 # Copy backup to main database
-cp Backups/backup_20260218_143022.db app_v1.1.0.db
+cp Backups/Nine_Backup_Manual_20260218_143022.db app_v1.2.0.db
 
 # Restart application
-./Nine-1.1.0-x86_64.AppImage
+./Nine-1.2.0-x86_64.AppImage
 ```
 
 **Windows:**
@@ -412,10 +323,10 @@ cp Backups/backup_20260218_143022.db app_v1.1.0.db
 cd $env:APPDATA\Nine
 
 # Backup current (corrupted) database
-Move-Item app_v1.1.0.db app_v1.1.0.db.corrupted
+Move-Item app_v1.2.0.db app_v1.2.0.db.corrupted
 
 # Copy backup to main database
-Copy-Item Backups\backup_20260218_143022.db app_v1.1.0.db
+Copy-Item Backups\Nine_Backup_Manual_20260218_143022.db app_v1.2.0.db
 
 # Restart application (Start Menu or double-click icon)
 ```
@@ -447,88 +358,79 @@ Reset the database when:
 
 - Starting fresh with new data
 - Training or demonstration scenarios
-- Selling/transferring application to someone else
 - Troubleshooting requires clean slate
 - Development/testing purposes
 
-**⚠️ Warning: Reset is PERMANENT and cannot be undone!**
+**<img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/exclamation-triangle-fill.svg" width="16" height="16" alt=""> Warning: Reset deletes all data. Only the automatic safety backup can bring it back.**
 
 ### Reset Procedure
 
 **Step-by-step:**
 
-1. **Navigate to:** Administration → Settings → Database → Backup & Restore
-2. **Click:** "Advanced" tab
-3. **Click:** "Reset Database" button (red button at bottom)
-4. **Confirmation dialog** appears:
+1. **Navigate to:** Application → Manage Database
+2. **Click:** "Reset Database" button in the Backup Actions pane (red button)
+3. **Confirmation dialog** appears:
 
    ```
-   ⚠️ DANGER: Reset Database
+   WARNING: This will delete the current database and create a new blank one. All data will be lost!
 
-   This will DELETE ALL DATA including:
-   - All properties, tenants, and leases
-   - All invoices, payments, and financial records
-   - All maintenance requests and inspections
-   - All documents and photos
-   - Organization and user accounts
+   A backup will be created before deletion.
 
-   A backup will be created automatically before reset.
-
-   Type "RESET" to confirm (case-sensitive):
-   _______
+   Are you absolutely sure you want to continue?
    ```
 
-5. **Type:** `RESET` (exactly, uppercase)
-6. **Click:** "Confirm Reset"
-7. **Automatic steps:**
-   - Current database backed up (safety backup: `pre-reset-backup_20260218_DATE.db`)
-   - Database reset to empty schema
-   - Application restarts to New Setup Wizard
-8. **Setup:** Go through New Setup Wizard to configure fresh installation
+4. **Click:** "OK" to confirm (or "Cancel" to abort)
+5. **Automatic steps:**
+   - Current database backed up (safety backup: `Nine_Backup_BeforeReset_<timestamp>.db`). If the backup fails, the reset is canceled.
+   - Database deleted
+   - Application restarts to the home page, where you can create a new account
+6. **Setup:** Go through New Account setup to configure the fresh installation
 
 **Safety features:**
 
-- ✅ Automatic backup created before reset
-- ✅ Typed confirmation required (prevents accidental clicks)
-- ✅ Can restore from pre-reset backup if needed
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> Automatic backup created before reset
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> Reset is canceled if the backup cannot be created
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> Can restore from the pre-reset backup if needed
 
 **Recovery from reset:**
 
 If you reset by mistake, **immediately restore** from the pre-reset backup:
 
-1. Navigate to Backups folder
-2. Find: `pre-reset-backup_20260218_143022.db`
-3. Use restore procedure (Method 2 or 3 above)
+1. Navigate to Application → Manage Database
+2. Find `Nine_Backup_BeforeReset_<timestamp>.db` in **Available Backups**
+3. Use the restore procedure (Method 1 or 2 above)
 4. Your data will be recovered
 
 ---
 
 ## Database Health Checks
 
-### Automatic Health Monitoring
+### Automatic Health Checks
 
-Nine monitors database health continuously:
+Nine runs an integrity check:
 
-- **On startup** - Integrity check before application loads
-- **Every hour** - Background health check via scheduled tasks
-- **Before backup** - Verify database is healthy before backup
-- **After errors** - Check health if database errors occur
+- **On startup** - Before the application loads. If it fails, Nine tries to recover automatically from the most recent valid backup.
+- **After migrations** - When a version upgrade applies schema changes.
+- **When the Database Settings page opens** - Same check as the manual one below.
+
+You can also run **Auto-Recover from Corruption** from the Backup Actions pane at any time.
 
 ### Manual Health Check
 
 **Run a manual health check:**
 
-1. **Navigate to:** Administration → Settings → Database → Health & Monitoring
-2. **Click:** "Run Health Check" button
-3. **Wait:** Health check runs (5-15 seconds)
+1. **Navigate to:** Application → Manage Database → Database Health Pane
+2. **Click:** "Check Health" button (the check also runs automatically when the page opens)
+3. **Wait:** Health check runs (a few seconds)
 4. **Results displayed:**
 
    ```
-   ✅ Database Health Check: PASSED
+   Database Health Check: PASSED
 
-   Database file: app_v1.1.0.db
+   Database file: app_v1.2.0.db
+   Location: /home/user/.config/Nine/app_v1.2.0.db
    File size: 47.3 MB
-   Schema version: 1.1.0
+   Schema version: 1.2.0
    Connection status: Connected
    Integrity check: PASSED
 
@@ -539,60 +441,33 @@ Nine monitors database health continuously:
    - Invoices: 96
    - Payments: 89
 
-   Last backup: February 18, 2026 2:00 AM
-   Next scheduled backup: February 19, 2026 2:00 AM
+   Last backup: Wednesday, February 18, 2026 2:00 PM
    ```
+
+   **Notes:**
+   - **Location** is the full path of the active database file (on Linux typically under `~/.config/Nine/`, on Windows under `%APPDATA%\Nine\`).
+   - Record counts are for the active organization only and include records that are not deleted and not archived. The `IsActive` flag is not used.
+   - **Last backup** is the newest file in the Backups folder, based on the timestamp in the backup file name (falling back to the file's modified time).
 
 ### Health Indicators
 
 **Green indicators (healthy):**
 
-- ✅ **Connection status: Connected** - Database accessible
-- ✅ **Integrity check: PASSED** - No corruption detected
-- ✅ **Schema version: 1.1.0** - Matches application version
-- ✅ **File accessible: Yes** - Database file readable and writable
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> **Connection status: Connected** - Database accessible
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> **Integrity check: PASSED** - No corruption detected
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> **Schema version: 1.2.0** - Matches application version
 
 **Yellow indicators (warning):**
 
-- ⚠️ **File size large** - Database over 500 MB (consider cleanup)
-- ⚠️ **No recent backup** - Last backup over 7 days ago
-- ⚠️ **Slow queries** - Database performance degraded
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/exclamation-triangle-fill.svg" width="16" height="16" alt=""> **File size large** - Database over 500 MB (consider cleanup)
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/exclamation-triangle-fill.svg" width="16" height="16" alt=""> **No recent backup** - Last backup over 7 days ago, or no backups found
 
 **Red indicators (critical):**
 
-- ❌ **Connection failed** - Cannot connect to database
-- ❌ **Integrity check: FAILED** - Corruption detected
-- ❌ **Schema mismatch** - Version incompatibility
-- ❌ **File locked** - Another process using database
-
-### Database Optimization
-
-**When to optimize:**
-
-- Database feels slow
-- Search queries take long time
-- Application startup is slow
-- After bulk data operations (imports, deletions)
-
-**Run optimization:**
-
-1. **Navigate to:** Administration → Settings → Database → Health & Monitoring
-2. **Click:** "Optimize Database" button
-3. **Wait:** Optimization runs (30 seconds to 2 minutes)
-4. **Automatic steps:**
-   - VACUUM command (reclaim unused space)
-   - ANALYZE command (update statistics)
-   - Index rebuilding
-   - Cache refresh
-5. **Results:** Performance improvements and size reduction
-
-**Expected results:**
-
-- **Speed:** Queries 20-50% faster
-- **Size:** Database file 10-30% smaller
-- **Startup:** Application launches faster
-
-**Recommendation:** Optimize database quarterly (every 3 months)
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/x-circle-fill.svg" width="16" height="16" alt=""> **Connection failed** - Cannot connect to database
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/x-circle-fill.svg" width="16" height="16" alt=""> **Integrity check: FAILED** - Corruption detected
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/x-circle-fill.svg" width="16" height="16" alt=""> **Schema mismatch** - Version incompatibility
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/x-circle-fill.svg" width="16" height="16" alt=""> **File locked** - Another process using the database (reported as a connection failure)
 
 ---
 
@@ -629,7 +504,7 @@ Nine monitors database health continuously:
    - Restart application
 
 2. **Wait for backup to complete:**
-   - Check if backup is running (Administration → Settings → Database)
+   - Check if backup is running (Application → Manage Database)
    - Wait 1-2 minutes for backup to finish
 
 3. **Close database tools:**
@@ -645,12 +520,12 @@ Nine monitors database health continuously:
    ```bash
    # Only if application is definitely closed
    # Linux
-   rm ~/.config/Nine/app_v1.1.0.db-wal
-   rm ~/.config/Nine/app_v1.1.0.db-shm
+   rm ~/.config/Nine/app_v1.2.0.db-wal
+   rm ~/.config/Nine/app_v1.2.0.db-shm
 
    # Windows
-   del %APPDATA%\Nine\app_v1.1.0.db-wal
-   del %APPDATA%\Nine\app_v1.1.0.db-shm
+   del %APPDATA%\Nine\app_v1.2.0.db-wal
+   del %APPDATA%\Nine\app_v1.2.0.db-shm
    ```
 
 ### Issue 2: Database Corruption
@@ -672,19 +547,19 @@ Nine monitors database health continuously:
 **Solutions:**
 
 1. **Restore from backup (recommended):**
-   - Use most recent backup
-   - Follow restore procedure above
+   - Use **Auto-Recover from Corruption** (Application → Manage Database), or restore the most recent backup manually
+   - Follow the restore procedure above
    - Verify data after restore
 
 2. **SQLite recovery tool (if no backup):**
 
    ```bash
    # Attempt to dump and rebuild database
-   sqlite3 app_v1.1.0.db ".dump" | sqlite3 app_v1.1.0_recovered.db
+   sqlite3 app_v1.2.0.db ".dump" | sqlite3 app_v1.2.0_recovered.db
 
    # Replace corrupted database with recovered one
-   mv app_v1.1.0.db app_v1.1.0.db.corrupted
-   mv app_v1.1.0_recovered.db app_v1.1.0.db
+   mv app_v1.2.0.db app_v1.2.0.db.corrupted
+   mv app_v1.2.0_recovered.db app_v1.2.0.db
    ```
 
 3. **Professional data recovery:**
@@ -694,10 +569,10 @@ Nine monitors database health continuously:
 
 **Prevention:**
 
-- ✅ Enable automatic daily backups
-- ✅ Store backups off-site (cloud or USB)
-- ✅ Use UPS (uninterruptible power supply)
-- ✅ Monitor hard drive health (SMART status)
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> Perform backups regularly
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> Store backups off-site (USB drive or cloud storage)
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> Use UPS (uninterruptible power supply)
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> Monitor hard drive health (SMART status)
 
 ### Issue 3: Migration Failures
 
@@ -728,7 +603,7 @@ Nine monitors database health continuously:
 
 3. **Manual schema repair (advanced):**
    - Requires SQLite knowledge
-   - Export data, fix schema, reimport
+   - Export data, fix schema, re-import
    - Not recommended for non-technical users
 
 4. **Fresh install with data export:**
@@ -739,9 +614,9 @@ Nine monitors database health continuously:
 
 **Prevention:**
 
-- ✅ **Always backup before updating**
-- ✅ Test updates on non-production copy first
-- ✅ Wait 1-2 weeks after release before updating (let others test)
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> **Always backup before updating**
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> Test updates on non-production copy first
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> Wait 1-2 weeks after release before updating (let others test)
 
 ### Issue 4: Slow Database Performance
 
@@ -761,21 +636,17 @@ Nine monitors database health continuously:
 
 **Solutions:**
 
-1. **Optimize database:**
-   - Administration → Settings → Database → Optimize
-   - Rebuilds indexes and reclaims space
-
-2. **Cleanup old data:**
+1. **Cleanup old data:**
    - Permanently delete soft-deleted records (advanced feature)
    - Archive old financial records
    - Remove unused documents/photos
 
-3. **Check system resources:**
+2. **Check system resources:**
    - Close other applications
    - Increase RAM if below minimum (2 GB)
    - Use SSD instead of HDD for data folder
 
-4. **Split database (advanced):**
+3. **Split database (advanced):**
    - Not officially supported
    - Contact support for guidance if needed
 
@@ -809,21 +680,21 @@ Nine monitors database health continuously:
 
    ```bash
    # Linux
-   find ~ -name "app_v1.1.0.db" 2>/dev/null
+   find ~ -name "app_v1.2.0.db" 2>/dev/null
 
    # Windows (PowerShell)
-   Get-ChildItem -Path C:\ -Filter "app_v1.1.0.db" -Recurse -ErrorAction SilentlyContinue
+   Get-ChildItem -Path C:\ -Filter "app_v1.2.0.db" -Recurse -ErrorAction SilentlyContinue
    ```
 
 3. **Restore from backup:**
    - If original database lost
    - Copy backup to correct location
-   - Rename to `app_v1.1.0.db`
+   - Rename to `app_v1.2.0.db`
 
 4. **Fix permissions (Linux):**
    ```bash
-   chmod 644 ~/.config/Nine/app_v1.1.0.db
-   chown $USER:$USER ~/.config/Nine/app_v1.1.0.db
+   chmod 644 ~/.config/Nine/app_v1.2.0.db
+   chown $USER:$USER ~/.config/Nine/app_v1.2.0.db
    ```
 
 ---
@@ -841,9 +712,9 @@ Nine monitors database health continuously:
 
 You may notice these files alongside the database:
 
-- `app_v1.1.0.db` - Main database file
-- `app_v1.1.0.db-wal` - Write-Ahead Log (temporary)
-- `app_v1.1.0.db-shm` - Shared Memory file (temporary)
+- `app_v1.2.0.db` - Main database file
+- `app_v1.2.0.db-wal` - Write-Ahead Log (temporary)
+- `app_v1.2.0.db-shm` - Shared Memory file (temporary)
 
 **WAL benefits:**
 
@@ -873,14 +744,14 @@ SELECT * FROM Properties WHERE IsDeleted = 0;
 -- Count active leases
 SELECT COUNT(*) FROM Leases WHERE Status = 'Active';
 
--- Total rent collected this month
-SELECT SUM(Amount) FROM Payments WHERE PaymentDate >= '2026-01-01';
+-- Total rent collected this year
+SELECT SUM(Amount) FROM Payments WHERE PaidOn >= '2026-01-01' AND IsDeleted = 0;
 
 -- Find overdue invoices
-SELECT * FROM Invoices WHERE DueDate < date('now') AND Status = 'Pending';
+SELECT * FROM Invoices WHERE DueOn < date('now') AND Status = 'Pending' AND IsDeleted = 0;
 ```
 
-**⚠️ Warning:**
+**<img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/exclamation-triangle-fill.svg" width="16" height="16" alt=""> Warning:**
 
 - **Read-only** recommended (SELECT queries only)
 - **Do NOT** modify data directly (UPDATE, DELETE, INSERT)
@@ -903,7 +774,7 @@ SELECT * FROM Properties WHERE IsDeleted = 0;
 .output financial_summary.csv
 SELECT
   l.PropertyId,
-  p.PropertyName,
+  p.Address,
   COUNT(DISTINCT i.Id) as InvoiceCount,
   SUM(i.Amount) as TotalBilled,
   SUM(i.AmountPaid) as TotalPaid
@@ -911,31 +782,27 @@ FROM Leases l
 JOIN Properties p ON l.PropertyId = p.Id
 LEFT JOIN Invoices i ON i.LeaseId = l.Id
 WHERE l.IsDeleted = 0
-GROUP BY l.PropertyId, p.PropertyName;
+GROUP BY l.PropertyId, p.Address;
 .output stdout
 ```
 
 ### Database Encryption
 
-SQLite databases are **not encrypted** by default. Nine includes database encryption options:
+SQLite databases are **not encrypted** by default. Nine includes database encryption using **SQLCipher**:
 
-**Option 1: SQLCipher**
+**Option 1: Built-in encryption (SQLCipher)**
 
-SQLCipher provides AES-256 encryption for database files. This is integrated into Nine:
-
-- **Enable encryption:** Administration → Settings → Database → Security → Enable Database Encryption
-- **AES-256 encryption** of entire database file
-- **Master password** required to unlock database
-- **Encryption state** tracked in DatabaseSettings table
-- **Performance impact:** Minimal (2-5% overhead)
+- **Enable encryption:** Application → Manage Database → Database Encryption pane → **Enable Database Encryption**
+- **AES-256 encryption** of the entire database file
+- **Master password** required to unlock the database (cached in your system keychain for convenience)
+- **Encryption state** tracked in the DatabaseSettings table
+- A backup is created automatically before encryption or decryption (`BeforeEncryption` / `BeforeDecryption`)
 
 **Important notes:**
 
-- ⚠️ **Backup before enabling encryption** (encrypted backups require password)
-- ⚠️ **Store password safely** - lost password = unrecoverable data
-- ✅ Encryption applied to new data immediately
-- ✅ Existing data encrypted in background (may take several minutes)
-- ✅ Transparent to application once enabled (automatic encryption/decryption)
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/exclamation-triangle-fill.svg" width="16" height="16" alt=""> **Store your password safely** - a lost password means unrecoverable data
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/exclamation-triangle-fill.svg" width="16" height="16" alt=""> Encrypted backups require the password. Use **Export Unencrypted Backup** if you need a portable copy (see Backup Procedures, Method 3)
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> Transparent to the application once enabled
 
 **Option 2: File-system encryption**
 
@@ -948,25 +815,19 @@ SQLCipher provides AES-256 encryption for database files. This is integrated int
 - VeraCrypt (cross-platform encrypted volumes)
 - 7-Zip (password-protected archives)
 
-**Recommendation:** Use full-disk encryption (BitLocker, FileVault) for simplicity.
+**Recommendation:** Use full-disk encryption (LUKS, BitLocker, FileVault) for simplicity.
 
 ### Multi-Computer Sync
 
-Nine is designed as single-computer desktop application. Multi-computer sync is **not officially supported** but possible with caveats:
+Nine is designed as a single-computer desktop application. Multi-computer sync is **not supported**. Do not place the database file in a shared or synced folder.
 
-**Cloud sync approach:**
+**<img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/exclamation-triangle-fill.svg" width="16" height="16" alt=""> Risks:**
 
-1. Place database file in synced folder (Dropbox, Google Drive)
-2. Configure symlink to synced location
-3. Only use on **one computer at a time** (avoid conflicts)
+- Database corruption if two computers write simultaneously
+- Sync conflicts if edits are made offline
+- Poor performance over a network
 
-**⚠️ Risks:**
-
-- Database corruption if both computers write simultaneously
-- Sync conflicts if edits made offline
-- Poor performance over network
-
-**Recommendation:** Use one computer as primary. For multi-computer access, wait for Nine Professional (web-based, v2.0.0).
+**Recommendation:** Use one computer as primary. To move your data to another computer, use a backup and **Upload Backup File** (see the FAQ: "How do I migrate to a new computer?").
 
 ### Schema Migrations & Model Optimization
 
@@ -980,13 +841,13 @@ The compiled model lives in `1-Nine.Infrastructure/Data/CompiledModels/` and is 
 
 **When to regenerate the compiled model:**
 
-| Change                                            | Re-run optimize? |
-| ------------------------------------------------- | ---------------- |
-| Add / remove entity or property                   | ✅ Yes           |
-| Add / modify relationship or index                | ✅ Yes           |
-| Rename entity or property                         | ✅ Yes           |
-| Data-only migration (seed data, no schema change) | ❌ No            |
-| Bug fix with no model changes                     | ❌ No            |
+| Change                                            | Re-run optimize?                                                                                                                                       |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Add / remove entity or property                   | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> Yes |
+| Add / modify relationship or index                | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> Yes |
+| Rename entity or property                         | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> Yes |
+| Data-only migration (seed data, no schema change) | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/x-circle-fill.svg" width="16" height="16" alt=""> No      |
+| Bug fix with no model changes                     | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/x-circle-fill.svg" width="16" height="16" alt=""> No      |
 
 > **Note:** If the compiled model is stale, EF Core throws an `InvalidOperationException` at startup — the app will not silently use wrong metadata.
 
@@ -1025,16 +886,15 @@ dotnet tool update dotnet-ef -g
 
 ### Daily Operations
 
-1. **Enable automatic backups**
-   - Set to daily at 2 AM
-   - Verify backups run successfully (check Last Backup timestamp)
+1. **Back up regularly**
+   - Nine has no automatic backups. Use **Create Manual Backup** (Application → Manage Database)
+   - Verify the newest file in **Available Backups** has the date you expect
 
 2. **Monitor database health**
    - Check health status weekly
    - Review any warnings/errors
 
 3. **Save work regularly**
-   - Application auto-saves most changes
    - Exit normally (don't force quit)
 
 ### Weekly Maintenance
@@ -1051,35 +911,30 @@ dotnet tool update dotnet-ef -g
 ### Monthly Maintenance
 
 1. **Copy backups off-site**
-   - Upload to cloud storage
-   - Copy to external USB drive
-   - Test restore from off-site backup
+   - Copy to an external USB drive or upload to cloud storage
+   - Test restore from an off-site backup
 
-2. **Review retention policy**
-   - Delete very old backups if needed
-   - Keep at least 3 months of backups
+2. **Review retention**
+   - Nine keeps only the 10 most recent backups, so older ones are deleted automatically
+   - Copy backups you want to keep long-term to external storage
 
 ### Quarterly Maintenance
 
-1. **Optimize database**
-   - Administration → Settings → Database → Optimize
-   - Improves performance
-
-2. **Test restore procedure**
+1. **Test restore procedure**
    - Practice restoring from backup
    - Verify you can recover data if needed
 
-3. **Archive old data (optional)**
+2. **Archive old data (optional)**
    - Export old financial records
-   - Permanently delete soft-deleted records (if feature available)
+   - Permanently delete records that are no longer needed
 
 ### Before Major Updates
 
 1. **Create manual backup**
-   - Administration → Settings → Database → Create Backup
+   - Application → Manage Database → Create Manual Backup
 
 2. **Copy backup to safe location**
-   - USB drive or cloud storage
+   - USB drive or another folder on computer
 
 3. **Document current state**
    - Note schema version
@@ -1098,8 +953,8 @@ dotnet tool update dotnet-ef -g
 **A:**
 
 - **Minimum:** Weekly
-- **Recommended:** Daily (automatic)
-- **Best practice:** Daily automatic + off-site copy weekly
+- **Recommended:** Daily (manual; Nine has no scheduled backups)
+- **Best practice:** Daily backup + an off-site copy weekly
 
 ### Q: Where are backups stored?
 
@@ -1114,7 +969,7 @@ dotnet tool update dotnet-ef -g
 
 ### Q: What if I lose all my backups?
 
-**A:** If both the main database and all backups are lost, **data cannot be recovered** unless you have off-site backups (cloud, USB drive). This is why the 3-2-1 backup rule is critical.
+**A:** If both the main database and all backups are lost, **data cannot be recovered** unless you have off-site backups (USB drive, cloud storage). This is why the 3-2-1 backup rule is critical.
 
 ### Q: Can I access the database while Nine is running?
 
@@ -1124,13 +979,14 @@ dotnet tool update dotnet-ef -g
 
 **A:**
 
-1. On old computer: Create backup
-2. Copy backup file to new computer (USB drive, cloud)
-3. Install Nine on new computer
-4. Copy backup to: the `Backups/` folder on new computer
-5. Restore from backup
+1. **Old computer:** Application → Manage Database → **Create Manual Backup**, then **Copy To** next to the new backup and save it to a USB drive or cloud storage.
+2. **New computer:** Install Nine.
+3. Go to Application → Manage Database and click **Upload Backup File**, then choose the `.db` file (500 MB maximum). Nine copies it into the `Backups/` folder and lists it in **Available Backups** as `Nine_Backup_Uploaded_…`. You don't need to copy files into the folder yourself.
+4. Choose how to bring the data in:
+   - **Restore** - Replaces the new computer's database with the backup, including user accounts. Best for a full migration.
+   - **Preview → Import All Data** - Brings the records into the existing database and keeps its current accounts, including your log-in.
 
-Or simply copy the entire Nine data folder (database + `Backups/`) to the new computer.
+**Note:** If the database is encrypted, you need the password on the new computer. Alternatively, use **Export Unencrypted Backup** on the old computer (see Backup Procedures, Method 3).
 
 ### Q: Can I use my database on both Windows and Linux?
 
@@ -1138,7 +994,7 @@ Or simply copy the entire Nine data folder (database + `Backups/`) to the new co
 
 ### Q: What happens if my hard drive fails?
 
-**A:** If you have **off-site backups** (cloud, USB), you can recover your data. If not, data is **permanently lost** (professional data recovery may be possible but expensive and not guaranteed).
+**A:** If you have **off-site backups** (USB drive, cloud storage), you can recover your data. If not, data is **permanently lost** (professional data recovery may be possible but expensive and not guaranteed).
 
 ### Q: Should I backup the WAL files too?
 
@@ -1169,14 +1025,14 @@ Use application UI for all changes.
 
 Need help with database management? We're here for you!
 
-**Email:** cisguru@outlook.com  
+**Email:** [cisguru@outlook.com](mailto:cisguru@outlook.com?subject=Nine%20Support%20-%20Database%20Management%20Guide)  
 **GitHub Issues:** [https://github.com/xnodeoncode/Nine/issues](https://github.com/xnodeoncode/Nine/issues)
 
 **When contacting support about database issues, include:**
 
 1. **Exact error message** (copy full text)
 2. **Steps to reproduce** (what you were doing when error occurred)
-3. **Database size** (from Administration → Settings → Database)
+3. **Database size** (from the Database Health pane, Application → Manage Database)
 4. **Last successful backup** (date/time)
 5. **Recent changes** (upgrades, bulk operations, etc.)
 6. **Console output**, if launched from a terminal
@@ -1187,23 +1043,22 @@ Need help with database management? We're here for you!
 
 **Key takeaways:**
 
-✅ **Enable automatic daily backups** - Your insurance policy  
-✅ **Store backups off-site** - Cloud or USB drive  
-✅ **Test restore occasionally** - Practice before you need it  
-✅ **Monitor database health** - Catch issues early  
-✅ **Optimize quarterly** - Maintain performance  
-✅ **Backup before major changes** - Always
+<img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> **Back up regularly** - Your insurance policy  
+<img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> **Store backups off-site** - USB drive or cloud storage  
+<img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> **Test restore occasionally** - Practice before you need it  
+<img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> **Monitor database health** - Catch issues early  
+<img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> **Backup before major changes** - Always
 
 **Follow the 3-2-1 backup rule:**
 
 - **3** copies of data (original + 2 backups)
 - **2** different storage types (local + external)
-- **1** off-site backup (cloud or remote location)
+- **1** off-site backup (for example, an external drive kept elsewhere or cloud storage)
 
-**With good database management practices, your data is safe and your business runs smoothly!** 🏠
+**With good database management practices, your data is safe and your business runs smoothly!** <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/house.svg" width="16" height="16" alt="">
 
 ---
 
-**Document Version:** 1.2  
-**Last Updated:** April 4, 2026  
+**Document Version:** 1.2.0  
+**Last Updated:** November 16, 2026  
 **Author:** CIS Guru with GitHub Copilot

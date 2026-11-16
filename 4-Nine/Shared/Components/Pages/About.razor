@@ -1,5 +1,6 @@
 @page "/about"
 @inject ThemeService ThemeService
+@inject ApplicationService ApplicationService
 @attribute [AllowAnonymous]
 @rendermode InteractiveServer
 @implements IDisposable
@@ -9,19 +10,19 @@
         <div class="text-start">
             <h1 class="display-4"><img src="@LogoSrc" width="90" alt="Nine." /></h1>
         </div>
-        <div class="d-flex flex-wrap gap-2 my-3">
-            <a href="https://github.com/xnodeoncode/Nine/releases" target="_blank">
-                <img src="https://img.shields.io/badge/version-1.1.0-blue.svg" alt="Version" />
+        <div class="d-flex flex-wrap gap-2 my-3 align-items-center">
+            <a href="@ReleaseNotesUrl" target="_blank" class="text-decoration-none"
+               title="Release notes (opens in your default browser)">
+                <span class="badge text-bg-primary">version @ApplicationService.ApplicationSettings.Version</span>
             </a>
-            <a href="https://github.com/xnodeoncode/Nine/blob/main/LICENSE" target="_blank">
-                <img src="https://img.shields.io/badge/license-MIT-green.svg" alt="License" />
+            <a href="licenses/Nine-LICENSE.txt" target="_blank" class="text-decoration-none" title="Nine license">
+                <span class="badge text-bg-success">license MIT</span>
             </a>
-            <a href="https://dotnet.microsoft.com/" target="_blank">
-                <img src="https://img.shields.io/badge/.NET-10.0-purple.svg" alt=".NET" />
-            </a>
-            <img src="https://img.shields.io/badge/platform-Linux%20%7C%20Windows-lightgrey.svg" alt="Platform" />
-            <a href="https://nineapp.co/" target="_blank">
-                <img src="https://img.shields.io/badge/website-nineapp.co-blue.svg" alt="Website" />
+            <span class="badge text-bg-secondary">.NET @Environment.Version.Major.@Environment.Version.Minor</span>
+            <span class="badge text-bg-light border">platform Linux | Windows</span>
+            <a href="@ApplicationService.ApplicationSettings.Website" target="_blank" class="text-decoration-none"
+               title="Opens in your default browser">
+                <span class="badge text-bg-info">website nineapp.co</span>
             </a>
         </div>
 
@@ -42,6 +43,33 @@
             </ul>
         </div>
         <hr class="my-4">
+        <div class="text-start" id="third-party-licenses">
+            <h5 class="mb-3">Third-Party Licenses</h5>
+            <p>
+                Nine is released under the MIT License (<a href="licenses/Nine-LICENSE.txt" target="_blank">view</a>).
+                It includes third-party software that is licensed separately, including QuestPDF, SQLCipher,
+                Electron and Bootstrap.
+                The complete list, with the license text for each component, is on the
+                <a href="licenses">third-party licenses</a> page
+                (stored with the application; no internet connection is needed).
+            </p>
+            <h6>PDF generation (QuestPDF)</h6>
+            <p>
+                Nine uses QuestPDF to generate its documents. QuestPDF is free for organizations and individuals with
+                annual gross revenue under USD 1,000,000, for charitable and qualifying academic organizations, and for
+                open-source projects. Government and public-sector organizations and publicly traded companies require a
+                paid QuestPDF license.
+                <a href="licenses/questpdf/QuestPDF-PackageLicense.txt" target="_blank">QuestPDF license text</a>.
+                Current terms: <a href="https://www.questpdf.com/license/community.html">questpdf.com/license/community.html</a>
+                (opens in your default browser).
+            </p>
+            <p>
+                <strong>You are responsible for confirming that you are eligible to use QuestPDF.</strong>
+                This notice is informational and is not legal advice.
+            </p>
+        </div>
+
+        <hr class="my-4">
 
         <div class="d-flex flex-wrap justify-content-center gap-2 mt-3">
             <a class="btn btn-outline-success" href="https://github.com/xnodeoncode/Nine/releases" target="_blank">
@@ -52,6 +80,18 @@
 </div>
 
 @code {
+    // Release notes for the installed version (tag vX.Y.Z); opens in the default browser.
+    private string ReleaseNotesUrl
+    {
+        get
+        {
+            var repo = string.IsNullOrWhiteSpace(ApplicationService.ApplicationSettings.Repository)
+                ? "https://github.com/xnodeoncode/Nine"
+                : ApplicationService.ApplicationSettings.Repository.TrimEnd('/');
+            return $"{repo}/releases/tag/v{ApplicationService.ApplicationSettings.Version}";
+        }
+    }
+
     // Obsidian always uses the inverted logo. Bootstrap and Teal use inverted in dark mode only.
     private string LogoSrc => (ThemeService.CurrentTheme == "dark")
         ? "/assets/nine-logo-inverted.svg"
