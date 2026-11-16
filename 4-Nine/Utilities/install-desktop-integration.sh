@@ -1,7 +1,10 @@
 #!/bin/bash
 #
 # Nine Desktop Integration Installer
-# Automatically creates desktop entry for Nine Property Management AppImage
+# Adds Nine to the application launcher for the Nine Property Management AppImage:
+#   - copies the AppImage to ~/Applications/Nine (the original is left where it is)
+#   - copies every script in this script's folder to ~/Applications/Nine/Utilities
+#   - creates the launcher entry and icon
 #
 # Usage: 
 #   First make this script executable: chmod +x install-desktop-integration.sh
@@ -62,20 +65,48 @@ echo ""
 APP_INSTALL_DIR="$HOME/Applications/Nine"
 mkdir -p "$APP_INSTALL_DIR"
 
-# Move AppImage to ~/Applications/Nine/ if not already there
-if [[ "$APPIMAGE_DIR" != "$APP_INSTALL_DIR" ]]; then
-    echo "Moving AppImage to $APP_INSTALL_DIR/..."
-    mv "$APPIMAGE_PATH" "$APP_INSTALL_DIR/"
-    APPIMAGE_PATH="$APP_INSTALL_DIR/$APPIMAGE_NAME"
-    APPIMAGE_DIR="$APP_INSTALL_DIR"
-    echo -e "${GREEN}✓ Moved to: $APPIMAGE_PATH${NC}"
-else
+# Copy the AppImage to ~/Applications/Nine/ (the original is left where it was)
+if [ "$APPIMAGE_PATH" -ef "$APP_INSTALL_DIR/$APPIMAGE_NAME" ]; then
     echo "✓ AppImage already in $APP_INSTALL_DIR/"
+else
+    echo "Copying AppImage to $APP_INSTALL_DIR/..."
+    cp -f "$APPIMAGE_PATH" "$APP_INSTALL_DIR/$APPIMAGE_NAME" || { echo -e "${RED}Error: could not copy the AppImage to $APP_INSTALL_DIR/${NC}"; exit 1; }
+    echo -e "${GREEN}✓ Copied to: $APP_INSTALL_DIR/$APPIMAGE_NAME${NC}"
 fi
+APPIMAGE_PATH="$APP_INSTALL_DIR/$APPIMAGE_NAME"
+APPIMAGE_DIR="$APP_INSTALL_DIR"
 
 # Make AppImage executable
 chmod +x "$APPIMAGE_PATH"
 echo "✓ Made AppImage executable"
+
+# Keep copies of the Nine scripts (everything in this installer's folder: install, removal, tool,
+# diagnostics, and so on) in ~/Applications/Nine/Utilities so they are still available after the
+# download folder is gone.
+UTILITIES_DIR="$APP_INSTALL_DIR/Utilities"
+mkdir -p "$UTILITIES_DIR"
+copy_script() {
+    local source_file="$1"
+    local name
+    name="$(basename "$source_file")"
+    local target_file="$UTILITIES_DIR/$name"
+    if [ "$source_file" -ef "$target_file" ]; then
+        [[ "$name" == *.sh ]] && chmod +x "$target_file"
+        echo "✓ $name already in $UTILITIES_DIR/"
+    elif cp -f "$source_file" "$target_file"; then
+        [[ "$name" == *.sh ]] && chmod +x "$target_file"
+        echo "✓ Copied $name to $UTILITIES_DIR/"
+    else
+        echo -e "${YELLOW}Warning: could not copy $name to $UTILITIES_DIR/${NC}"
+    fi
+}
+SCRIPT_DIR="$(dirname "$SCRIPT_PATH")"
+for source_file in "$SCRIPT_DIR"/*.sh "$SCRIPT_DIR"/*.ps1; do
+    [ -f "$source_file" ] && copy_script "$source_file"
+done
+for required in nine-removal.sh nine-tool.sh; do
+    [ -f "$SCRIPT_DIR/$required" ] || echo -e "${YELLOW}Warning: $required not found next to the installer; it was not copied.${NC}"
+done
 
 echo ""
 
@@ -175,8 +206,8 @@ echo ""
 echo "Nine Property Management should now appear in your application launcher."
 echo "You can search for 'Nine' or find it in Office/Finance categories."
 echo ""
-echo "To remove Nine, use the removal script from the same download as this installer:"
-echo "  ./nine-removal.sh --help"
+echo "To remove Nine, use the tool that was copied to the Utilities folder:"
+echo "  $UTILITIES_DIR/nine-tool.sh remove --help"
 echo ""
 echo "Or remove the desktop integration manually:"
 echo "  rm ~/.local/share/applications/nine.desktop"

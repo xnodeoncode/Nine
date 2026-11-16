@@ -14,10 +14,15 @@
 #   - the AppImages        ~/Applications/Nine
 #
 # Options:
+#   --all               Remove everything: the launcher entry, icon, AppImages, ALL data and the
+#                       database encryption key. Same as --remove-data --remove-keychain.
 #   --remove-data       Also delete Nine's data folder (databases, backups, settings) for ALL versions.
 #                       Default location: ~/.config/Nine (or $XDG_CONFIG_HOME/Nine).
 #   --remove-keychain   Also delete the stored database encryption key. It is shared by every
 #                       version of Nine on this account.
+#   --remove-keychain-only
+#                       Delete ONLY the database encryption key. The AppImages, launcher entry
+#                       and data are left untouched.
 #   --keep-appimages    Do not delete ~/Applications/Nine.
 #   --only NAME         Remove one AppImage from ~/Applications/Nine (for example
 #                       Nine-1.2.0-x86_64.AppImage) and nothing else. Your data and the
@@ -36,6 +41,8 @@ NC='\033[0m' # No Color
 
 REMOVE_DATA=0
 REMOVE_KEYCHAIN=0
+ALL_FLAG=0
+KEYCHAIN_ONLY=0
 KEEP_APPIMAGES=0
 ONLY_NAME=""
 DRY_RUN=0
@@ -49,11 +56,13 @@ KEYCHAIN_ATTRIBUTE="key-type"
 KEYCHAIN_VALUE="database-encryption-Nine-Electron"
 
 usage() {
-    sed -n '3,27p' "$0" | sed 's/^# \{0,1\}//'
+    sed -n '3,32p' "$0" | sed 's/^# \{0,1\}//'
 }
 
 while [ $# -gt 0 ]; do
     case "$1" in
+        --remove-keychain-only) KEYCHAIN_ONLY=1 ;;
+        --all) REMOVE_DATA=1; REMOVE_KEYCHAIN=1; ALL_FLAG=1 ;;
         --remove-data) REMOVE_DATA=1 ;;
         --remove-keychain) REMOVE_KEYCHAIN=1 ;;
         --keep-appimages) KEEP_APPIMAGES=1 ;;
@@ -77,8 +86,18 @@ while [ $# -gt 0 ]; do
     shift
 done
 
+if [ $KEYCHAIN_ONLY -eq 1 ] && { [ $ALL_FLAG -eq 1 ] || [ $REMOVE_DATA -eq 1 ] || [ $REMOVE_KEYCHAIN -eq 1 ] || [ $KEEP_APPIMAGES -eq 1 ] || [ -n "$ONLY_NAME" ]; }; then
+    echo -e "${RED}Error: --remove-keychain-only cannot be combined with any other removal option${NC}"
+    exit 1
+fi
+
 if [ -n "$ONLY_NAME" ] && { [ $REMOVE_DATA -eq 1 ] || [ $REMOVE_KEYCHAIN -eq 1 ] || [ $KEEP_APPIMAGES -eq 1 ]; }; then
-    echo -e "${RED}Error: --only cannot be combined with --remove-data, --remove-keychain or --keep-appimages${NC}"
+    echo -e "${RED}Error: --only cannot be combined with --all, --remove-data, --remove-keychain or --keep-appimages${NC}"
+    exit 1
+fi
+
+if [ $ALL_FLAG -eq 1 ] && [ $KEEP_APPIMAGES -eq 1 ]; then
+    echo -e "${RED}Error: --all removes everything, so it cannot be combined with --keep-appimages${NC}"
     exit 1
 fi
 
@@ -141,6 +160,25 @@ if pgrep -f '\.mount_Nine|resources/bin/Nine' > /dev/null 2>&1; then
     exit 1
 fi
 
+# ---- Remove the encryption key only ----
+if [ $KEYCHAIN_ONLY -eq 1 ]; then
+    if ! command -v secret-tool > /dev/null 2>&1; then
+        echo -e "${YELLOW}secret-tool is not installed, so the encryption key cannot be removed by this script.${NC}"
+        exit 1
+    fi
+    if ! secret-tool lookup "$KEYCHAIN_ATTRIBUTE" "$KEYCHAIN_VALUE" > /dev/null 2>&1; then
+        echo "No Nine encryption key was found in the keychain. Nothing to do."
+        exit 0
+    fi
+    echo -e "${RED}This deletes the database encryption key shared by every version of Nine on this account.${NC}"
+    echo "Encrypted databases and encrypted backups cannot be opened without it."
+    echo -e "${YELLOW}Nothing else is removed. Any encrypted database in $DATA_DIR becomes unreadable.${NC}"
+    confirm_typed "Type DELETE to remove the encryption key: " "DELETE" || { echo "Cancelled."; exit 0; }
+    run secret-tool clear "$KEYCHAIN_ATTRIBUTE" "$KEYCHAIN_VALUE" && report "Removed the database encryption key"
+    echo -e "${GREEN}Done.${NC}"
+    exit 0
+fi
+
 # ---- Remove a single AppImage only ----
 if [ -n "$ONLY_NAME" ]; then
     case "$ONLY_NAME" in
@@ -160,7 +198,7 @@ if [ -n "$ONLY_NAME" ]; then
     run rm -f -- "$TARGET"
     if [ -f "$DESKTOP_FILE" ] && grep -qF "$TARGET" "$DESKTOP_FILE"; then
         echo -e "${YELLOW}The launcher entry pointed to this AppImage and no longer works.${NC}"
-        echo "Run install-desktop-integration.sh with the version you kept to fix it."
+        echo "Run install-desktop-integration.sh (kept in $APP_INSTALL_DIR/Utilities) with the version you kept to fix it."
     fi
     echo -e "${GREEN}Done.${NC}"
     exit 0
