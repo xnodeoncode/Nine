@@ -183,7 +183,7 @@ To see them, go to **Application → Manage Database** and look in the **Availab
 
 For **maximum protection**, copy backups to multiple locations.
 
-**Note:** Nine never uploads your backups. Where you store them (USB drive, external disk, cloud storage service) and who can access that storage is your decision and your responsibility. See [Your Responsibilities](https://github.com/xnodeoncode/Nine/blob/main/Documentation/Privacy.md#your-responsibilities) in the Privacy Statement.
+**Note:** Nine never uploads your backups. Where you store them (USB drive, external disk, cloud storage service) and who can access that storage is your decision and your responsibility. See [Your Responsibilities](https://github.com/xnodeoncode/Nine/blob/main/Documentation/Privacy.md#your-responsibilities) in the Privacy Statement. Consider enabling database encryption (Application → Manage Database → Database Encryption) before copying backups to storage you don't physically control.
 
 **Within the application (recommended):**
 
@@ -1025,7 +1025,7 @@ Use application UI for all changes.
 
 Need help with database management? We're here for you!
 
-**Email:** cisguru@outlook.com  
+**Email:** [cisguru@outlook.com](mailto:cisguru@outlook.com?subject=Nine%20Support%20-%20Database%20Management%20Guide)  
 **GitHub Issues:** [https://github.com/xnodeoncode/Nine/issues](https://github.com/xnodeoncode/Nine/issues)
 
 **When contacting support about database issues, include:**
