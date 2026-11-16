@@ -42,7 +42,7 @@ Your database contains **all your property management data:**
 - Properties and tenants
 - Leases and financial records
 - Invoices and payments
-- Maintenance requests and inspections
+- Repairs and inspections
 - Documents and photos
 - User accounts and settings
 
@@ -63,19 +63,19 @@ Your database contains **all your property management data:**
 **Linux:**
 
 ```bash
-~/.config/Nine/app_v1.1.0.db
+~/.config/Nine/app_v1.2.0.db
 ```
 
 **Windows:**
 
 ```
-%APPDATA%\Nine\app_v1.1.0.db
+%APPDATA%\Nine\app_v1.2.0.db
 ```
 
 **Full path examples:**
 
-- **Linux:** `/home/username/.config/Nine/app_v1.1.0.db`
-- **Windows:** `C:\Users\YourName\AppData\Roaming\Nine\app_v1.1.0.db`
+- **Linux:** `/home/username/.config/Nine/app_v1.2.0.db`
+- **Windows:** `C:\Users\YourName\AppData\Roaming\Nine\app_v1.2.0.db`
 
 ### Database Structure
 
@@ -94,70 +94,30 @@ The database file is a **single SQLite file** containing:
 
 ### Schema Version
 
-Nine v1.1.0 uses schema version `1.1.0`. This tracks the database structure and ensures compatibility.
+Nine v1.2.0 uses schema version `1.2.0`. This tracks the database structure and ensures compatibility.
 
 **Check your schema version:**
 
-1. Navigate to **Administration** → **Settings** → **Database**
+1. Navigate to **Application**
 2. View **"Database Information"** panel
-3. See **"Schema Version: 1.1.0"**
+3. See **"Schema Version: 1.2.0"**
 
-### Auto-Migration System
+### Auto-Migration/Upgrade
 
 When you upgrade Nine to a new version:
 
 1. Application detects current schema version
 2. Compares with required schema version
-3. Automatically applies migrations if needed
-4. Updates schema version in database
-5. Application starts normally
+3. Creates a backup of the existing database if needed
+4. Automatically applies migrations/upgrade if needed
+5. Updates schema version in database
+6. Application starts normally
+7. All data is preserved
 
 **No manual intervention required** - migrations are automatic and seamless!
 
 **Version Upgrade Compatibility:**  
-Not all version upgrades are supported automatically. Check the **[Compatibility Matrix](Compatibility-Matrix.md)** before upgrading to see if your current version can auto-migrate to the target version, or if manual steps are required.
-
-#### Migration to v1.0.0
-
-The v1.0.0 release introduced the following schema changes:
-
-> **Note:** For complete version compatibility information and upgrade paths, see the **[Compatibility Matrix](Compatibility-Matrix.md)**.
-
-**New Tables:**
-
-- **DatabaseSettings** - Tracks encryption state and configuration
-  - DatabaseEncryptionEnabled (boolean)
-  - EncryptionChangedOn (datetime)
-  - Other security settings
-
-**New Columns:**
-
-- **IsSampleData** - Boolean flag added to 30+ tables to identify sample/demo data
-  - Default value: false
-  - Helps distinguish real data from system-generated examples
-
-**Index Changes:**
-
-- **Invoice/Payment unique indexes** - Now composite indexes including OrganizationId
-  - Ensures multi-tenant data integrity
-  - Prevents number conflicts across organizations
-
-**Other Enhancements:**
-
-- **EncryptionSalt** column added (nullable) for future encryption support
-
-**Breaking Change - No Automatic Migration:**
-
-- This was a **breaking schema change** - there is no automatic migration path from pre-v1.0.0 databases
-- Pre-v1.0.0 data is **not carried forward**; upgrading requires starting with a fresh v1.0.0 database
-- If you need pre-v1.0.0 data, export it manually before upgrading (see [Data Export](#data-export))
-- This is why the **[Compatibility Matrix](Compatibility-Matrix.md)** exists - to track which version transitions support automatic migration and which require manual steps
-- This limitation is specific to the initial pre-v1.0.0 → v1.0.0 transition - releases from v1.0.0 onward use the additive, automatic migration process described above
-
-**Important:** v1.0.0 application **requires** v1.0.0 database schema - the DatabaseSettings table is queried on startup. Running v1.0.0 app against a pre-v1.0.0 database will result in an error; there is no automatic migration for this transition.
-
-**Version Compatibility:**  
-See the **[Compatibility Matrix](Compatibility-Matrix.md)** for detailed information about which app versions work with which database versions, and whether automatic migration is available.
+Not all version upgrades are supported automatically. Check the **[Compatibility Matrix](https://github.com/xnodeoncode/Nine/blob/main/Documentation/Compatibility-Matrix.md)** before upgrading to see if your current version can auto-migrate to the target version, or if manual steps are required.
 
 ---
 
@@ -184,11 +144,12 @@ See the **[Compatibility Matrix](Compatibility-Matrix.md)** for detailed informa
 **Step-by-step:**
 
 1. **Open Nine**
-2. **Navigate to:** Administration → Settings → Database
-3. **Click:** "Backup & Restore" tab
-4. **Click:** "Create Backup" button
+2. **Navigate to:** Application → Manage Database
+3. In the Backup Actions Panel
+4. **Click:** "Create Manual Backup" button
 5. **Wait:** Progress indicator shows backup creation
 6. **Confirmation:** "Backup created successfully!" message appears
+7. **Confirmation:** New database backup file appears in **Available Backups** list
 
 **Backup details:**
 
@@ -206,52 +167,38 @@ See the **[Compatibility Matrix](Compatibility-Matrix.md)** for detailed informa
 - Making bulk changes (e.g., deleting multiple records)
 - Testing new features
 
-### Method 2: Scheduled Automatic Backups (Recommended for Daily Use)
+### Method 2: Automatic Backups
 
-Set up automatic backups that run on a schedule:
+Automatic Backups: Created before each migration and encryption change
 
-**Configuration:**
+1. **Navigate to:** Application → Manage Database
 
-1. **Navigate to:** Administration → Settings → Database → Backup & Restore
-2. **Enable:** "Schedule Automatic Backups" toggle (turn ON)
-3. **Choose frequency:**
-   - Daily (recommended)
-   - Weekly
-   - Monthly
-4. **Set backup time:**
-   - Default: 2:00 AM (when computer is idle)
-   - Choose a time when application is running
-5. **Set retention policy:**
-   - Keep backups for: 7 days, 30 days, 90 days, Forever
-   - Older backups automatically deleted to save space
-6. **Click:** "Save Settings"
+In the **Available Backups** list
 
-**Important notes:**
+1. Look for a Pre*Migration*... entry
 
-- ⚠️ **Computer must be on** for scheduled backups to run
-- ⚠️ **Application must be running** (can be minimized)
-- ✅ Backups run in background (no interruption to your work)
-- ✅ Failed backups logged and retried next scheduled time
-
-**Verify automatic backups are working:**
-
-1. Check the "Last Backup" timestamp in Database settings
-2. Browse to the `Backups/` folder
-3. Verify recent backup files exist
-4. Check file dates match your schedule
-
-### Method 3: External Backup (Cloud or USB Drive)
+### Method 3: External Backup (USB Drive)
 
 For **maximum protection**, copy backups to multiple locations:
 
-**Cloud storage examples:**
+**Within the application (recommended)**
 
-- Google Drive
-- Dropbox
-- OneDrive
-- iCloud Drive
-- Backblaze
-- AWS S3
+1. **Navigate to:** Application → Manage Database
+2. **Click** Create Manual Backup in the **Backup Actions** Pane or use an existing backup in the **Available Backups** list.
+3. **Click** **"Copy To"** next to the database file that you would like to make a manual back up for.
+4. **Save** In the File/Save dialog that opens, navigate to the location where you would like to save the file and click **Save**.
+
+**NOTE: If the database is encrypted, you will need to remember the password in order to access the data. An unencrypted backup can be generated if desired.**
+
+**Generate an unencrypted backup**
+
+1. **Navigate to:** Application → Manage Database
+2. **Click** **Export Unencrypted Backup** in the **Database Encryption** pane
+3. A new **Nine_Unencrypted_Backup...db** file will appear in the **Available Backups** list.
+4. **Click** **Copy To** next to the database file that you would like to backup.
+5. **Save** In the File/Save dialog that opens, navigate to the location where you would like to save the file and click **Save**.
+
+**Manual Backup**
 
 **USB/External drive backup:**
 
@@ -268,24 +215,10 @@ rsync -av ~/.config/Nine/Backups/ /media/usb/NineBackups/
 **Windows:**
 
 ```powershell
-# Copy all backups to USB drive
+# Copy all backups to USB drive at drive letter E:
+# Replace E: with the actual drive letter for your USB drive.
 Copy-Item "$env:APPDATA\Nine\Backups\*.db" "E:\NineBackups\" -Recurse
 ```
-
-**Automated cloud sync:**
-
-Many cloud services offer **folder sync** - configure your cloud client to sync the Backups folder:
-
-1. Install cloud storage client (e.g., Dropbox, Google Drive)
-2. Configure sync for: the `Backups/` folder
-3. Backups automatically uploaded to cloud
-4. Access your backups from anywhere
-
-**Best practice:** Use the **3-2-1 backup rule**:
-
-- **3** copies of your data (original + 2 backups)
-- **2** different storage types (local SSD + external USB)
-- **1** off-site backup (cloud storage)
 
 ---
 
@@ -301,42 +234,21 @@ Restore from backup when:
 - Migrating to new computer
 - Testing or training scenarios
 
-### Method 1: Staged Restore (Preview Before Committing)
+### Method 1: Import (Preview Before Committing)
 
-**Staged restore** lets you preview a backup before fully restoring it:
+**Import All Data** lets you preview a backup before importing:
 
 **Step-by-step:**
 
-1. **Navigate to:** Administration → Settings → Database → Backup & Restore
-2. **Click:** "Available Backups" dropdown
-3. **Select** a backup from the list:
+1. **Navigate to:** Application → Manage Database
+2. **Locate** the **Available Backups** pane
+3. **Choose** a backup from the list
    - Shows filename and date
    - Example: `backup_20260218_143022.db (Feb 18, 2026 2:30 PM)`
-4. **Click:** "Staged Restore" button
-5. **Wait:** System creates temporary copy and validates backup
-6. **Preview:** Backup information shown:
-   - Backup date and time
-   - Database size
-   - Schema version
-   - Record counts (properties, tenants, leases)
-7. **Decision point:**
-   - If backup looks correct: **Click "Confirm Restore"**
-   - If backup is wrong: **Click "Cancel"** (no changes made)
-
-**What happens during staged restore:**
-
-1. Backup file copied to a staging area
-2. Backup validated (integrity check)
-3. Schema version verified
-4. Record counts displayed for review
-5. Original database **NOT modified** until you confirm
-
-**Advantages:**
-
-- ✅ Safe - preview before committing
-- ✅ Verify backup integrity before restore
-- ✅ See what data will be restored
-- ✅ Can cancel without risk
+4. **Click:** "Preview" button to see the records in the database
+5. On the Preview Database page, click the tabs at the bottom to preview the data in each table.
+6. **Import:** If the data is correct, click **Import All Data**.
+7. Importing the data preserves the data that is already in the existing database that is running **including your log-in information**.
 
 ### Method 2: Full Restore (Direct Restore with Restart)
 
@@ -344,10 +256,10 @@ Restore from backup when:
 
 **Step-by-step:**
 
-1. **Navigate to:** Administration → Settings → Database → Backup & Restore
-2. **Click:** "Available Backups" dropdown
+1. **Navigate to:** Application → Manage Database
+2. **Find:** "Available Backups" panel
 3. **Select** a backup file
-4. **Click:** "Restore from Backup" button
+4. **Click:** "Restore" button
 5. **Confirmation dialog** appears:
 
    ```
@@ -447,7 +359,6 @@ Reset the database when:
 
 - Starting fresh with new data
 - Training or demonstration scenarios
-- Selling/transferring application to someone else
 - Troubleshooting requires clean slate
 - Development/testing purposes
 
@@ -457,10 +368,9 @@ Reset the database when:
 
 **Step-by-step:**
 
-1. **Navigate to:** Administration → Settings → Database → Backup & Restore
-2. **Click:** "Advanced" tab
-3. **Click:** "Reset Database" button (red button at bottom)
-4. **Confirmation dialog** appears:
+1. **Navigate to:** Application → Manage Database
+2. **Click:** "Reset Database" button in Backup Actions panel (red button at bottom)
+3. **Confirmation dialog** appears:
 
    ```
    ⚠️ DANGER: Reset Database
@@ -478,13 +388,13 @@ Reset the database when:
    _______
    ```
 
-5. **Type:** `RESET` (exactly, uppercase)
-6. **Click:** "Confirm Reset"
-7. **Automatic steps:**
+4. **Type:** `RESET` (exactly, uppercase)
+5. **Click:** "Confirm Reset"
+6. **Automatic steps:**
    - Current database backed up (safety backup: `pre-reset-backup_20260218_DATE.db`)
    - Database reset to empty schema
-   - Application restarts to New Setup Wizard
-8. **Setup:** Go through New Setup Wizard to configure fresh installation
+   - Application restarts to home page where you can create a new account.
+7. **Setup:** Go through New Account setup to configure fresh installation
 
 **Safety features:**
 
@@ -510,7 +420,6 @@ If you reset by mistake, **immediately restore** from the pre-reset backup:
 Nine monitors database health continuously:
 
 - **On startup** - Integrity check before application loads
-- **Every hour** - Background health check via scheduled tasks
 - **Before backup** - Verify database is healthy before backup
 - **After errors** - Check health if database errors occur
 
@@ -518,8 +427,8 @@ Nine monitors database health continuously:
 
 **Run a manual health check:**
 
-1. **Navigate to:** Administration → Settings → Database → Health & Monitoring
-2. **Click:** "Run Health Check" button
+1. **Navigate to:** Application → Manage Database → Database Health Pane
+2. **Click:** "Check Health" button
 3. **Wait:** Health check runs (5-15 seconds)
 4. **Results displayed:**
 
@@ -565,35 +474,6 @@ Nine monitors database health continuously:
 - ❌ **Schema mismatch** - Version incompatibility
 - ❌ **File locked** - Another process using database
 
-### Database Optimization
-
-**When to optimize:**
-
-- Database feels slow
-- Search queries take long time
-- Application startup is slow
-- After bulk data operations (imports, deletions)
-
-**Run optimization:**
-
-1. **Navigate to:** Administration → Settings → Database → Health & Monitoring
-2. **Click:** "Optimize Database" button
-3. **Wait:** Optimization runs (30 seconds to 2 minutes)
-4. **Automatic steps:**
-   - VACUUM command (reclaim unused space)
-   - ANALYZE command (update statistics)
-   - Index rebuilding
-   - Cache refresh
-5. **Results:** Performance improvements and size reduction
-
-**Expected results:**
-
-- **Speed:** Queries 20-50% faster
-- **Size:** Database file 10-30% smaller
-- **Startup:** Application launches faster
-
-**Recommendation:** Optimize database quarterly (every 3 months)
-
 ---
 
 ## Troubleshooting
@@ -629,7 +509,7 @@ Nine monitors database health continuously:
    - Restart application
 
 2. **Wait for backup to complete:**
-   - Check if backup is running (Administration → Settings → Database)
+   - Check if backup is running (Application → Manage Database)
    - Wait 1-2 minutes for backup to finish
 
 3. **Close database tools:**
@@ -694,8 +574,8 @@ Nine monitors database health continuously:
 
 **Prevention:**
 
-- ✅ Enable automatic daily backups
-- ✅ Store backups off-site (cloud or USB)
+- ✅ Perform backups regularly
+- ✅ Store backups off-site (USB)
 - ✅ Use UPS (uninterruptible power supply)
 - ✅ Monitor hard drive health (SMART status)
 
@@ -1204,6 +1084,6 @@ Need help with database management? We're here for you!
 
 ---
 
-**Document Version:** 1.2  
-**Last Updated:** April 4, 2026  
+**Document Version:** 1.2.0
+**Last Updated:** November 15, 2026  
 **Author:** CIS Guru with GitHub Copilot
