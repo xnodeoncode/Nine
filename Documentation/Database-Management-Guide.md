@@ -183,6 +183,8 @@ To see them, go to **Application → Manage Database** and look in the **Availab
 
 For **maximum protection**, copy backups to multiple locations.
 
+**Note:** Nine never uploads your backups. Where you store them, and who can access that storage, is your decision and your responsibility. See [Backups, Exports and Documents](https://github.com/xnodeoncode/Nine/blob/main/Documentation/Privacy.md#backups-exports-and-documents) in the Privacy Policy.
+
 **Within the application (recommended):**
 
 1. **Navigate to:** Application → Manage Database
