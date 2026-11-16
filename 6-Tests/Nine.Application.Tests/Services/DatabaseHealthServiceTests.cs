@@ -40,21 +40,25 @@ namespace Nine.Application.Tests
         }
 
         [Fact]
-        public async Task CountActiveRecordsAsync_ExcludesInactiveDeletedArchivedAndOtherOrganizations()
+        public async Task CountActiveRecordsAsync_ExcludesDeletedArchivedAndOtherOrganizations_IgnoringIsActive()
         {
             var activeProperty = NewProperty("1 Active St", _orgId);
             var inactiveProperty = NewProperty("2 Inactive St", _orgId, isActive: false);
             var deletedProperty = NewProperty("3 Deleted St", _orgId, isDeleted: true);
+            var archivedProperty = NewProperty("5 Archived St", _orgId, isArchived: true);
             var otherOrgProperty = NewProperty("4 Other St", _otherOrgId);
-            _context.Properties.AddRange(activeProperty, inactiveProperty, deletedProperty, otherOrgProperty);
+            _context.Properties.AddRange(activeProperty, inactiveProperty, deletedProperty, archivedProperty, otherOrgProperty);
 
             var activeTenant = NewTenant("a", _orgId);
             var inactiveTenant = NewTenant("b", _orgId, isActive: false);
-            _context.Tenants.AddRange(activeTenant, inactiveTenant);
+            var deletedTenant = NewTenant("c", _orgId, isDeleted: true);
+            _context.Tenants.AddRange(activeTenant, inactiveTenant, deletedTenant);
 
             var activeLease = NewLease(activeProperty.Id, activeTenant.Id, isActive: true);
             var inactiveLease = NewLease(activeProperty.Id, activeTenant.Id, isActive: false);
-            _context.Leases.AddRange(activeLease, inactiveLease);
+            var deletedLease = NewLease(activeProperty.Id, activeTenant.Id, isActive: true, isDeleted: true);
+            var archivedLease = NewLease(activeProperty.Id, activeTenant.Id, isActive: true, isArchived: true);
+            _context.Leases.AddRange(activeLease, inactiveLease, deletedLease, archivedLease);
 
             var invoice1 = NewInvoice(activeLease.Id, "INV-1");
             var invoice2 = NewInvoice(activeLease.Id, "INV-2");
@@ -73,9 +77,9 @@ namespace Nine.Application.Tests
 
             var counts = await DatabaseHealthService.CountActiveRecordsAsync(_context, _orgId);
 
-            Assert.Equal(1, counts.Properties);
-            Assert.Equal(1, counts.Tenants);
-            Assert.Equal(1, counts.Leases);
+            Assert.Equal(2, counts.Properties);
+            Assert.Equal(2, counts.Tenants);
+            Assert.Equal(2, counts.Leases);
             Assert.Equal(2, counts.Invoices);
             Assert.Equal(1, counts.Payments);
         }
@@ -184,23 +188,23 @@ namespace Nine.Application.Tests
             BackupCount = lastBackup == null ? 0 : 1
         };
 
-        private static Property NewProperty(string address, Guid orgId, bool isActive = true, bool isDeleted = false) => new()
+        private static Property NewProperty(string address, Guid orgId, bool isActive = true, bool isDeleted = false, bool isArchived = false) => new()
         {
             Id = Guid.NewGuid(), OrganizationId = orgId, Address = address, City = "City", State = "ST",
-            ZipCode = "12345", IsActive = isActive, IsDeleted = isDeleted, CreatedBy = UserId, CreatedOn = DateTime.UtcNow
+            ZipCode = "12345", IsActive = isActive, IsDeleted = isDeleted, IsArchived = isArchived, CreatedBy = UserId, CreatedOn = DateTime.UtcNow
         };
 
-        private Tenant NewTenant(string key, Guid orgId, bool isActive = true) => new()
+        private Tenant NewTenant(string key, Guid orgId, bool isActive = true, bool isDeleted = false) => new()
         {
             Id = Guid.NewGuid(), OrganizationId = orgId, FirstName = "T", LastName = key, Email = $"{key}@test.com",
-            IdentificationNumber = $"ID-{key}", IsActive = isActive, CreatedBy = UserId, CreatedOn = DateTime.UtcNow
+            IdentificationNumber = $"ID-{key}", IsActive = isActive, IsDeleted = isDeleted, CreatedBy = UserId, CreatedOn = DateTime.UtcNow
         };
 
-        private Lease NewLease(Guid propertyId, Guid tenantId, bool isActive) => new()
+        private Lease NewLease(Guid propertyId, Guid tenantId, bool isActive, bool isDeleted = false, bool isArchived = false) => new()
         {
             Id = Guid.NewGuid(), OrganizationId = _orgId, PropertyId = propertyId, TenantId = tenantId,
             StartDate = DateTime.Today, EndDate = DateTime.Today.AddYears(1), MonthlyRent = 1500, SecurityDeposit = 1500,
-            Status = "Active", IsActive = isActive, CreatedBy = UserId, CreatedOn = DateTime.UtcNow
+            Status = "Active", IsActive = isActive, IsDeleted = isDeleted, IsArchived = isArchived, CreatedBy = UserId, CreatedOn = DateTime.UtcNow
         };
 
         private Invoice NewInvoice(Guid leaseId, string number, Guid? orgId = null, bool isArchived = false, bool isDeleted = false) => new()

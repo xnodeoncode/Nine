@@ -436,12 +436,13 @@ Nine monitors database health continuously:
    ✅ Database Health Check: PASSED
 
    Database file: app_v1.1.0.db
+   Location: /home/user/.config/Nine/app_v1.1.0.db
    File size: 47.3 MB
    Schema version: 1.1.0
    Connection status: Connected
    Integrity check: PASSED
 
-   Active record counts:
+   Record counts:
    - Properties: 9
    - Tenants: 12
    - Leases: 8
@@ -453,7 +454,7 @@ Nine monitors database health continuously:
 
    **Notes:**
 
-   - Record counts are for the active organization only. Properties, tenants and leases count active, non-deleted records; invoices and payments count non-deleted, non-archived records.
+   - Record counts are for the active organization only (not deleted, not archived). Counts include records that are not deleted and not archived.
    - **Last backup** is the newest file in the Backups folder, based on the timestamp in the backup file name (falling back to the file's modified time).
 
 ### Health Indicators

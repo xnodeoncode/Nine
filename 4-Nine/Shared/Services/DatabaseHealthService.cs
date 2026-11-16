@@ -43,6 +43,7 @@ namespace Nine.Shared.Services
             try
             {
                 var dbPath = await _backupService.GetDatabasePathAsync();
+                report.DatabasePath = dbPath;
                 report.DatabaseFileName = Path.GetFileName(dbPath);
                 if (File.Exists(dbPath))
                 {
@@ -124,16 +125,16 @@ namespace Nine.Shared.Services
         }
 
         /// <summary>
-        /// Counts active records for one organization. Properties, tenants and leases must be
-        /// IsActive; invoices and payments must not be archived. All exclude soft-deleted rows.
+        /// Counts records for one organization, excluding soft-deleted and archived rows.
+        /// The entity-specific IsActive flag is intentionally not used.
         /// </summary>
         public static async Task<DatabaseRecordCounts> CountActiveRecordsAsync(ApplicationDbContext db, Guid organizationId)
         {
             return new DatabaseRecordCounts
             {
-                Properties = await db.Properties.CountAsync(e => e.OrganizationId == organizationId && e.IsActive && !e.IsDeleted),
-                Tenants = await db.Tenants.CountAsync(e => e.OrganizationId == organizationId && e.IsActive && !e.IsDeleted),
-                Leases = await db.Leases.CountAsync(e => e.OrganizationId == organizationId && e.IsActive && !e.IsDeleted),
+                Properties = await db.Properties.CountAsync(e => e.OrganizationId == organizationId && !e.IsDeleted && !e.IsArchived),
+                Tenants = await db.Tenants.CountAsync(e => e.OrganizationId == organizationId && !e.IsDeleted && !e.IsArchived),
+                Leases = await db.Leases.CountAsync(e => e.OrganizationId == organizationId && !e.IsDeleted && !e.IsArchived),
                 Invoices = await db.Invoices.CountAsync(e => e.OrganizationId == organizationId && !e.IsDeleted && !e.IsArchived),
                 Payments = await db.Payments.CountAsync(e => e.OrganizationId == organizationId && !e.IsDeleted && !e.IsArchived)
             };
@@ -189,6 +190,7 @@ namespace Nine.Shared.Services
         public string ConnectionMessage { get; set; } = string.Empty;
         public bool IntegrityPassed { get; set; }
         public string IntegrityMessage { get; set; } = string.Empty;
+        public string DatabasePath { get; set; } = string.Empty;
         public string DatabaseFileName { get; set; } = string.Empty;
         public long FileSizeBytes { get; set; }
         public string? SchemaVersion { get; set; }
