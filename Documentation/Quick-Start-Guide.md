@@ -29,16 +29,25 @@ Let's get started.
 Before you begin, ensure you have:
 
 - **Operating System:**
-  - Linux (RHEL 10, Ubuntu 20.04+, Debian 11+, Fedora 35+), OR
+  - Linux, 64-bit (x86_64). Tested on Red Hat Enterprise Linux 10 with GNOME; see [AppImage Requirements](#appimage-requirements), OR
   - Windows 10/11 (64-bit)
 - **Hardware:**
   - 8 GB RAM minimum (16 GB recommended)
   - 2 GB disk space
 - **Download:** [Nine v1.2.0](https://github.com/xnodeoncode/Nine/releases/tag/v1.2.0) for your platform
 
-### AppImage for Universal Linux Support
+### AppImage Requirements
 
-**Nine as an AppImage.** The Nine AppImage file has been tested to run on Red Hat Enterprise Linux 10. However, AppImage as a format runs on all major Linux distributions, including Ubuntu, Debian, Fedora, Red Hat, Arch and openSUSE. No installation is required: download, make executable (using `chmod +x Nine-1.2.0-x86_64.AppImage`), and run.
+**Nine as an AppImage.** The Nine AppImage has been tested on Red Hat Enterprise Linux 10 with the GNOME desktop. No installation is required: download, make executable (using `chmod +x Nine-1.2.0-x86_64.AppImage`), and run.
+
+The AppImage format is designed to run on most Linux distributions. The AppImage bundles Nine and its runtime, but it still requires the following on your system:
+
+- **A 64-bit (x86_64) Linux system with a recent C library (glibc).**
+- **FUSE,** which AppImages use to start. Some distributions do not install it by default. If the AppImage will not start, install your distribution's FUSE package, or run it with `./Nine-1.2.0-x86_64.AppImage --appimage-extract-and-run`.
+- **A graphical desktop with the common GTK and graphics libraries** that Electron applications use. Most desktop distributions already include them.
+- **A Secret Service provider (for example, GNOME Keyring or KWallet)** to store the database password securely.
+
+**Desktop integration script.** The optional `nine-tool.sh` script has been tested on RHEL 10 with GNOME, so not guaranteed to work on all distros. It writes to the standard locations (`~/.local/share/applications` and `~/.local/share/icons`). If it does not work for you, run the AppImage directly.
 
 ### Windows Portable
 
@@ -465,9 +474,9 @@ secret-tool clear key-type database-encryption-Nine-Electron
 
 Not directly. Enter your properties, tenants and leases manually, or restore from a Nine backup.
 
-### Can I have more than 3 users?
+### Can I have more than 4 users?
 
-Nine is limited to 3 users per organization.
+Nine is limited to 4 accounts per organization: 1 system account and 3 login accounts.
 
 <!-- VERIFY: property limit. The previous guide said 9 properties; no enforcement was found in the code. Confirm and add or remove. -->
 

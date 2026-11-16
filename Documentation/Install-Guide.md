@@ -1,4 +1,9 @@
-# Nine Property Management v1.2.0
+# Nine. - Installation Guide
+
+---
+
+**Version:** 1.2.0  
+**Last Updated:** November 16, 2026
 
 ---
 
@@ -43,17 +48,17 @@ chmod +x Install/Nine-1.2.0-x86_64.AppImage
 ./Install/Utilities/nine-tool.sh install Install/Nine-1.2.0-x86_64.AppImage
 ```
 
-The installer copies the AppImage to `~/Applications/Nine/` (the file you downloaded is left in place) and adds Nine to your application launcher. It also copies the scripts from `Utilities` to `~/Applications/Nine/Utilities/`, so you can use them later to uninstall Nine or to troubleshoot.
+The installer copies the AppImage to `~/Applications/Nine/` (the file you downloaded is left in place) and adds Nine to your application launcher. It also copies the scripts from `Utilities` to `~/Applications/Nine/Utilities/`, so you can use them later to uninstall Nine or to troubleshoot the application.
 
 ---
 
 ## First Launch
 
 On first launch you will be prompted to create an admin account.
-See `Documentation/Quick-Start-Guide.md` for a full walk-through.
+See the [Quick-Start-Guide.md](https://github.com/xnodeoncode/Nine/blob/main/Documentation/Quick-Start-Guide.md) for a full walk-through.
 
 **Windows:** Search for **Nine** in the Start Menu.
-**Linux:** Search for **Nine** in your application launcher, or browse **Office → Finance**.
+**Linux:** Search for **Nine** in your application launcher.
 
 ---
 
@@ -68,22 +73,24 @@ See `Documentation/Quick-Start-Guide.md` for a full walk-through.
 Use the removal script from the `Utilities` folder (a copy is also in `~/Applications/Nine/Utilities/` after installing). It undoes the desktop integration, and removes your data and database encryption key only when you ask it to.
 
 ```bash
-chmod +x Install/Utilities/*.sh
-./Install/Utilities/nine-tool.sh remove --help
+cd ~/Applications/Nine
+chmod +x Utilities/*.sh
+./Utilities/nine-tool.sh remove --help
 ```
 
 Common uses:
 
 ```bash
-./Install/Utilities/nine-tool.sh remove --dry-run   # preview; nothing is changed
-./Install/Utilities/nine-tool.sh remove             # remove the launcher entry, icon and AppImages; keep your data
-./Install/Utilities/nine-tool.sh remove --all       # remove everything, including all data and the encryption key (permanent)
+cd ~/Applications/Nine
+./Utilities/nine-tool.sh remove --dry-run   # preview; nothing is changed
+./Utilities/nine-tool.sh remove             # remove the launcher entry, icon and AppImages; keep your data
+./Utilities/nine-tool.sh remove --all       # remove everything, including all data and the encryption key (permanent)
 ```
 
-Back up your database to a location outside of Nine first. See the Database Management Guide in the `Documentation` folder.
+Back up your database to a location outside of Nine first. See the [Database Management Guide](https://github.com/xnodeoncode/Nine/blob/main/Documentation/Database-Management-Guide.md).
 
 ---
 
 ## Troubleshooting
 
-For startup timing, build verification and log capture, see `Documentation/Advanced-Troubleshooting-Guide.md`.
+For startup timing, build verification and log capture, see [Advanced Troubleshooting Guide](https://github.com/xnodeoncode/Nine/blob/main/Documentation/Advanced-Troubleshooting-Guide.md).

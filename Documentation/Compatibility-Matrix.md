@@ -1,4 +1,4 @@
-# Nine Compatibility Matrix
+# Nine. Compatibility Matrix
 
 **Last Updated:** November 11, 2026  
 **Current Release:** v1.2.0  
@@ -10,11 +10,11 @@
 
 This matrix tracks version compatibility across Nine releases, enabling you to:
 
-- ✅ **Verify upgrade/downgrade compatibility** - Check if app versions work with your database
-- ✅ **Identify component versions** - Know which dependencies are installed
-- ✅ **Plan rollbacks safely** - Understand which versions can coexist
-- ✅ **Troubleshoot version mismatches** - Diagnose compatibility issues
-- ✅ **Track breaking changes** - See when incompatibilities were introduced
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> **Verify upgrade/downgrade compatibility** - Check if app versions work with your database
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> **Identify component versions** - Know which dependencies are installed
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> **Plan rollbacks safely** - Understand which versions can coexist
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> **Troubleshoot version mismatches** - Diagnose compatibility issues
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> **Track breaking changes** - See when incompatibilities were introduced
 
 **For detailed release information**, see version-specific [Release Notes](#support--resources).
 
@@ -136,18 +136,18 @@ This matrix tracks version compatibility across Nine releases, enabling you to:
 
 #### Schema Change Classification
 
-| Change Type                                          | Version | DB File Changes | EF Compatible | Notes                                                                                             |
-| ---------------------------------------------------- | ------- | --------------- | ------------- | ------------------------------------------------------------------------------------------------- |
-| Add nullable column                                  | PATCH   | No              | ✅ Yes        | Existing rows get NULL automatically                                                              |
-| Add new table                                        | PATCH   | No              | ✅ Yes        | No impact on existing data                                                                        |
-| Add new index                                        | PATCH   | No              | ✅ Yes        | No impact on existing data                                                                        |
-| Remove column (unused/obsolete)                      | MINOR   | Yes             | ✅ Yes        | EF generates `DropColumn`; data lost                                                              |
-| Remove table                                         | MINOR   | Yes             | ✅ Yes        | EF generates `DropTable`; data lost                                                               |
-| Add non-nullable column with default/backfill        | MINOR   | Yes             | ✅ Yes        | EF adds column + default; migration review required                                               |
-| Rename column or table                               | MAJOR   | Yes             | ⚠️ Partial    | EF generates drop+add (data loss); must hand-edit migration to use `RenameColumn` / `RenameTable` |
-| Change column type (compatible, e.g. int → bigint)   | MAJOR   | Yes             | ✅ Yes        | EF generates `AlterColumn`; verify data integrity                                                 |
-| Change column type (incompatible, e.g. string → int) | MAJOR   | Yes             | ❌ No         | EF cannot convert data; manual migration script needed                                            |
-| Restructure relationship or foreign key              | MAJOR   | Yes             | ⚠️ Partial    | May require data migration depending on cardinality                                               |
+| Change Type                                          | Version | DB File Changes | EF Compatible                                                                                                                                                      | Notes                                                                                             |
+| ---------------------------------------------------- | ------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------- |
+| Add nullable column                                  | PATCH   | No              | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> Yes             | Existing rows get NULL automatically                                                              |
+| Add new table                                        | PATCH   | No              | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> Yes             | No impact on existing data                                                                        |
+| Add new index                                        | PATCH   | No              | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> Yes             | No impact on existing data                                                                        |
+| Remove column (unused/obsolete)                      | MINOR   | Yes             | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> Yes             | EF generates `DropColumn`; data lost                                                              |
+| Remove table                                         | MINOR   | Yes             | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> Yes             | EF generates `DropTable`; data lost                                                               |
+| Add non-nullable column with default/backfill        | MINOR   | Yes             | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> Yes             | EF adds column + default; migration review required                                               |
+| Rename column or table                               | MAJOR   | Yes             | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/exclamation-triangle-fill.svg" width="16" height="16" alt=""> Partial | EF generates drop+add (data loss); must hand-edit migration to use `RenameColumn` / `RenameTable` |
+| Change column type (compatible, e.g. int → bigint)   | MAJOR   | Yes             | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> Yes             | EF generates `AlterColumn`; verify data integrity                                                 |
+| Change column type (incompatible, e.g. string → int) | MAJOR   | Yes             | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/x-circle-fill.svg" width="16" height="16" alt=""> No                  | EF cannot convert data; manual migration script needed                                            |
+| Restructure relationship or foreign key              | MAJOR   | Yes             | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/exclamation-triangle-fill.svg" width="16" height="16" alt=""> Partial | May require data migration depending on cardinality                                               |
 
 > **Rollback note:** PATCH releases share the same DB file across all patch versions. Rolling back from v1.0.3 → v1.0.1 leaves any patch-added columns in place. SQLite ignores unknown columns on reads and leaves them NULL on writes — safe but unsupported.
 
@@ -157,11 +157,11 @@ This matrix tracks version compatibility across Nine releases, enabling you to:
 
 ### Rollback Safety
 
-| From Version | To Version | Database Compatible  | Safe Rollback | Notes                                 |
-| ------------ | ---------- | -------------------- | ------------- | ------------------------------------- |
-| v1.1.0       | v1.0.1     | ❌ No (v1.1.0→1.0.0) | ❌ No         | v1.0.1 missing DatabaseSettings table |
-| v1.0.1       | v1.0.0     | ✅ Yes (v1.0.0)      | ✅ Yes        | Drop-in replacement                   |
-| v1.1.0       | v1.0.0     | ❌ No (v1.1.0→1.0.0) | ❌ No         | v1.0.0 missing DatabaseSettings table |
+| From Version | To Version | Database Compatible                                                                                                                                              | Safe Rollback                                                                                                                                          | Notes                                 |
+| ------------ | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------- |
+| v1.1.0       | v1.0.1     | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/x-circle-fill.svg" width="16" height="16" alt=""> No (v1.1.0→1.0.0) | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/x-circle-fill.svg" width="16" height="16" alt=""> No      | v1.0.1 missing DatabaseSettings table |
+| v1.0.1       | v1.0.0     | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> Yes (v1.0.0)  | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> Yes | Drop-in replacement                   |
+| v1.1.0       | v1.0.0     | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/x-circle-fill.svg" width="16" height="16" alt=""> No (v1.1.0→1.0.0) | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/x-circle-fill.svg" width="16" height="16" alt=""> No      | v1.0.0 missing DatabaseSettings table |
 
 ### Upgrade Compatibility
 
@@ -190,11 +190,11 @@ This matrix tracks version compatibility across Nine releases, enabling you to:
 
 ## Platform Support
 
-| Platform                | v1.0.0 | v1.0.1 | v1.1.0 | v1.2.0 | Notes                                              |
-| ----------------------- | ------ | ------ | ------ | ------ | -------------------------------------------------- |
-| **Linux (AppImage)**    | ✅     | ✅     | ✅     | ✅     | Red Hat Enterprise Linux 10 (RHEL 10) tested       |
-| **Windows 10/11 (x64)** | ✅     | ✅     | ✅     | ✅     | Portable exe, Windows Installer, Windows 11 tested |
-| **macOS**               | ❌     | ❌     | ❌     | ✅     | Currently not supported                            |
+| Platform                | v1.0.0                                                                                                                                                | v1.0.1                                                                                                                                                | v1.1.0                                                                                                                                                | v1.2.0                                                                                                                                                | Notes                                              |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| **Linux (AppImage)**    | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt="Yes"> | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt="Yes"> | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt="Yes"> | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt="Yes"> | Red Hat Enterprise Linux 10 (RHEL 10) tested       |
+| **Windows 10/11 (x64)** | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt="Yes"> | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt="Yes"> | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt="Yes"> | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt="Yes"> | Portable exe, Windows Installer, Windows 11 tested |
+| **macOS**               | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/x-circle-fill.svg" width="16" height="16" alt="No">      | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/x-circle-fill.svg" width="16" height="16" alt="No">      | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/x-circle-fill.svg" width="16" height="16" alt="No">      | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt="No">  | Currently not supported                            |
 
 ---
 
@@ -236,7 +236,7 @@ This matrix tracks version compatibility across Nine releases, enabling you to:
 | Limitation                | All Versions           | Reason                       |
 | ------------------------- | ---------------------- | ---------------------------- |
 | **Maximum Properties** \* | 9 (Nine)               | Simple Start tier constraint |
-| **Maximum Users** \*      | 3 (1 system + 3 login) | Simplified access control    |
+| **Maximum Users** \*      | 4 (1 system + 3 login) | Simplified access control    |
 | **Organizations** \*      | 1                      | Desktop application scope    |
 | **File Upload Size** \*   | 10 MB per file         | Performance management       |
 | **SQLite Concurrency**    | Single writer          | SQLite WAL mode limitation   |
@@ -264,9 +264,9 @@ This matrix tracks version compatibility across Nine releases, enabling you to:
 
 ### Getting Help
 
-- 📧 **Email:** [cisguru@outlook.com](mailto:cisguru@outlook.com?subject=Nine%20Support%20-%20Compatibility%20Matrix)
-- 🐛 **Bug Reports:** [GitHub Issues](https://github.com/xnodeoncode/Nine/issues)
-- 📖 **Documentation:** [/Documentation/](https://github.com/xnodeoncode/Nine/tree/main/Documentation)
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/envelope.svg" width="16" height="16" alt=""> **Email:** [cisguru@outlook.com](mailto:cisguru@outlook.com?subject=Nine%20Support%20-%20Compatibility%20Matrix)
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/bug.svg" width="16" height="16" alt=""> **Bug Reports:** [GitHub Issues](https://github.com/xnodeoncode/Nine/issues)
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/book.svg" width="16" height="16" alt=""> **Documentation:** [/Documentation/](https://github.com/xnodeoncode/Nine/tree/main/Documentation)
 
 ---
 

@@ -1,4 +1,4 @@
-# Nine - Database Management Guide
+# Nine. - Database Management Guide
 
 **Version:** 1.2.0  
 **Last Updated:** November 16, 2026  
@@ -28,11 +28,11 @@ Nine uses **SQLite** as its database engine - a lightweight, file-based database
 
 ### What You'll Learn
 
-- ✅ How to back up your database
-- ✅ How to restore from a backup
-- ✅ How to check database health
-- ✅ How to troubleshoot common database issues
-- ✅ Best practices for data protection
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> How to back up your database
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> How to restore from a backup
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> How to check database health
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> How to troubleshoot common database issues
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> Best practices for data protection
 
 ### Why Database Management Matters
 
@@ -281,15 +281,15 @@ Restore from backup when:
 
 **Safety features:**
 
-- ✅ Current database is kept as a `.beforeRestore` file before it is replaced
-- ✅ Restore can be undone by renaming that file back to the database name
-- ✅ Application restart ensures a clean state
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> Current database is kept as a `.beforeRestore` file before it is replaced
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> Restore can be undone by renaming that file back to the database name
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> Application restart ensures a clean state
 
 **Important notes:**
 
-- ⚠️ **All users are disconnected** during restart
-- ⚠️ **Unsaved work will be lost** - save everything first
-- ⚠️ A restore is a **snapshot**: anything entered after the backup was made is not included
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/exclamation-triangle-fill.svg" width="16" height="16" alt=""> **All users are disconnected** during restart
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/exclamation-triangle-fill.svg" width="16" height="16" alt=""> **Unsaved work will be lost** - save everything first
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/exclamation-triangle-fill.svg" width="16" height="16" alt=""> A restore is a **snapshot**: anything entered after the backup was made is not included
 
 ### Method 3: Manual Restore (Advanced Users)
 
@@ -361,7 +361,7 @@ Reset the database when:
 - Troubleshooting requires clean slate
 - Development/testing purposes
 
-**⚠️ Warning: Reset deletes all data. Only the automatic safety backup can bring it back.**
+**<img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/exclamation-triangle-fill.svg" width="16" height="16" alt=""> Warning: Reset deletes all data. Only the automatic safety backup can bring it back.**
 
 ### Reset Procedure
 
@@ -388,9 +388,9 @@ Reset the database when:
 
 **Safety features:**
 
-- ✅ Automatic backup created before reset
-- ✅ Reset is canceled if the backup cannot be created
-- ✅ Can restore from the pre-reset backup if needed
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> Automatic backup created before reset
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> Reset is canceled if the backup cannot be created
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> Can restore from the pre-reset backup if needed
 
 **Recovery from reset:**
 
@@ -425,7 +425,7 @@ You can also run **Auto-Recover from Corruption** from the Backup Actions pane a
 4. **Results displayed:**
 
    ```
-   ✅ Database Health Check: PASSED
+   Database Health Check: PASSED
 
    Database file: app_v1.2.0.db
    Location: /home/user/.config/Nine/app_v1.2.0.db
@@ -453,21 +453,21 @@ You can also run **Auto-Recover from Corruption** from the Backup Actions pane a
 
 **Green indicators (healthy):**
 
-- ✅ **Connection status: Connected** - Database accessible
-- ✅ **Integrity check: PASSED** - No corruption detected
-- ✅ **Schema version: 1.2.0** - Matches application version
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> **Connection status: Connected** - Database accessible
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> **Integrity check: PASSED** - No corruption detected
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> **Schema version: 1.2.0** - Matches application version
 
 **Yellow indicators (warning):**
 
-- ⚠️ **File size large** - Database over 500 MB (consider cleanup)
-- ⚠️ **No recent backup** - Last backup over 7 days ago, or no backups found
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/exclamation-triangle-fill.svg" width="16" height="16" alt=""> **File size large** - Database over 500 MB (consider cleanup)
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/exclamation-triangle-fill.svg" width="16" height="16" alt=""> **No recent backup** - Last backup over 7 days ago, or no backups found
 
 **Red indicators (critical):**
 
-- ❌ **Connection failed** - Cannot connect to database
-- ❌ **Integrity check: FAILED** - Corruption detected
-- ❌ **Schema mismatch** - Version incompatibility
-- ❌ **File locked** - Another process using the database (reported as a connection failure)
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/x-circle-fill.svg" width="16" height="16" alt=""> **Connection failed** - Cannot connect to database
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/x-circle-fill.svg" width="16" height="16" alt=""> **Integrity check: FAILED** - Corruption detected
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/x-circle-fill.svg" width="16" height="16" alt=""> **Schema mismatch** - Version incompatibility
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/x-circle-fill.svg" width="16" height="16" alt=""> **File locked** - Another process using the database (reported as a connection failure)
 
 ---
 
@@ -569,10 +569,10 @@ You can also run **Auto-Recover from Corruption** from the Backup Actions pane a
 
 **Prevention:**
 
-- ✅ Perform backups regularly
-- ✅ Store backups off-site (USB drive or cloud storage)
-- ✅ Use UPS (uninterruptible power supply)
-- ✅ Monitor hard drive health (SMART status)
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> Perform backups regularly
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> Store backups off-site (USB drive or cloud storage)
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> Use UPS (uninterruptible power supply)
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> Monitor hard drive health (SMART status)
 
 ### Issue 3: Migration Failures
 
@@ -614,9 +614,9 @@ You can also run **Auto-Recover from Corruption** from the Backup Actions pane a
 
 **Prevention:**
 
-- ✅ **Always backup before updating**
-- ✅ Test updates on non-production copy first
-- ✅ Wait 1-2 weeks after release before updating (let others test)
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> **Always backup before updating**
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> Test updates on non-production copy first
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> Wait 1-2 weeks after release before updating (let others test)
 
 ### Issue 4: Slow Database Performance
 
@@ -751,7 +751,7 @@ SELECT SUM(Amount) FROM Payments WHERE PaidOn >= '2026-01-01' AND IsDeleted = 0;
 SELECT * FROM Invoices WHERE DueOn < date('now') AND Status = 'Pending' AND IsDeleted = 0;
 ```
 
-**⚠️ Warning:**
+**<img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/exclamation-triangle-fill.svg" width="16" height="16" alt=""> Warning:**
 
 - **Read-only** recommended (SELECT queries only)
 - **Do NOT** modify data directly (UPDATE, DELETE, INSERT)
@@ -800,9 +800,9 @@ SQLite databases are **not encrypted** by default. Nine includes database encryp
 
 **Important notes:**
 
-- ⚠️ **Store your password safely** - a lost password means unrecoverable data
-- ⚠️ Encrypted backups require the password. Use **Export Unencrypted Backup** if you need a portable copy (see Backup Procedures, Method 3)
-- ✅ Transparent to the application once enabled
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/exclamation-triangle-fill.svg" width="16" height="16" alt=""> **Store your password safely** - a lost password means unrecoverable data
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/exclamation-triangle-fill.svg" width="16" height="16" alt=""> Encrypted backups require the password. Use **Export Unencrypted Backup** if you need a portable copy (see Backup Procedures, Method 3)
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> Transparent to the application once enabled
 
 **Option 2: File-system encryption**
 
@@ -821,7 +821,7 @@ SQLite databases are **not encrypted** by default. Nine includes database encryp
 
 Nine is designed as a single-computer desktop application. Multi-computer sync is **not supported**. Do not place the database file in a shared or synced folder.
 
-**⚠️ Risks:**
+**<img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/exclamation-triangle-fill.svg" width="16" height="16" alt=""> Risks:**
 
 - Database corruption if two computers write simultaneously
 - Sync conflicts if edits are made offline
@@ -841,13 +841,13 @@ The compiled model lives in `1-Nine.Infrastructure/Data/CompiledModels/` and is 
 
 **When to regenerate the compiled model:**
 
-| Change                                            | Re-run optimize? |
-| ------------------------------------------------- | ---------------- |
-| Add / remove entity or property                   | ✅ Yes           |
-| Add / modify relationship or index                | ✅ Yes           |
-| Rename entity or property                         | ✅ Yes           |
-| Data-only migration (seed data, no schema change) | ❌ No            |
-| Bug fix with no model changes                     | ❌ No            |
+| Change                                            | Re-run optimize?                                                                                                                                       |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Add / remove entity or property                   | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> Yes |
+| Add / modify relationship or index                | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> Yes |
+| Rename entity or property                         | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> Yes |
+| Data-only migration (seed data, no schema change) | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/x-circle-fill.svg" width="16" height="16" alt=""> No      |
+| Bug fix with no model changes                     | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/x-circle-fill.svg" width="16" height="16" alt=""> No      |
 
 > **Note:** If the compiled model is stale, EF Core throws an `InvalidOperationException` at startup — the app will not silently use wrong metadata.
 
@@ -1043,11 +1043,11 @@ Need help with database management? We're here for you!
 
 **Key takeaways:**
 
-✅ **Back up regularly** - Your insurance policy  
-✅ **Store backups off-site** - USB drive or cloud storage  
-✅ **Test restore occasionally** - Practice before you need it  
-✅ **Monitor database health** - Catch issues early  
-✅ **Backup before major changes** - Always
+<img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> **Back up regularly** - Your insurance policy  
+<img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> **Store backups off-site** - USB drive or cloud storage  
+<img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> **Test restore occasionally** - Practice before you need it  
+<img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> **Monitor database health** - Catch issues early  
+<img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> **Backup before major changes** - Always
 
 **Follow the 3-2-1 backup rule:**
 
@@ -1055,7 +1055,7 @@ Need help with database management? We're here for you!
 - **2** different storage types (local + external)
 - **1** off-site backup (for example, an external drive kept elsewhere or cloud storage)
 
-**With good database management practices, your data is safe and your business runs smoothly!** 🏠
+**With good database management practices, your data is safe and your business runs smoothly!** <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/house.svg" width="16" height="16" alt="">
 
 ---
 

@@ -308,7 +308,7 @@ namespace Nine.Application.Services
                 if (currentUserCount >= _settings.MaxOrganizationUsers)
                 {
                     throw new InvalidOperationException(
-                        $"User limit reached. Nine allows maximum {_settings.MaxOrganizationUsers} user accounts (including system account). " +
+                        "User limit reached. Nine allows a maximum of 4 user accounts (3 login accounts plus the system account). " +
                         "Upgrade to Nine Professional for unlimited users.");
                 }
             }

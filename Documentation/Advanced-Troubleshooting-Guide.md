@@ -1,4 +1,12 @@
-# Advanced Troubleshooting Guide
+# Nine. - Advanced Troubleshooting Guide
+
+---
+
+**Version:** 1.2.0  
+**Last Updated:** November 16, 2026  
+**Audience:** Administrators and Power Users
+
+---
 
 This guide is for advanced troubleshooting and installation help, usually when you are working with the Nine development team.
 Everyday installation, backup and upgrade steps are in the [Quick Start Guide](Quick-Start-Guide.md) and the
@@ -10,11 +18,11 @@ The commands below are for **Linux (AppImage)**. Windows versions of the scripts
 
 ## Where the scripts are
 
-| Where | Folder |
-| ----- | ------ |
-| In the release download | The `Utilities` folder, next to the AppImage |
+| Where                                           | Folder                                                                       |
+| ----------------------------------------------- | ---------------------------------------------------------------------------- |
+| In the release download                         | The `Utilities` folder, next to the AppImage                                 |
 | After running the desktop integration installer | `~/Applications/Nine/Utilities/` (the AppImage is in `~/Applications/Nine/`) |
-| Inside the application package (fallback) | `resources/bin/Utilities/` |
+| Inside the application package (fallback)       | `resources/bin/Utilities/`                                                   |
 
 If you no longer have the scripts, you can read them out of the AppImage without unpacking all of it:
 
@@ -38,12 +46,12 @@ chmod +x *.sh                # only needed once, if the executable bit was lost
 ./nine-tool.sh help          # list the commands
 ```
 
-| Command | Runs | What it does |
-| ------- | ---- | ------------ |
-| `install <AppImage>` | `install-desktop-integration.sh` | Copies the AppImage to `~/Applications/Nine`, adds Nine to the application launcher, and copies the scripts to `~/Applications/Nine/Utilities` |
-| `remove [options]` | `nine-removal.sh` | Removes the launcher entry, icon and AppImages; optionally the data and the saved encryption key |
-| `diagnose [AppImage]` | `diagnose-startup.sh` | Starts Nine, times how long startup takes, and reports the database files |
-| `verify [AppImage] [options]` | `verify-build.sh` | Starts Nine and checks ports, host-header protection and every outbound connection attempt |
+| Command                       | Runs                             | What it does                                                                                                                                   |
+| ----------------------------- | -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `install <AppImage>`          | `install-desktop-integration.sh` | Copies the AppImage to `~/Applications/Nine`, adds Nine to the application launcher, and copies the scripts to `~/Applications/Nine/Utilities` |
+| `remove [options]`            | `nine-removal.sh`                | Removes the launcher entry, icon and AppImages; optionally the data and the saved encryption key                                               |
+| `diagnose [AppImage]`         | `diagnose-startup.sh`            | Starts Nine, times how long startup takes, and reports the database files                                                                      |
+| `verify [AppImage] [options]` | `verify-build.sh`                | Starts Nine and checks ports, host-header protection and every outbound connection attempt                                                     |
 
 Options after the command name are passed straight to the script, for example `./nine-tool.sh remove --dry-run`.
 
