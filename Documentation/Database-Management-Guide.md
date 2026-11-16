@@ -169,13 +169,13 @@ Not all version upgrades are supported automatically. Check the **[Compatibility
 
 Nine does **not** run scheduled backups. It creates a backup automatically only at these events:
 
-| Event                       | Filename contains          |
-| --------------------------- | -------------------------- |
-| Before applying migrations  | `PreMigration_<n>Pending`  |
-| Initial setup               | `InitialSetup`             |
-| Before enabling encryption  | `BeforeEncryption`         |
-| Before disabling encryption | `BeforeDecryption`         |
-| Before a database reset     | `BeforeReset`              |
+| Event                       | Filename contains         |
+| --------------------------- | ------------------------- |
+| Before applying migrations  | `PreMigration_<n>Pending` |
+| Initial setup               | `InitialSetup`            |
+| Before enabling encryption  | `BeforeEncryption`        |
+| Before disabling encryption | `BeforeDecryption`        |
+| Before a database reset     | `BeforeReset`             |
 
 To see them, go to **Application → Manage Database** and look in the **Available Backups** list.
 
@@ -230,6 +230,8 @@ Restore from backup when:
 - Need to revert to previous state
 - Migrating to new computer
 - Testing or training scenarios
+
+**Backup from another computer or a USB drive?** On the Manage Database page, click **Upload Backup File** and choose the `.db` file. Nine copies it into the `Backups/` folder and lists it in **Available Backups**, where you can use the methods below. You don't need to copy it into the folder yourself.
 
 ### Method 1: Import (Preview Before Committing)
 
@@ -441,7 +443,6 @@ You can also run **Auto-Recover from Corruption** from the Backup Actions pane a
    ```
 
    **Notes:**
-
    - **Location** is the full path of the active database file (on Linux typically under `~/.config/Nine/`, on Windows under `%APPDATA%\Nine\`).
    - Record counts are for the active organization only and include records that are not deleted and not archived. The `IsActive` flag is not used.
    - **Last backup** is the newest file in the Backups folder, based on the timestamp in the backup file name (falling back to the file's modified time).
@@ -812,7 +813,7 @@ SQLite databases are **not encrypted** by default. Nine includes database encryp
 - VeraCrypt (cross-platform encrypted volumes)
 - 7-Zip (password-protected archives)
 
-**Recommendation:** Use full-disk encryption (BitLocker, FileVault) for simplicity.
+**Recommendation:** Use full-disk encryption (LUKS, BitLocker, FileVault) for simplicity.
 
 ### Multi-Computer Sync
 
@@ -830,7 +831,7 @@ Nine is designed as single-computer desktop application. Multi-computer sync is 
 - Sync conflicts if edits made offline
 - Poor performance over network
 
-**Recommendation:** Use one computer as primary. For multi-computer access, wait for Nine Professional (web-based, v2.0.0).
+**Recommendation:** Use one computer as primary. For multi-computer access.
 
 ### Schema Migrations & Model Optimization
 
@@ -890,7 +891,7 @@ dotnet tool update dotnet-ef -g
 ### Daily Operations
 
 1. **Back up regularly**
-   - Nine has no scheduled backups. Use **Create Manual Backup** (Application → Manage Database)
+   - Nine has no automatic backups. Use **Create Manual Backup** (Application → Manage Database)
    - Verify the newest file in **Available Backups** has the date you expect
 
 2. **Monitor database health**
@@ -898,7 +899,6 @@ dotnet tool update dotnet-ef -g
    - Review any warnings/errors
 
 3. **Save work regularly**
-   - Application auto-saves most changes
    - Exit normally (don't force quit)
 
 ### Weekly Maintenance
@@ -914,8 +914,7 @@ dotnet tool update dotnet-ef -g
 
 ### Monthly Maintenance
 
-1. **Copy backups off-site**
-   - Upload to cloud storage
+1. **Copy backups to external storage**
    - Copy to external USB drive
    - Test restore from off-site backup
 
@@ -931,7 +930,7 @@ dotnet tool update dotnet-ef -g
 
 2. **Archive old data (optional)**
    - Export old financial records
-   - Permanently delete soft-deleted records (if feature available)
+   - Permanently delete records that are no longer needed
 
 ### Before Major Updates
 
@@ -939,7 +938,7 @@ dotnet tool update dotnet-ef -g
    - Application → Manage Database → Create Manual Backup
 
 2. **Copy backup to safe location**
-   - USB drive or cloud storage
+   - USB drive or another folder on computer
 
 3. **Document current state**
    - Note schema version
@@ -974,7 +973,7 @@ dotnet tool update dotnet-ef -g
 
 ### Q: What if I lose all my backups?
 
-**A:** If both the main database and all backups are lost, **data cannot be recovered** unless you have off-site backups (cloud, USB drive). This is why the 3-2-1 backup rule is critical.
+**A:** If both the main database and all backups are lost, **data cannot be recovered** unless you have backups on external storage (USB drive). This is why the 3-2-1 backup rule is critical.
 
 ### Q: Can I access the database while Nine is running?
 
@@ -984,13 +983,14 @@ dotnet tool update dotnet-ef -g
 
 **A:**
 
-1. On old computer: Create backup
-2. Copy backup file to new computer (USB drive, cloud)
-3. Install Nine on new computer
-4. Copy backup to: the `Backups/` folder on new computer
-5. Restore from backup
+1. **Old computer:** Application → Manage Database → **Create Manual Backup**, then **Copy To** next to the new backup and save it to a USB drive or cloud folder.
+2. **New computer:** Install Nine.
+3. Go to Application → Manage Database and click **Upload Backup File**, then choose the `.db` file (500 MB maximum). Nine copies it into the `Backups/` folder and lists it in **Available Backups** as `Nine_Backup_Uploaded_…`. You don't need to copy files into the folder yourself.
+4. Choose how to bring the data in:
+   - **Restore** - Replaces the new computer's database with the backup, including user accounts. Best for a full migration.
+   - **Preview → Import All Data** - Brings the records into the existing database and keeps its current accounts, including your log-in.
 
-Or simply copy the entire Nine data folder (database + `Backups/`) to the new computer.
+**Note:** If the database is encrypted, you need the password on the new computer. Alternatively, use **Export Unencrypted Backup** on the old computer (see Backup Procedures, Method 3).
 
 ### Q: Can I use my database on both Windows and Linux?
 
