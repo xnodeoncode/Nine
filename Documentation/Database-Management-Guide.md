@@ -183,7 +183,7 @@ To see them, go to **Application → Manage Database** and look in the **Availab
 
 For **maximum protection**, copy backups to multiple locations.
 
-**Note:** Nine never uploads your backups. Where you store them, and who can access that storage, is your decision and your responsibility. See [Backups, Exports and Documents](https://github.com/xnodeoncode/Nine/blob/main/Documentation/Privacy.md#backups-exports-and-documents) in the Privacy Policy.
+**Note:** Nine never uploads your backups. Where you store them (USB drive, external disk, cloud storage service) and who can access that storage is your decision and your responsibility. See [Your Responsibilities](https://github.com/xnodeoncode/Nine/blob/main/Documentation/Privacy.md#your-responsibilities) in the Privacy Statement.
 
 **Within the application (recommended):**
 
@@ -570,7 +570,7 @@ You can also run **Auto-Recover from Corruption** from the Backup Actions pane a
 **Prevention:**
 
 - ✅ Perform backups regularly
-- ✅ Store backups on external storage (USB)
+- ✅ Store backups off-site (USB drive or cloud storage)
 - ✅ Use UPS (uninterruptible power supply)
 - ✅ Monitor hard drive health (SMART status)
 
@@ -910,9 +910,9 @@ dotnet tool update dotnet-ef -g
 
 ### Monthly Maintenance
 
-1. **Copy backups to external storage**
-   - Copy to external USB drive
-   - Test restore from a backup on external storage
+1. **Copy backups off-site**
+   - Copy to an external USB drive or upload to cloud storage
+   - Test restore from an off-site backup
 
 2. **Review retention**
    - Nine keeps only the 10 most recent backups, so older ones are deleted automatically
@@ -954,7 +954,7 @@ dotnet tool update dotnet-ef -g
 
 - **Minimum:** Weekly
 - **Recommended:** Daily (manual; Nine has no scheduled backups)
-- **Best practice:** Daily backup + a copy on external storage weekly
+- **Best practice:** Daily backup + an off-site copy weekly
 
 ### Q: Where are backups stored?
 
@@ -969,7 +969,7 @@ dotnet tool update dotnet-ef -g
 
 ### Q: What if I lose all my backups?
 
-**A:** If both the main database and all backups are lost, **data cannot be recovered** unless you have backups on external storage (USB drive). This is why the 3-2-1 backup rule is critical.
+**A:** If both the main database and all backups are lost, **data cannot be recovered** unless you have off-site backups (USB drive, cloud storage). This is why the 3-2-1 backup rule is critical.
 
 ### Q: Can I access the database while Nine is running?
 
@@ -979,7 +979,7 @@ dotnet tool update dotnet-ef -g
 
 **A:**
 
-1. **Old computer:** Application → Manage Database → **Create Manual Backup**, then **Copy To** next to the new backup and save it to a USB drive or other external storage.
+1. **Old computer:** Application → Manage Database → **Create Manual Backup**, then **Copy To** next to the new backup and save it to a USB drive or cloud storage.
 2. **New computer:** Install Nine.
 3. Go to Application → Manage Database and click **Upload Backup File**, then choose the `.db` file (500 MB maximum). Nine copies it into the `Backups/` folder and lists it in **Available Backups** as `Nine_Backup_Uploaded_…`. You don't need to copy files into the folder yourself.
 4. Choose how to bring the data in:
@@ -994,7 +994,7 @@ dotnet tool update dotnet-ef -g
 
 ### Q: What happens if my hard drive fails?
 
-**A:** If you have backups on external storage (such as a USB drive), you can recover your data. If not, data is **permanently lost** (professional data recovery may be possible but expensive and not guaranteed).
+**A:** If you have **off-site backups** (USB drive, cloud storage), you can recover your data. If not, data is **permanently lost** (professional data recovery may be possible but expensive and not guaranteed).
 
 ### Q: Should I backup the WAL files too?
 
@@ -1044,7 +1044,7 @@ Need help with database management? We're here for you!
 **Key takeaways:**
 
 ✅ **Back up regularly** - Your insurance policy  
-✅ **Store backups on external storage** - Such as a USB drive  
+✅ **Store backups off-site** - USB drive or cloud storage  
 ✅ **Test restore occasionally** - Practice before you need it  
 ✅ **Monitor database health** - Catch issues early  
 ✅ **Backup before major changes** - Always
@@ -1053,7 +1053,7 @@ Need help with database management? We're here for you!
 
 - **3** copies of data (original + 2 backups)
 - **2** different storage types (local + external)
-- **1** copy stored away from the computer (for example, an external drive kept elsewhere)
+- **1** off-site backup (for example, an external drive kept elsewhere or cloud storage)
 
 **With good database management practices, your data is safe and your business runs smoothly!** 🏠
 
