@@ -67,11 +67,11 @@ namespace Nine.Application.Services
                     Name = organization.Name,
                     LateFeeEnabled = true,
                     LateFeeAutoApply = true,
-                    LateFeeGracePeriodDays = 3,
+                    LateFeeGracePeriodDays = 5,
                     LateFeePercentage = 0.05m,
                     MaxLateFeeAmount = 50.00m,
                     PaymentReminderEnabled = true,
-                    PaymentReminderDaysBefore = 3,
+                    PaymentReminderDaysBefore = 10,
                     CreatedOn = DateTime.UtcNow,
                     CreatedBy = ownerId
                 };
@@ -127,11 +127,11 @@ namespace Nine.Application.Services
                     Name = organization.Name,
                     LateFeeEnabled = true,
                     LateFeeAutoApply = true,
-                    LateFeeGracePeriodDays = 3,
+                    LateFeeGracePeriodDays = 5,
                     LateFeePercentage = 0.05m,
                     MaxLateFeeAmount = 50.00m,
                     PaymentReminderEnabled = true,
-                    PaymentReminderDaysBefore = 3,
+                    PaymentReminderDaysBefore = 10,
                     CreatedOn = DateTime.UtcNow,
                     CreatedBy = userId
                 };

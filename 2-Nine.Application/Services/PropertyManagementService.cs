@@ -1730,11 +1730,11 @@ namespace Nine.Application.Services
                     OrganizationId = organizationId.Value, // This should be set to the actual organization ID
                     LateFeeEnabled = true,
                     LateFeeAutoApply = true,
-                    LateFeeGracePeriodDays = 3,
+                    LateFeeGracePeriodDays = 5,
                     LateFeePercentage = 0.05m,
                     MaxLateFeeAmount = 50.00m,
                     PaymentReminderEnabled = true,
-                    PaymentReminderDaysBefore = 3,
+                    PaymentReminderDaysBefore = 10,
                     CreatedOn = DateTime.UtcNow,
                     CreatedBy = string.IsNullOrEmpty(userId) ? string.Empty : userId
                 };
