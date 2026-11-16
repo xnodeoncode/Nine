@@ -1,7 +1,7 @@
 # Nine - Database Management Guide
 
 **Version:** 1.2.0  
-**Last Updated:** November 11, 2026  
+**Last Updated:** November 16, 2026  
 **Audience:** Administrators and Power Users
 
 ---
@@ -28,11 +28,10 @@ Nine uses **SQLite** as its database engine - a lightweight, file-based database
 
 ### What You'll Learn
 
-- ✅ How to back up your database (manual and automatic)
+- ✅ How to back up your database
 - ✅ How to restore from a backup
 - ✅ How to check database health
 - ✅ How to troubleshoot common database issues
-- ✅ How to optimize database performance
 - ✅ Best practices for data protection
 
 ### Why Database Management Matters
@@ -145,20 +144,19 @@ Not all version upgrades are supported automatically. Check the **[Compatibility
 
 1. **Open Nine**
 2. **Navigate to:** Application → Manage Database
-3. In the Backup Actions Panel
-4. **Click:** "Create Manual Backup" button
-5. **Wait:** Progress indicator shows backup creation
-6. **Confirmation:** "Backup created successfully!" message appears
-7. **Confirmation:** New database backup file appears in **Available Backups** list
+3. **Click:** "Create Manual Backup" in the Backup Actions pane
+4. **Wait:** A progress indicator shows backup creation
+5. **Confirmation:** A "Backup created successfully" message appears and the new file is listed in **Available Backups**
 
 **Backup details:**
 
-- **Filename:** `backup_YYYYMMDD_HHMMSS.db`
-  - Example: `backup_20260218_143022.db` (February 18, 2026 at 2:30:22 PM)
+- **Filename:** `Nine_Backup_<Reason>_YYYYMMDD_HHMMSS.db`
+  - Example: `Nine_Backup_Manual_20260218_143022.db` (February 18, 2026 at 2:30:22 PM)
 - **Location:** `Backups/` folder
   - Linux: `~/.config/Nine/Backups/`
   - Windows: `%APPDATA%\Nine\Backups\`
 - **Size:** Same as database file (~5-200 MB)
+- **Retention:** Nine keeps the **10 most recent** backups and deletes older ones automatically. Copy backups you want to keep elsewhere (see Method 3).
 
 **Best practice:** Create a manual backup **before**:
 
@@ -169,38 +167,37 @@ Not all version upgrades are supported automatically. Check the **[Compatibility
 
 ### Method 2: Automatic Backups
 
-Automatic Backups: Created before each migration and encryption change
+Nine does **not** run scheduled backups. It creates a backup automatically only at these events:
 
-1. **Navigate to:** Application → Manage Database
+| Event                       | Filename contains          |
+| --------------------------- | -------------------------- |
+| Before applying migrations  | `PreMigration_<n>Pending`  |
+| Initial setup               | `InitialSetup`             |
+| Before enabling encryption  | `BeforeEncryption`         |
+| Before disabling encryption | `BeforeDecryption`         |
+| Before a database reset     | `BeforeReset`              |
 
-In the **Available Backups** list
-
-1. Look for a Pre*Migration*... entry
+To see them, go to **Application → Manage Database** and look in the **Available Backups** list.
 
 ### Method 3: External Backup (USB Drive)
 
-For **maximum protection**, copy backups to multiple locations:
+For **maximum protection**, copy backups to multiple locations.
 
-**Within the application (recommended)**
-
-1. **Navigate to:** Application → Manage Database
-2. **Click** Create Manual Backup in the **Backup Actions** Pane or use an existing backup in the **Available Backups** list.
-3. **Click** **"Copy To"** next to the database file that you would like to make a manual back up for.
-4. **Save** In the File/Save dialog that opens, navigate to the location where you would like to save the file and click **Save**.
-
-**NOTE: If the database is encrypted, you will need to remember the password in order to access the data. An unencrypted backup can be generated if desired.**
-
-**Generate an unencrypted backup**
+**Within the application (recommended):**
 
 1. **Navigate to:** Application → Manage Database
-2. **Click** **Export Unencrypted Backup** in the **Database Encryption** pane
-3. A new **Nine_Unencrypted_Backup...db** file will appear in the **Available Backups** list.
-4. **Click** **Copy To** next to the database file that you would like to backup.
-5. **Save** In the File/Save dialog that opens, navigate to the location where you would like to save the file and click **Save**.
+2. **Click** **Create Manual Backup** in the **Backup Actions** pane, or use an existing backup in the **Available Backups** list.
+3. **Click** **Copy To** next to the backup you want to copy.
+4. In the Save dialog, choose a location and click **Save**.
 
-**Manual Backup**
+**Note:** If the database is encrypted, you need the password to open the backup. You can create an unencrypted copy if needed:
 
-**USB/External drive backup:**
+1. **Navigate to:** Application → Manage Database
+2. **Click** **Export Unencrypted Backup** in the **Database Encryption** pane.
+3. A new `Nine_Unencrypted_Backup_...db` file appears in the **Available Backups** list.
+4. **Click** **Copy To** next to it and save it to your chosen location.
+
+**From the command line (USB/external drive):**
 
 **Linux:**
 
@@ -244,7 +241,7 @@ Restore from backup when:
 2. **Locate** the **Available Backups** pane
 3. **Choose** a backup from the list
    - Shows filename and date
-   - Example: `backup_20260218_143022.db (Feb 18, 2026 2:30 PM)`
+   - Example: `Nine_Backup_Manual_20260218_143022.db`
 4. **Click:** "Preview" button to see the records in the database
 5. On the Preview Database page, click the tabs at the bottom to preview the data in each table.
 6. **Import:** If the data is correct, click **Import All Data**.
@@ -263,34 +260,32 @@ Restore from backup when:
 5. **Confirmation dialog** appears:
 
    ```
-   ⚠️ Warning: This will replace your current database
+   Are you sure you want to restore from '<backup file name>'?
 
-   Current database will be backed up automatically before restore.
-   Application will restart after restore completes.
+   This will replace your current database and the application will restart automatically.
 
-   Are you sure you want to continue?
+   Current database will be saved as .beforeRestore backup.
    ```
 
-6. **Click:** "Yes, Restore" to proceed (or "Cancel" to abort)
+6. **Click:** "OK" to proceed (or "Cancel" to abort)
 7. **Automatic steps:**
-   - Current database backed up (safety backup)
-   - Selected backup validated
-   - Current database replaced with backup
-   - Application restarts automatically
-8. **Verification:** After restart, check data to ensure correct
+   - The selected backup is staged for restore
+   - The application restarts
+   - On startup, the current database is renamed to `<database>.beforeRestore.<timestamp>` (in the same folder as the database)
+   - The selected backup is moved into place
+8. **Verification:** After restart, check your data
 
 **Safety features:**
 
-- ✅ Current database automatically backed up before restore
-- ✅ Restore can be undone (restore the safety backup)
-- ✅ Validation prevents corrupted backup from being used
-- ✅ Application restart ensures clean state
+- ✅ Current database is kept as a `.beforeRestore` file before it is replaced
+- ✅ Restore can be undone by renaming that file back to the database name
+- ✅ Application restart ensures a clean state
 
 **Important notes:**
 
-- ⚠️ **All users logged out** during restore
+- ⚠️ **All users are disconnected** during restart
 - ⚠️ **Unsaved work will be lost** - save everything first
-- ⚠️ **Takes 10-30 seconds** depending on database size
+- ⚠️ A restore is a **snapshot**: anything entered after the backup was made is not included
 
 ### Method 3: Manual Restore (Advanced Users)
 
@@ -306,13 +301,13 @@ pkill Nine
 cd ~/.config/Nine/
 
 # Backup current (corrupted) database
-mv app_v1.1.0.db app_v1.1.0.db.corrupted
+mv app_v1.2.0.db app_v1.2.0.db.corrupted
 
 # Copy backup to main database
-cp Backups/backup_20260218_143022.db app_v1.1.0.db
+cp Backups/Nine_Backup_Manual_20260218_143022.db app_v1.2.0.db
 
 # Restart application
-./Nine-1.1.0-x86_64.AppImage
+./Nine-1.2.0-x86_64.AppImage
 ```
 
 **Windows:**
@@ -324,10 +319,10 @@ cp Backups/backup_20260218_143022.db app_v1.1.0.db
 cd $env:APPDATA\Nine
 
 # Backup current (corrupted) database
-Move-Item app_v1.1.0.db app_v1.1.0.db.corrupted
+Move-Item app_v1.2.0.db app_v1.2.0.db.corrupted
 
 # Copy backup to main database
-Copy-Item Backups\backup_20260218_143022.db app_v1.1.0.db
+Copy-Item Backups\Nine_Backup_Manual_20260218_143022.db app_v1.2.0.db
 
 # Restart application (Start Menu or double-click icon)
 ```
@@ -362,66 +357,59 @@ Reset the database when:
 - Troubleshooting requires clean slate
 - Development/testing purposes
 
-**⚠️ Warning: Reset is PERMANENT and cannot be undone!**
+**⚠️ Warning: Reset deletes all data. Only the automatic safety backup can bring it back.**
 
 ### Reset Procedure
 
 **Step-by-step:**
 
 1. **Navigate to:** Application → Manage Database
-2. **Click:** "Reset Database" button in Backup Actions panel (red button at bottom)
+2. **Click:** "Reset Database" button in the Backup Actions pane (red button)
 3. **Confirmation dialog** appears:
 
    ```
-   ⚠️ DANGER: Reset Database
+   WARNING: This will delete the current database and create a new blank one. All data will be lost!
 
-   This will DELETE ALL DATA including:
-   - All properties, tenants, and leases
-   - All invoices, payments, and financial records
-   - All maintenance requests and inspections
-   - All documents and photos
-   - Organization and user accounts
+   A backup will be created before deletion.
 
-   A backup will be created automatically before reset.
-
-   Type "RESET" to confirm (case-sensitive):
-   _______
+   Are you absolutely sure you want to continue?
    ```
 
-4. **Type:** `RESET` (exactly, uppercase)
-5. **Click:** "Confirm Reset"
-6. **Automatic steps:**
-   - Current database backed up (safety backup: `pre-reset-backup_20260218_DATE.db`)
-   - Database reset to empty schema
-   - Application restarts to home page where you can create a new account.
-7. **Setup:** Go through New Account setup to configure fresh installation
+4. **Click:** "OK" to confirm (or "Cancel" to abort)
+5. **Automatic steps:**
+   - Current database backed up (safety backup: `Nine_Backup_BeforeReset_<timestamp>.db`). If the backup fails, the reset is canceled.
+   - Database deleted
+   - Application restarts to the home page, where you can create a new account
+6. **Setup:** Go through New Account setup to configure the fresh installation
 
 **Safety features:**
 
 - ✅ Automatic backup created before reset
-- ✅ Typed confirmation required (prevents accidental clicks)
-- ✅ Can restore from pre-reset backup if needed
+- ✅ Reset is canceled if the backup cannot be created
+- ✅ Can restore from the pre-reset backup if needed
 
 **Recovery from reset:**
 
 If you reset by mistake, **immediately restore** from the pre-reset backup:
 
-1. Navigate to Backups folder
-2. Find: `pre-reset-backup_20260218_143022.db`
-3. Use restore procedure (Method 2 or 3 above)
+1. Navigate to Application → Manage Database
+2. Find `Nine_Backup_BeforeReset_<timestamp>.db` in **Available Backups**
+3. Use the restore procedure (Method 1 or 2 above)
 4. Your data will be recovered
 
 ---
 
 ## Database Health Checks
 
-### Automatic Health Monitoring
+### Automatic Health Checks
 
-Nine monitors database health continuously:
+Nine runs an integrity check:
 
-- **On startup** - Integrity check before application loads
-- **Before backup** - Verify database is healthy before backup
-- **After errors** - Check health if database errors occur
+- **On startup** - Before the application loads. If it fails, Nine tries to recover automatically from the most recent valid backup.
+- **After migrations** - When a version upgrade applies schema changes.
+- **When the Database Settings page opens** - Same check as the manual one below.
+
+You can also run **Auto-Recover from Corruption** from the Backup Actions pane at any time.
 
 ### Manual Health Check
 
@@ -435,10 +423,10 @@ Nine monitors database health continuously:
    ```
    ✅ Database Health Check: PASSED
 
-   Database file: app_v1.1.0.db
-   Location: /home/user/.config/Nine/app_v1.1.0.db
+   Database file: app_v1.2.0.db
+   Location: /home/user/.config/Nine/app_v1.2.0.db
    File size: 47.3 MB
-   Schema version: 1.1.0
+   Schema version: 1.2.0
    Connection status: Connected
    Integrity check: PASSED
 
@@ -464,7 +452,7 @@ Nine monitors database health continuously:
 
 - ✅ **Connection status: Connected** - Database accessible
 - ✅ **Integrity check: PASSED** - No corruption detected
-- ✅ **Schema version: 1.1.0** - Matches application version
+- ✅ **Schema version: 1.2.0** - Matches application version
 
 **Yellow indicators (warning):**
 
@@ -529,12 +517,12 @@ Nine monitors database health continuously:
    ```bash
    # Only if application is definitely closed
    # Linux
-   rm ~/.config/Nine/app_v1.1.0.db-wal
-   rm ~/.config/Nine/app_v1.1.0.db-shm
+   rm ~/.config/Nine/app_v1.2.0.db-wal
+   rm ~/.config/Nine/app_v1.2.0.db-shm
 
    # Windows
-   del %APPDATA%\Nine\app_v1.1.0.db-wal
-   del %APPDATA%\Nine\app_v1.1.0.db-shm
+   del %APPDATA%\Nine\app_v1.2.0.db-wal
+   del %APPDATA%\Nine\app_v1.2.0.db-shm
    ```
 
 ### Issue 2: Database Corruption
@@ -556,19 +544,19 @@ Nine monitors database health continuously:
 **Solutions:**
 
 1. **Restore from backup (recommended):**
-   - Use most recent backup
-   - Follow restore procedure above
+   - Use **Auto-Recover from Corruption** (Application → Manage Database), or restore the most recent backup manually
+   - Follow the restore procedure above
    - Verify data after restore
 
 2. **SQLite recovery tool (if no backup):**
 
    ```bash
    # Attempt to dump and rebuild database
-   sqlite3 app_v1.1.0.db ".dump" | sqlite3 app_v1.1.0_recovered.db
+   sqlite3 app_v1.2.0.db ".dump" | sqlite3 app_v1.2.0_recovered.db
 
    # Replace corrupted database with recovered one
-   mv app_v1.1.0.db app_v1.1.0.db.corrupted
-   mv app_v1.1.0_recovered.db app_v1.1.0.db
+   mv app_v1.2.0.db app_v1.2.0.db.corrupted
+   mv app_v1.2.0_recovered.db app_v1.2.0.db
    ```
 
 3. **Professional data recovery:**
@@ -612,7 +600,7 @@ Nine monitors database health continuously:
 
 3. **Manual schema repair (advanced):**
    - Requires SQLite knowledge
-   - Export data, fix schema, reimport
+   - Export data, fix schema, re-import
    - Not recommended for non-technical users
 
 4. **Fresh install with data export:**
@@ -645,21 +633,17 @@ Nine monitors database health continuously:
 
 **Solutions:**
 
-1. **Optimize database:**
-   - Administration → Settings → Database → Optimize
-   - Rebuilds indexes and reclaims space
-
-2. **Cleanup old data:**
+1. **Cleanup old data:**
    - Permanently delete soft-deleted records (advanced feature)
    - Archive old financial records
    - Remove unused documents/photos
 
-3. **Check system resources:**
+2. **Check system resources:**
    - Close other applications
    - Increase RAM if below minimum (2 GB)
    - Use SSD instead of HDD for data folder
 
-4. **Split database (advanced):**
+3. **Split database (advanced):**
    - Not officially supported
    - Contact support for guidance if needed
 
@@ -693,21 +677,21 @@ Nine monitors database health continuously:
 
    ```bash
    # Linux
-   find ~ -name "app_v1.1.0.db" 2>/dev/null
+   find ~ -name "app_v1.2.0.db" 2>/dev/null
 
    # Windows (PowerShell)
-   Get-ChildItem -Path C:\ -Filter "app_v1.1.0.db" -Recurse -ErrorAction SilentlyContinue
+   Get-ChildItem -Path C:\ -Filter "app_v1.2.0.db" -Recurse -ErrorAction SilentlyContinue
    ```
 
 3. **Restore from backup:**
    - If original database lost
    - Copy backup to correct location
-   - Rename to `app_v1.1.0.db`
+   - Rename to `app_v1.2.0.db`
 
 4. **Fix permissions (Linux):**
    ```bash
-   chmod 644 ~/.config/Nine/app_v1.1.0.db
-   chown $USER:$USER ~/.config/Nine/app_v1.1.0.db
+   chmod 644 ~/.config/Nine/app_v1.2.0.db
+   chown $USER:$USER ~/.config/Nine/app_v1.2.0.db
    ```
 
 ---
@@ -725,9 +709,9 @@ Nine monitors database health continuously:
 
 You may notice these files alongside the database:
 
-- `app_v1.1.0.db` - Main database file
-- `app_v1.1.0.db-wal` - Write-Ahead Log (temporary)
-- `app_v1.1.0.db-shm` - Shared Memory file (temporary)
+- `app_v1.2.0.db` - Main database file
+- `app_v1.2.0.db-wal` - Write-Ahead Log (temporary)
+- `app_v1.2.0.db-shm` - Shared Memory file (temporary)
 
 **WAL benefits:**
 
@@ -757,11 +741,11 @@ SELECT * FROM Properties WHERE IsDeleted = 0;
 -- Count active leases
 SELECT COUNT(*) FROM Leases WHERE Status = 'Active';
 
--- Total rent collected this month
-SELECT SUM(Amount) FROM Payments WHERE PaymentDate >= '2026-01-01';
+-- Total rent collected this year
+SELECT SUM(Amount) FROM Payments WHERE PaidOn >= '2026-01-01' AND IsDeleted = 0;
 
 -- Find overdue invoices
-SELECT * FROM Invoices WHERE DueDate < date('now') AND Status = 'Pending';
+SELECT * FROM Invoices WHERE DueOn < date('now') AND Status = 'Pending' AND IsDeleted = 0;
 ```
 
 **⚠️ Warning:**
@@ -787,7 +771,7 @@ SELECT * FROM Properties WHERE IsDeleted = 0;
 .output financial_summary.csv
 SELECT
   l.PropertyId,
-  p.PropertyName,
+  p.Address,
   COUNT(DISTINCT i.Id) as InvoiceCount,
   SUM(i.Amount) as TotalBilled,
   SUM(i.AmountPaid) as TotalPaid
@@ -795,31 +779,27 @@ FROM Leases l
 JOIN Properties p ON l.PropertyId = p.Id
 LEFT JOIN Invoices i ON i.LeaseId = l.Id
 WHERE l.IsDeleted = 0
-GROUP BY l.PropertyId, p.PropertyName;
+GROUP BY l.PropertyId, p.Address;
 .output stdout
 ```
 
 ### Database Encryption
 
-SQLite databases are **not encrypted** by default. Nine includes database encryption options:
+SQLite databases are **not encrypted** by default. Nine includes database encryption using **SQLCipher**:
 
-**Option 1: SQLCipher**
+**Option 1: Built-in encryption (SQLCipher)**
 
-SQLCipher provides AES-256 encryption for database files. This is integrated into Nine:
-
-- **Enable encryption:** Administration → Settings → Database → Security → Enable Database Encryption
-- **AES-256 encryption** of entire database file
-- **Master password** required to unlock database
-- **Encryption state** tracked in DatabaseSettings table
-- **Performance impact:** Minimal (2-5% overhead)
+- **Enable encryption:** Application → Manage Database → Database Encryption pane → **Enable Database Encryption**
+- **AES-256 encryption** of the entire database file
+- **Master password** required to unlock the database (cached in your system keychain for convenience)
+- **Encryption state** tracked in the DatabaseSettings table
+- A backup is created automatically before encryption or decryption (`BeforeEncryption` / `BeforeDecryption`)
 
 **Important notes:**
 
-- ⚠️ **Backup before enabling encryption** (encrypted backups require password)
-- ⚠️ **Store password safely** - lost password = unrecoverable data
-- ✅ Encryption applied to new data immediately
-- ✅ Existing data encrypted in background (may take several minutes)
-- ✅ Transparent to application once enabled (automatic encryption/decryption)
+- ⚠️ **Store your password safely** - a lost password means unrecoverable data
+- ⚠️ Encrypted backups require the password. Use **Export Unencrypted Backup** if you need a portable copy (see Backup Procedures, Method 3)
+- ✅ Transparent to the application once enabled
 
 **Option 2: File-system encryption**
 
@@ -909,9 +889,9 @@ dotnet tool update dotnet-ef -g
 
 ### Daily Operations
 
-1. **Enable automatic backups**
-   - Set to daily at 2 AM
-   - Verify backups run successfully (check Last Backup timestamp)
+1. **Back up regularly**
+   - Nine has no scheduled backups. Use **Create Manual Backup** (Application → Manage Database)
+   - Verify the newest file in **Available Backups** has the date you expect
 
 2. **Monitor database health**
    - Check health status weekly
@@ -939,28 +919,24 @@ dotnet tool update dotnet-ef -g
    - Copy to external USB drive
    - Test restore from off-site backup
 
-2. **Review retention policy**
-   - Delete very old backups if needed
-   - Keep at least 3 months of backups
+2. **Review retention**
+   - Nine keeps only the 10 most recent backups, so older ones are deleted automatically
+   - Copy backups you want to keep long-term to external storage
 
 ### Quarterly Maintenance
 
-1. **Optimize database**
-   - Administration → Settings → Database → Optimize
-   - Improves performance
-
-2. **Test restore procedure**
+1. **Test restore procedure**
    - Practice restoring from backup
    - Verify you can recover data if needed
 
-3. **Archive old data (optional)**
+2. **Archive old data (optional)**
    - Export old financial records
    - Permanently delete soft-deleted records (if feature available)
 
 ### Before Major Updates
 
 1. **Create manual backup**
-   - Administration → Settings → Database → Create Backup
+   - Application → Manage Database → Create Manual Backup
 
 2. **Copy backup to safe location**
    - USB drive or cloud storage
@@ -982,8 +958,8 @@ dotnet tool update dotnet-ef -g
 **A:**
 
 - **Minimum:** Weekly
-- **Recommended:** Daily (automatic)
-- **Best practice:** Daily automatic + off-site copy weekly
+- **Recommended:** Daily (manual; Nine has no scheduled backups)
+- **Best practice:** Daily backup + off-site copy weekly
 
 ### Q: Where are backups stored?
 
@@ -1060,7 +1036,7 @@ Need help with database management? We're here for you!
 
 1. **Exact error message** (copy full text)
 2. **Steps to reproduce** (what you were doing when error occurred)
-3. **Database size** (from Administration → Settings → Database)
+3. **Database size** (from the Database Health pane, Application → Manage Database)
 4. **Last successful backup** (date/time)
 5. **Recent changes** (upgrades, bulk operations, etc.)
 6. **Console output**, if launched from a terminal
@@ -1071,11 +1047,10 @@ Need help with database management? We're here for you!
 
 **Key takeaways:**
 
-✅ **Enable automatic daily backups** - Your insurance policy  
+✅ **Back up regularly** - Your insurance policy  
 ✅ **Store backups off-site** - Cloud or USB drive  
 ✅ **Test restore occasionally** - Practice before you need it  
 ✅ **Monitor database health** - Catch issues early  
-✅ **Optimize quarterly** - Maintain performance  
 ✅ **Backup before major changes** - Always
 
 **Follow the 3-2-1 backup rule:**
@@ -1088,6 +1063,6 @@ Need help with database management? We're here for you!
 
 ---
 
-**Document Version:** 1.2.0
-**Last Updated:** November 15, 2026  
+**Document Version:** 1.2.0  
+**Last Updated:** November 16, 2026  
 **Author:** CIS Guru with GitHub Copilot
