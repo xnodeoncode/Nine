@@ -1,7 +1,5 @@
 # Nine. - Third-Party Licensing Notices
 
----
-
 **Version:** 1.2.0  
 **Last Updated:** November 16, 2026
 

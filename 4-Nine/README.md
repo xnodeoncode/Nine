@@ -63,13 +63,15 @@ Nine. is designed to simplify property management operations through a centraliz
 - **Backup Management** - In-app data backup, recovery, and encryption features
 - **Audit Logging** - Record creation and change tracking
 
+---
+
 ## Technology Stack
 
 ### Backend
 
-- **Backend**: ASP.NET Core 10.0
+- **Backend**: ASP.NET Core
 - **UI Framework**: Blazor Server
-- **Database**: SQLCipher (SQLite) with Entity Framework Core 10.0
+- **Database**: SQLCipher (SQLite) with Entity Framework Core
 - **Authentication**: ASP.NET Core Identity
 
 ### Frontend
@@ -96,28 +98,19 @@ Nine. is designed to simplify property management operations through a centraliz
 
 ---
 
-# Contributing
-
-1. Fork the repository **@ the development branch** (Main is protected and will only accept PRs for releases. Main should always match the latest release.)
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-### Development Guidelines
-
-- Follow C# coding conventions
-- Use meaningful commit messages
-- Update documentation for new features
-- Add unit tests for new functionality
-- Ensure responsive design compatibility
-
 ## Prerequisites
 
 - [.NET 10.0 SDK](https://dotnet.microsoft.com/download/dotnet/10.0)
+- [Node.js](https://nodejs.org/) (LTS) and npm, used once to download the Electron binary (see step 2)
 - [Git](https://git-scm.com/)
 - [Visual Studio Code](https://code.visualstudio.com/) (recommended) or Visual Studio 2022
 - [C# Dev Kit Extension](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csdevkit) for VS Code
+- A graphical desktop session. Nine runs in an Electron window and cannot run headless.
+- Development is supported on **Linux x64** and **Windows x64**.
+
+**Optional tools:** [`dotnet-ef`](https://learn.microsoft.com/ef/core/cli/dotnet) (`dotnet tool install --global dotnet-ef`), only needed to change the database schema.
+
+---
 
 ## Quick Start
 
@@ -134,7 +127,18 @@ cd Nine
 dotnet build
 ```
 
-### 3. Start the Development Server
+**First build only:** if the build prints `[ElectronRestore] SETUP REQUIRED`, the Electron binary has not been downloaded yet. Run the following once, then build again:
+
+```bash
+cd 4-Nine/bin/Debug/net10.0/linux-x64/.electron   # on Windows, use the matching win-x64 output folder
+npm install
+cd ../../../../../..
+dotnet build
+```
+
+The exact folder is shown in the warning message. The downloaded Electron binary is cached in `~/.cache/electron` on Linux and `%LOCALAPPDATA%\electron\Cache` (`C:\Users\<username>\AppData\Local\electron\Cache`) on Windows, so later builds reuse it.
+
+### 3. Start the Electron application
 
 ```bash
 cd 4-Nine
@@ -145,167 +149,53 @@ The database is created and migrated automatically on first run.
 
 ### 4. Access the Application
 
-- The Electron splash screen, and then application window, should automatically load.
+The Electron splash screen, and then the application window, should load automatically. A new database opens to the home page, where you log in or register an account. The [Quick Start Guide](https://github.com/xnodeoncode/Nine/blob/main/Documentation/Quick-Start-Guide.md) walks through creating your first organization, property and lease.
+
+To start over with a clean database, close Nine and delete the database file (`~/.config/Nine/app_v1.2.0.db` on Linux, `%APPDATA%\Nine\app_v1.2.0.db` on Windows, which is `C:\Users\<username>\AppData\Roaming\Nine`), or use **Reset Database** on the Manage Database page.
+
+### 5. Testing
+
+```bash
+dotnet test Nine.sln
+```
+
+### Changing the database schema
+
+If you change an entity, you must add a migration, update the database, and regenerate the compiled model. Skipping the last step causes a runtime error. See **Schema Migrations & Model Optimization** in the [Database Management Guide](https://github.com/xnodeoncode/Nine/blob/main/Documentation/Database-Management-Guide.md) for the commands.
 
 ## Project Structure
 
-The application follows Clean Architecture principles with clear separation of concerns:
-
-**Note: the file names and directories may change, but the architecture will remain the same.**
-
 ```
 Nine/
-├── Nine.Core/                         # Domain Layer (no dependencies)
-│   ├── Entities/                      # Domain models & business entities
-│   │   ├── BaseModel.cs               # Base entity with common properties
-│   │   ├── Property.cs                # Property entity
-│   │   ├── Tenant.cs                  # Tenant entity
-│   │   ├── Lease.cs                   # Lease entity
-│   │   ├── SecurityDeposit.cs         # Security deposit entity
-│   │   └── ...                        # Other domain entities
-│   └── Constants/                     # Application constants
-│       ├── ApplicationConstants.cs
-│       └── ApplicationSettings.cs
-│
-├── Nine.Infrastructure/               # Infrastructure Layer
-│   ├── Data/                          # Database & persistence
-│   │   ├── ApplicationDbContext.cs    # EF Core DbContext
-│   │   ├── Migrations/                # EF Core migrations (44 files)
-│   │   ├── Scripts/                   # SQL scripts for manual operations
-│   │   └── Backups/                   # Database backups
-│   └── Services/                      # External service implementations
-│
-├── Nine.Application/                  # Application Layer (business logic)
-│   └── Services/                      # Domain services
-│       ├── PropertyManagementService.cs
-│       ├── SecurityDepositService.cs
-│       ├── TenantConversionService.cs
-│       ├── FinancialReportService.cs
-│       ├── ChecklistService.cs
-│       ├── CalendarEventService.cs
-│       ├── NoteService.cs
-│       └── PdfGenerators/             # PDF generation services
-│           ├── LeasePdfGenerator.cs
-│           ├── InvoicePdfGenerator.cs
-│           ├── PaymentPdfGenerator.cs
-│           └── ...
-│
-├── Nine.Shared.UI.Library/            # Reusable UI component library that can be used across different UI implementations
-│   ├── Data/                          # Database & persistence
-│   │   ├── ApplicationDbContext.cs    # EF Core DbContext
-│   │   ├── Migrations/                # EF Core migrations (44 files)
-│   │   ├── Scripts/                   # SQL scripts for manual operations
-│   │   └── Backups/                   # Database backups
-│   └── Services/                      # External service implementations
-│
-├── Nine/                              # Primary web application designed to run within Electron
-│   │
-│   ├── Assets/                        # Artifacts needed to support the Electron build process
-│   │   └── ...
-│   ├── Utilities/                     # Install, removal, diagnostic and verification scripts (bash and PowerShell)
-│   │   └── ...
-│   ├── Data/                          # Database context, creation and migration scripts
-│   │   └── ...
-│   ├── Entities/                      # Local application specific entities
-│   │   └── ...
-│   ├── Extensions/                    # Application utilities and extensions
-│   │   └── ...
-│   ├── Features/                      # Presentation Layer (Vertical Slices)
-│   │   ├── Administration/            # Admin features
-│   │   │   ├── Application/           # Daily report and schema management
-│   │   │   ├── Organizations/         # Organization information and settings
-│   │   │   ├── Settings/              # Application settings and database management
-│   │   │   ├── Users/                 # User management
-│   │   │   └── Dashboard.razor
-│   │   ├── Calendar/                  # Calendar grid and list views
-│   │   ├── DatabaseUnlock/            # Database security features
-│   │   ├── Notifications/             # Notification hub and settings
-│   │   ├── PropertyManagement/        # Property management features
-│   │   │   ├── Checklists/            # Checklist CRUD & management
-│   │   │   ├── ChecklistTemplates/    # Checklist Template CRUD & management
-│   │   │   ├── Documents/             # Document management
-│   │   │   ├── Inspections/           # Property inspection CRUD and management
-│   │   │   ├── Invoices/              # Invoice CRUD & management
-│   │   │   ├── Leases/                # Lease CRUD & management
-│   │   │   ├── Payments/              # Payment CRUD & management
-│   │   │   ├── Properties/            # Property CRUD & management
-│   │   │   ├── Repairs/               # Repair CRUD & management
-│   │   │   ├── Reports/               # Financial & operational reports
-│   │   │   ├── SecurityDeposits/      # Security deposit management
-│   │   │   └── Tenants/               # Tenant CRUD & management
-│   │   └── ...
-│   │   │
-│   ├── Fonts/                         # Licensed fonts for use in the UI
-│   │   │
-│   │   └── ...
-│   │   │
-│   ├── Properties/                    # Publish profiles and configuration files used by Electron builder
-│   │   ├── PublishProfiles/
-│   │   └── ...
-│   │   │
-│   ├── Services/                      # UI level services
-│   │   └── ...
-│   │
-│   ├── Shared/                        # Shared UI Layer
-│   │   ├── Authorization/             # Organization access control components
-│   │   │   └── ...
-│   │   │
-│   │   ├── Components/                # Reusable UI components
-│   │   │   ├── Account/               # Authentication components
-│   │   │   │   └── ...
-│   │   │   ├── Pages/                 # Shared pages (Home, About, Error)
-│   │   │   │   └── ...
-│   │   │   ├── Shared/
-│   │   │   │   └── ...
-│   │   │   ├── NotesTimeline.razor
-│   │   │   ├── SessionTimeoutModal.razor
-│   │   │   └── ToastContainer.razor
-│   │   │   └── ...
-│   │   │
-│   │   ├── Layout/                    # Layout components
-│   │   │   ├── MainLayout.razor
-│   │   │   └── NavMenu.razor
-│   │   │   └── ...
-│   │   │
-│   │   └── Services/                  # UI-specific services
-│   │   │   ├── ToastService.cs
-│   │   │   ├── ThemeService.cs
-│   │   │   ├── SessionTimeoutService.cs
-│   │   │   ├── UserContextService.cs
-│   │   │   └── DocumentService.cs
-│   │   │   └── ...
-│   │   │
-│   │   └── ...
-│   │
-│   ├── wwwroot/                       # Static files
-│   │   ├── assets/                    # Images & static assets
-│   │   ├── js/                        # JavaScript files
-│   │   └── lib/                       # Client libraries
-│   │
-│   ├── Program.cs                     # Application entry point
-│   ├── appsettings.json               # Configuration
-│   └── appsettings.Development.json   # Development config
+├── 0-Nine.Core/           # Domain entities and interfaces
+├── 1-Nine.Infrastructure/ # Data access and external services
+├── 2-Nine.Application/    # Business logic and services
+├── 3-Nine.Shared.UI/      # Shared Blazor components
+├── 4-Nine/                # Desktop application (Electron host)
+└── 6-Tests/               # Unit and integration tests
 ```
 
 ### Architecture Principles
 
-**Clean Architecture Layers:**
+**Layered Architecture:**
+
+Arrows mean "depends on". Every project can also use Core directly.
 
 ```
-Features → Application → Core
-    ↓
-Infrastructure → Core
-    ↓
-Shared → Core
+4-Nine (Features, Shared, Electron host)
+   └─▶ 3-Nine.Shared.UI
+          └─▶ 2-Nine.Application
+                 └─▶ 1-Nine.Infrastructure
+                        └─▶ 0-Nine.Core
 ```
 
 **Dependency Rules:**
 
-- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> **Core** has NO dependencies (pure domain entities)
-- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> **Infrastructure** depends only on Core (data access)
-- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> **Application** depends on Core and Infrastructure (business logic)
-- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> **Features** depend on Application + Core (UI features)
-- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> **Shared** depends on Core (cross-cutting UI)
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> **0-Nine.Core** has no dependencies (pure domain entities)
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> **1-Nine.Infrastructure** depends on Core (data access)
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> **2-Nine.Application** depends on Core and Infrastructure (business logic)
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> **3-Nine.Shared.UI** depends on Application and Core (reusable UI components)
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> **4-Nine** depends on Shared.UI, Application and Core (features, shared UI and the Electron host)
 
 **Benefits:**
 
@@ -341,29 +231,6 @@ The system includes three user roles:
 - Financial tracking
 - Document management
 
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](https://github.com/xnodeoncode/Nine/blob/main/LICENSE) file for details.
-
-## Support
-
-### Documentation
-
-- Check the [Release Notes](https://github.com/xnodeoncode/Nine/releases) for the specific release for recent changes
-- Review component-specific README files in subdirectories
-- Refer to ASP.NET Core and Blazor documentation
-
-### Getting Help
-
-- Create an [issue on GitHub](https://github.com/xnodeoncode/Nine/issues) for bugs
-- Check existing issues for known problems
-- Review the [project documentation](https://github.com/xnodeoncode/Nine/tree/main/Documentation)
-- Contact the [development team](mailto:cisguru@outlook.com?subject=Nine%20Support%20-%20README)
-
-- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/journal-text.svg" width="16" height="16" alt=""> **[Copilot Instructions](../.github/copilot-instructions.md)** — Architecture and development guidelines
-
----
-
 ## Application Limits
 
 Nine. is intentionally constrained for an optimal user experience:
@@ -375,58 +242,54 @@ Nine. is intentionally constrained for an optimal user experience:
 | **Organizations** | 1                              | Desktop application scope             |
 | **File uploads**  | 10 MB per file                 | Performance management                |
 
----
-
-## Technology Stack
-
-- **Framework:** ASP.NET Core 10.0 + Blazor Server
-- **Desktop:** ElectronNET.Core 0.4.1
-- **Database:** SQLite with SQLCipher AES-256 encryption
-- **PDF Generation:** QuestPDF, used under its own license (not Nine's MIT license) — see [Third-Party Licenses](#third-party-licenses)
-- **UI:** Bootstrap 5.3, Material Design Icons
-
----
-
-## Project Structure
-
-```
-Nine/
-├── 0-Nine.Core/           # Domain entities and interfaces
-├── 1-Nine.Infrastructure/ # Data access and external services
-├── 2-Nine.Application/    # Business logic and services
-├── 3-Nine.Shared.UI/      # Shared Blazor components
-├── 4-Nine/                # Desktop application (Electron host)
-└── 6-Tests/               # Unit and integration tests
-```
-
----
-
-## Testing
-
-```bash
-dotnet test Nine.sln
-```
-
----
-
 ## Contributing
 
-1. **Fork** the repository
-2. **Create a feature branch** from `development`:
-   `git checkout -b feature/your-feature`
-3. Read **[copilot-instructions.md](../.github/copilot-instructions.md)** for architecture guidelines
-4. Make changes, write tests, ensure build passes
-5. **Submit a pull request** to `development`
+`main` is reserved for releases and is maintained by the project owner. Do not branch from it or open pull requests against it. All contributions go through `development`.
 
-**Branch strategy:**
+1. **Fork** [xnodeoncode/Nine](https://github.com/xnodeoncode/Nine) on GitHub, clone your fork, and add the original repository as `upstream`:
+
+   ```bash
+   git clone https://github.com/<your-account>/Nine.git
+   cd Nine
+   git remote add upstream https://github.com/xnodeoncode/Nine.git
+   ```
+
+2. **Start from an up-to-date `development`** and create a feature branch:
+
+   ```bash
+   git checkout development
+   git pull upstream development
+   git checkout -b feature/your-feature
+   ```
+
+3. **Read [copilot-instructions.md](../.github/copilot-instructions.md)** before changing code. It describes the architecture, service patterns, organization isolation, soft delete, constants, dependency-injection registration and the database schema change process.
+4. **Make your changes** and add tests for new functionality.
+5. **Merge your feature branch into your fork's `development`, then build and test there.** Everything must pass before you submit:
+
+   ```bash
+   git checkout development
+   git merge feature/your-feature
+   dotnet build Nine.sln
+   dotnet test Nine.sln
+   git push origin development
+   ```
+
+6. **Open a pull request** from your fork's `development` to `development` in `xnodeoncode/Nine`.
+
+**Branch flow:**
 
 ```
-main (protected, production-ready)
-  ↑ Pull Request
-development (integration testing)
-  ↑ Direct merge
-feature/your-feature
+feature/your-feature  ──merge──▶  your fork: development  ──pull request──▶  xnodeoncode/Nine: development
+                                  (build and test here)
 ```
+
+### Development Guidelines
+
+- Follow C# coding conventions
+- Use meaningful commit messages
+- Update documentation for new features
+- Add unit tests for new functionality
+- Ensure responsive design compatibility
 
 **Build and run:**
 
@@ -436,7 +299,13 @@ dotnet build Nine.sln
 cd 4-Nine && dotnet watch
 ```
 
----
+**Linux note:** `dotnet watch` may fail with `The configured user limit (128) on the number of inotify instances has been reached`. This is the default on some distros. Raise the limit and run it again:
+
+```bash
+sudo sysctl fs.inotify.max_user_instances=512
+```
+
+This lasts until the next reboot. To make it permanent, add `fs.inotify.max_user_instances=512` to a file in `/etc/sysctl.d/`. See [inotify(7)](https://man7.org/linux/man-pages/man7/inotify.7.html) for what these limits control.
 
 ## Versioning
 
@@ -447,8 +316,6 @@ cd 4-Nine && dotnet watch
 - **PATCH** = bug fixes
 
 **Current version:** 1.2.0 · **Database schema:** 1.2.0
-
----
 
 ## License
 
@@ -470,19 +337,14 @@ license.
 **You are responsible for confirming that you are eligible to use QuestPDF before installing or operating Nine.** If you
 are not eligible, obtain a license from QuestPDF or do not use Nine. This notice is informational and is not legal advice.
 
----
-
 ## Support
 
 - <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/globe.svg" width="16" height="16" alt=""> **Website:** [nineapp.co](https://nineapp.co/)
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/book.svg" width="16" height="16" alt=""> **Documentation:** [project documentation](https://github.com/xnodeoncode/Nine/tree/main/Documentation) and the [release notes](https://github.com/xnodeoncode/Nine/releases)
 - <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/bug.svg" width="16" height="16" alt=""> **Bug Reports:** [GitHub Issues](https://github.com/xnodeoncode/Nine/issues)
 - <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/lightbulb.svg" width="16" height="16" alt=""> **Feature Requests:** [GitHub Discussions](https://github.com/xnodeoncode/Nine/discussions)
 - <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/envelope.svg" width="16" height="16" alt=""> **Other Questions:** [cisguru@outlook.com](mailto:cisguru@outlook.com?subject=Nine%20Support%20-%20README) (private)
 
----
-
 ## **Start with Nine.** <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/house.svg" width="16" height="16" alt="">
-
-**Nine.**
 
 Built with <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/heart-fill.svg" width="16" height="16" alt=""> using ASP.NET Core 10.0, Blazor Server, and AI Tools (GitHub Copilot and Claude Sonnet)

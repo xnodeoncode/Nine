@@ -1,7 +1,5 @@
 # Nine. - Advanced Troubleshooting Guide
 
----
-
 **Version:** 1.2.0  
 **Last Updated:** November 16, 2026  
 **Audience:** Administrators and Power Users
