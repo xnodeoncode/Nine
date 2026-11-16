@@ -568,7 +568,7 @@ You can also run **Auto-Recover from Corruption** from the Backup Actions pane a
 **Prevention:**
 
 - ✅ Perform backups regularly
-- ✅ Store backups off-site (USB)
+- ✅ Store backups on external storage (USB)
 - ✅ Use UPS (uninterruptible power supply)
 - ✅ Monitor hard drive health (SMART status)
 
@@ -817,21 +817,15 @@ SQLite databases are **not encrypted** by default. Nine includes database encryp
 
 ### Multi-Computer Sync
 
-Nine is designed as single-computer desktop application. Multi-computer sync is **not officially supported** but possible with caveats:
-
-**Cloud sync approach:**
-
-1. Place database file in synced folder (Dropbox, Google Drive)
-2. Configure symlink to synced location
-3. Only use on **one computer at a time** (avoid conflicts)
+Nine is designed as a single-computer desktop application. Multi-computer sync is **not supported**. Do not place the database file in a shared or synced folder.
 
 **⚠️ Risks:**
 
-- Database corruption if both computers write simultaneously
-- Sync conflicts if edits made offline
-- Poor performance over network
+- Database corruption if two computers write simultaneously
+- Sync conflicts if edits are made offline
+- Poor performance over a network
 
-**Recommendation:** Use one computer as primary. For multi-computer access.
+**Recommendation:** Use one computer as primary. To move your data to another computer, use a backup and **Upload Backup File** (see the FAQ: "How do I migrate to a new computer?").
 
 ### Schema Migrations & Model Optimization
 
@@ -916,7 +910,7 @@ dotnet tool update dotnet-ef -g
 
 1. **Copy backups to external storage**
    - Copy to external USB drive
-   - Test restore from off-site backup
+   - Test restore from a backup on external storage
 
 2. **Review retention**
    - Nine keeps only the 10 most recent backups, so older ones are deleted automatically
@@ -958,7 +952,7 @@ dotnet tool update dotnet-ef -g
 
 - **Minimum:** Weekly
 - **Recommended:** Daily (manual; Nine has no scheduled backups)
-- **Best practice:** Daily backup + off-site copy weekly
+- **Best practice:** Daily backup + a copy on external storage weekly
 
 ### Q: Where are backups stored?
 
@@ -983,7 +977,7 @@ dotnet tool update dotnet-ef -g
 
 **A:**
 
-1. **Old computer:** Application → Manage Database → **Create Manual Backup**, then **Copy To** next to the new backup and save it to a USB drive or cloud folder.
+1. **Old computer:** Application → Manage Database → **Create Manual Backup**, then **Copy To** next to the new backup and save it to a USB drive or other external storage.
 2. **New computer:** Install Nine.
 3. Go to Application → Manage Database and click **Upload Backup File**, then choose the `.db` file (500 MB maximum). Nine copies it into the `Backups/` folder and lists it in **Available Backups** as `Nine_Backup_Uploaded_…`. You don't need to copy files into the folder yourself.
 4. Choose how to bring the data in:
@@ -998,7 +992,7 @@ dotnet tool update dotnet-ef -g
 
 ### Q: What happens if my hard drive fails?
 
-**A:** If you have **off-site backups** (cloud, USB), you can recover your data. If not, data is **permanently lost** (professional data recovery may be possible but expensive and not guaranteed).
+**A:** If you have backups on external storage (such as a USB drive), you can recover your data. If not, data is **permanently lost** (professional data recovery may be possible but expensive and not guaranteed).
 
 ### Q: Should I backup the WAL files too?
 
@@ -1048,7 +1042,7 @@ Need help with database management? We're here for you!
 **Key takeaways:**
 
 ✅ **Back up regularly** - Your insurance policy  
-✅ **Store backups off-site** - Cloud or USB drive  
+✅ **Store backups on external storage** - Such as a USB drive  
 ✅ **Test restore occasionally** - Practice before you need it  
 ✅ **Monitor database health** - Catch issues early  
 ✅ **Backup before major changes** - Always
@@ -1057,7 +1051,7 @@ Need help with database management? We're here for you!
 
 - **3** copies of data (original + 2 backups)
 - **2** different storage types (local + external)
-- **1** off-site backup (cloud or remote location)
+- **1** copy stored away from the computer (for example, an external drive kept elsewhere)
 
 **With good database management practices, your data is safe and your business runs smoothly!** 🏠
 
