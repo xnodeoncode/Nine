@@ -1,7 +1,5 @@
 # Nine. - Installation Guide
 
----
-
 **Version:** 1.2.0  
 **Last Updated:** November 16, 2026
 
@@ -54,23 +52,26 @@ The installer copies the AppImage to `~/Applications/Nine/` (the file you downlo
 
 ## First Launch
 
-On first launch you will be prompted to create an admin account.
+On first launch you will be prompted to create an account. The first account created is automatically assigned the 'Owner' role with full access within the application.
 See the [Quick-Start-Guide.md](https://github.com/xnodeoncode/Nine/blob/main/Documentation/Quick-Start-Guide.md) for a full walk-through.
 
 **Windows:** Search for **Nine** in the Start Menu.
+
 **Linux:** Search for **Nine** in your application launcher.
 
 ---
 
 ## Uninstall
 
+Back up your database to external storage or a location outside of the application installation folder first. See the [Database Management Guide](https://github.com/xnodeoncode/Nine/blob/main/Documentation/Database-Management-Guide.md).
+
 **Windows (Installer):** Use **Add or Remove Programs** in Windows Settings.
 
-**Windows (Portable):** Delete the `Nine-1.2.0-x64-Portable.exe` file.
+**Windows (Portable):** Delete the `Nine-1.2.0-x64-Portable.exe` file. (The database files will still be on your hard drive)
 
 **Linux:**
 
-Use the removal script from the `Utilities` folder (a copy is also in `~/Applications/Nine/Utilities/` after installing). It undoes the desktop integration, and removes your data and database encryption key only when you ask it to.
+Use the removal script from the `Utilities` folder (a copy is also in `~/Applications/Nine/Utilities/` after installing). It undoes the desktop integration, and can remove the application only, the application and your data, or the application, your data, and the database encryption key.
 
 ```bash
 cd ~/Applications/Nine
@@ -86,8 +87,6 @@ cd ~/Applications/Nine
 ./Utilities/nine-tool.sh remove             # remove the launcher entry, icon and AppImages; keep your data
 ./Utilities/nine-tool.sh remove --all       # remove everything, including all data and the encryption key (permanent)
 ```
-
-Back up your database to a location outside of Nine first. See the [Database Management Guide](https://github.com/xnodeoncode/Nine/blob/main/Documentation/Database-Management-Guide.md).
 
 ---
 

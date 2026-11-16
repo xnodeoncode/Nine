@@ -350,7 +350,7 @@ Copy-Item Backups\Nine_Backup_Manual_20260218_143022.db app_v1.2.0.db
 - All financial records **deleted**
 - All documents and photos **deleted**
 - Organization and user accounts **deleted**
-- You will go through New Setup Wizard again
+- Nine returns to its first-run state: the home page, where you register a new account
 
 ### When to Reset
 
@@ -656,7 +656,7 @@ You can also run **Auto-Recover from Corruption** from the Backup Actions pane a
 
 - Error: "Database file not found"
 - Application shows empty data
-- Fresh installation wizard appears
+- The home page asks you to register a new account, as on a first run
 
 **Causes:**
 
