@@ -16,7 +16,7 @@ namespace Nine.Core.Constants
         public string PreviousDatabaseFileName { get; set; } = string.Empty;
         public bool SoftDeleteEnabled { get; set; }
         public string SchemaVersion { get; set; } = string.Empty;
-        public int MaxOrganizationUsers { get; set; } = 0; // 0 = unlimited (Professional), 3 = Nine limit
+        public int MaxOrganizationUsers { get; set; } = 0; // 0 = unlimited (Professional); Nine sets 3 login accounts, excluding the system account
         public string License { get; set; } = string.Empty;
         public string LicenseUrl { get; set; } = string.Empty;
         public string HelpUrl { get; set; } = string.Empty;

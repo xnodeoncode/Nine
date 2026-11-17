@@ -13,10 +13,11 @@
     </div>
     <div class="col-md-4">
         <select class="form-select" value="@StatusFilter" @onchange="HandleStatusFilterChanged">
-            <option value="">All Properties</option>
-            <option value="Available">Available</option>
-            <option value="Pending">Pending Lease</option>
-            <option value="Occupied">Occupied</option>
+            <option value="">All Statuses</option>
+            @foreach (var status in ApplicationConstants.PropertyStatuses.AllPropertyStatuses)
+            {
+                <option value="@status">@FormatPropertyStatus(status)</option>
+            }
         </select>
     </div>
     <div class="col-md-4">
@@ -64,7 +65,10 @@
                     ShowEditDelete="@ShowEditDelete"
                     OnView="@OnView"
                     OnEdit="@OnEdit"
-                    OnDelete="@OnDelete" />
+                    OnDelete="@OnDelete"
+                    OnArchive="@OnArchive"
+                    OnRestore="@OnRestore"
+                    ShowArchived="@ShowArchived" />
             </div>
         }
     </div>
@@ -154,9 +158,24 @@ else
                                         </button>
                                         @if (ShowEditDelete)
                                         {
-                                            <button class="btn btn-outline-secondary" @onclick="() => HandleEdit(property.Id)" title="Edit">
-                                                <i class="bi bi-pencil"></i>
-                                            </button>
+                                            @if (!ShowArchived)
+                                            {
+                                                <button class="btn btn-outline-secondary" @onclick="() => HandleEdit(property.Id)" title="Edit">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                            }
+                                            @if (!ShowArchived && OnArchive.HasDelegate)
+                                            {
+                                                <button class="btn btn-outline-warning" @onclick="() => HandleArchive(property.Id)" title="Archive">
+                                                    <i class="bi bi-archive"></i>
+                                                </button>
+                                            }
+                                            @if (ShowArchived && OnRestore.HasDelegate)
+                                            {
+                                                <button class="btn btn-outline-success" @onclick="() => HandleRestore(property.Id)" title="Restore">
+                                                    <i class="bi bi-arrow-counterclockwise"></i>
+                                                </button>
+                                            }
                                             <button class="btn btn-outline-danger" 
                                                     @onclick="() => HandleDelete(property.Id)">
                                                 <i class="bi bi-trash"></i>
@@ -293,6 +312,24 @@ else
     /// </summary>
     [Parameter]
     public EventCallback<Guid> OnDelete { get; set; }
+
+    /// <summary>
+    /// Callback when Archive button is clicked
+    /// </summary>
+    [Parameter]
+    public EventCallback<Guid> OnArchive { get; set; }
+
+    /// <summary>
+    /// Callback when Unarchive button is clicked
+    /// </summary>
+    [Parameter]
+    public EventCallback<Guid> OnRestore { get; set; }
+
+    /// <summary>
+    /// When true, shows Unarchive button instead of Archive/Edit
+    /// </summary>
+    [Parameter]
+    public bool ShowArchived { get; set; }
     
     private async Task HandleSearchChanged(ChangeEventArgs e)
     {
@@ -323,6 +360,16 @@ else
     private async Task HandleDelete(Guid propertyId)
     {
         await OnDelete.InvokeAsync(propertyId);
+    }
+
+    private async Task HandleArchive(Guid propertyId)
+    {
+        await OnArchive.InvokeAsync(propertyId);
+    }
+
+    private async Task HandleRestore(Guid propertyId)
+    {
+        await OnRestore.InvokeAsync(propertyId);
     }
     
     private string GetStatusBadgeClass(string status)

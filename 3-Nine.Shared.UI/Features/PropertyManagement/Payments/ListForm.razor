@@ -1,15 +1,22 @@
 @using Nine.Core.Entities
+@using Nine.Application.Services
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.Forms
 @inject NavigationManager Navigation
 @inject PaymentService PaymentService
-@inject IJSRuntime JSRuntime
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1><span class="bi bi-cash-coin" aria-hidden="true"></span> Payments</h1>
-    <button class="btn btn-primary" @onclick="CreatePayment">
-        <i class="bi bi-plus-lg"></i> Record Payment
-    </button>
+    <div class="d-flex align-items-center gap-3">
+        <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="showArchivedPayments"
+                   @bind="_showArchived" @bind:after="RefreshView" />
+            <label class="form-check-label text-muted" for="showArchivedPayments">Show Archived</label>
+        </div>
+        <button class="btn btn-primary" @onclick="CreatePayment">
+            <i class="bi bi-plus-lg"></i> Record Payment
+        </button>
+    </div>
 </div>
 
 @if (payments == null)
@@ -154,10 +161,22 @@ else
                                                         <button class="btn btn-sm btn-outline-primary" @onclick="() => ViewPayment(payment.Id)" title="View">
                                                             <i class="bi bi-eye"></i>
                                                         </button>
-                                                        <button class="btn btn-sm btn-outline-secondary" @onclick="() => EditPayment(payment.Id)" title="Edit">
-                                                            <i class="bi bi-pencil"></i>
-                                                        </button>
-                                                        <button class="btn btn-sm btn-outline-danger" @onclick="() => DeletePayment(payment)" title="Delete">
+                                                        @if (!_showArchived)
+                                                        {
+                                                            <button class="btn btn-sm btn-outline-secondary" @onclick="() => EditPayment(payment.Id)" title="Edit">
+                                                                <i class="bi bi-pencil"></i>
+                                                            </button>
+                                                            <button class="btn btn-sm btn-outline-warning" @onclick="() => ShowArchiveModal(payment.Id)" title="Archive">
+                                                                <i class="bi bi-archive"></i>
+                                                            </button>
+                                                        }
+                                                        @if (_showArchived)
+                                                        {
+                                                            <button class="btn btn-sm btn-outline-secondary" @onclick="() => UnarchivePayment(payment.Id)" title="Unarchive">
+                                                                <i class="bi bi-arrow-counterclockwise"></i>
+                                                            </button>
+                                                        }
+                                                        <button class="btn btn-sm btn-outline-danger" @onclick="() => ShowDeleteModal(payment.Id)" title="Delete">
                                                             <i class="bi bi-trash"></i>
                                                         </button>
                                                     </div>
@@ -223,10 +242,22 @@ else
                                             <button class="btn btn-sm btn-outline-primary" @onclick="() => ViewPayment(payment.Id)" title="View">
                                                 <i class="bi bi-eye"></i>
                                             </button>
-                                            <button class="btn btn-sm btn-outline-secondary" @onclick="() => EditPayment(payment.Id)" title="Edit">
-                                                <i class="bi bi-pencil"></i>
-                                            </button>
-                                            <button class="btn btn-sm btn-outline-danger" @onclick="() => DeletePayment(payment)" title="Delete">
+                                            @if (!_showArchived)
+                                            {
+                                                <button class="btn btn-sm btn-outline-secondary" @onclick="() => EditPayment(payment.Id)" title="Edit">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-warning" @onclick="() => ShowArchiveModal(payment.Id)" title="Archive">
+                                                    <i class="bi bi-archive"></i>
+                                                </button>
+                                            }
+                                            @if (_showArchived)
+                                            {
+                                                <button class="btn btn-sm btn-outline-secondary" @onclick="() => UnarchivePayment(payment.Id)" title="Unarchive">
+                                                    <i class="bi bi-arrow-counterclockwise"></i>
+                                                </button>
+                                            }
+                                            <button class="btn btn-sm btn-outline-danger" @onclick="() => ShowDeleteModal(payment.Id)" title="Delete">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </div>
@@ -289,6 +320,16 @@ else
     </div>
 }
 
+<ActionConfirmModal IsVisible="@_showArchiveModal" Variant="warning"
+    Title="Archive Payment" ConfirmText="Archive"
+    Cascade="@_cascade" IsProcessing="@_isProcessing"
+    OnConfirm="ConfirmArchive" OnCancel="CloseModals" />
+
+<ActionConfirmModal IsVisible="@_showDeleteModal" Variant="danger"
+    Title="Delete Payment" ConfirmText="Delete Permanently"
+    Cascade="@_cascade" IsProcessing="@_isProcessing"
+    OnConfirm="ConfirmDelete" OnCancel="CloseModals" />
+
 @code {
     private List<Payment>? payments;
     private List<Payment> filteredPayments = new();
@@ -313,11 +354,22 @@ else
     private int pageSize = 20;
     private int totalPages = 1;
     private int totalRecords = 0;
+    private Guid _pendingId;
+    private CascadeSummary? _cascade;
+    private bool _showArchiveModal;
+    private bool _showDeleteModal;
+    private bool _isProcessing;
+    private bool _showArchived;
 
     [CascadingParameter]
     private Task<AuthenticationState> AuthenticationStateTask { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
+    {
+        await LoadPayments();
+    }
+
+    private async Task RefreshView()
     {
         await LoadPayments();
     }
@@ -329,7 +381,9 @@ else
 
         if (!string.IsNullOrEmpty(userId))
         {
-            payments = await PaymentService.GetPaymentsWithRelationsAsync();
+            payments = _showArchived
+                ? await PaymentService.GetArchivedAsync()
+                : await PaymentService.GetPaymentsWithRelationsAsync();
             FilterPayments();
             UpdateStatistics();
         }
@@ -475,10 +529,51 @@ else
 
     private async Task DeletePayment(Payment payment)
     {
-        if (await JSRuntime.InvokeAsync<bool>("confirm", $"Are you sure you want to delete this payment of {payment.Amount:C}?"))
-        {
-            await PaymentService.DeleteAsync(payment.Id);
-            await LoadPayments();
-        }
+        await ShowDeleteModal(payment.Id);
+    }
+
+    private async Task ShowArchiveModal(Guid id)
+    {
+        _pendingId = id;
+        _cascade = await PaymentService.GetArchiveCascadeSummaryAsync(id);
+        _showArchiveModal = true;
+    }
+
+    private async Task ShowDeleteModal(Guid id)
+    {
+        _pendingId = id;
+        _cascade = await PaymentService.GetDeleteCascadeSummaryAsync(id);
+        _showDeleteModal = true;
+    }
+
+    private async Task ConfirmArchive()
+    {
+        _isProcessing = true;
+        await PaymentService.ArchiveAsync(_pendingId);
+        _isProcessing = false;
+        CloseModals();
+        await LoadPayments();
+    }
+
+    private async Task ConfirmDelete()
+    {
+        _isProcessing = true;
+        await PaymentService.DeleteAsync(_pendingId);
+        _isProcessing = false;
+        CloseModals();
+        await LoadPayments();
+    }
+
+    private async Task UnarchivePayment(Guid id)
+    {
+        await PaymentService.RestoreAsync(id);
+        await LoadPayments();
+    }
+
+    private void CloseModals()
+    {
+        _showArchiveModal = false;
+        _showDeleteModal = false;
+        _cascade = null;
     }
 }

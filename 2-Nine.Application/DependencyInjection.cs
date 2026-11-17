@@ -1,6 +1,7 @@
 using Nine.Application.Services;
 using Nine.Application.Services.PdfGenerators;
 using Nine.Application.Services.Workflows;
+using Nine.Core.Interfaces.Services;
 using Nine.Infrastructure;
 using Nine.Infrastructure.Data;
 using Microsoft.Extensions.DependencyInjection;
@@ -36,7 +37,11 @@ public static class DependencyInjection
         services.AddScoped<DocumentService>();
         services.AddScoped<DatabasePreviewService>();
         services.AddScoped<EmailService>();
+        services.AddScoped<IEmailService>(sp => sp.GetRequiredService<EmailService>());
         services.AddScoped<EmailSettingsService>();
+        services.AddScoped<ExpenseDueService>();
+        services.AddScoped<ExpenseGenerationService>();
+        services.AddScoped<ExpensePaymentService>();
         services.AddScoped<FinancialReportService>();
         services.AddScoped<InspectionService>();
         services.AddScoped<InvoiceService>();
@@ -56,12 +61,14 @@ public static class DependencyInjection
         services.AddScoped<ProspectiveTenantService>();
         services.AddScoped<RentalApplicationService>();
         services.AddScoped<RepairService>();
+        services.AddScoped<PropertyExpenseService>();
         services.AddScoped<SampleDataWorkflowService>();
         services.AddScoped<ScheduledTaskService>();
         services.AddScoped<SchemaValidationService>();
         services.AddScoped<ScreeningService>();
         services.AddScoped<SecurityDepositService>();
         services.AddScoped<SMSService>();
+        services.AddScoped<ISMSService>(sp => sp.GetRequiredService<SMSService>());
         services.AddScoped<SMSSettingsService>();
         services.AddScoped<TenantConversionService>();
         services.AddScoped<TenantService>();

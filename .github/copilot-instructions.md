@@ -87,7 +87,7 @@ feature/Phase-X-Feature-Name
 
 ## Project Overview
 
-Nine is a multi-tenant property management system built with **ASP.NET Core 9.0 + Blazor Server**. It manages properties, tenants, leases, invoices, payments, documents, inspections, and maintenance requests with role-based access control.
+Nine is a multi-tenant property management system built with **ASP.NET Core 10.0 + Blazor Server**. It manages properties, tenants, leases, invoices, payments, documents, inspections, and maintenance requests with role-based access control.
 
 ## Architecture Fundamentals
 
@@ -639,14 +639,19 @@ public async Task<Entity> AddEntityAsync(Entity entity)
 ### Database Changes
 
 1. **EF Core Migrations**: Primary approach for schema changes
-   - Migrations stored in `Data/Migrations/`
-   - Run `dotnet ef migrations add MigrationName --project Nine`
-   - Apply with `dotnet ef database update --project Nine`
+   - Migrations stored in `1-Nine.Infrastructure/Data/Migrations/`
+   - Add migration: `dotnet ef migrations add MigrationName --project 1-Nine.Infrastructure --startup-project 4-Nine --context ApplicationDbContext --output-dir Data/Migrations`
+   - Apply to database: `dotnet ef database update --project 1-Nine.Infrastructure --startup-project 4-Nine --context ApplicationDbContext`
    - Generate SQL script: `dotnet ef migrations script --output schema.sql`
-2. **SQL Scripts**: Reference scripts in `Data/Scripts/` (not executed, for documentation)
-3. Update `ApplicationDbContext.cs` with DbSet and entity configuration
-4. Connection string in `appsettings.json`: `"DefaultConnection": "DataSource=Infrastructure/Data/app.db;Cache=Shared"`
-5. **Database**: SQLite (not SQL Server) - scripts will be SQLite syntax
+2. **Regenerate Compiled Model** (REQUIRED after every schema change):
+   - The app uses a **pre-compiled EF Core model** (`1-Nine.Infrastructure/Data/CompiledModels/`) for performance.
+   - After every migration, regenerate it or EF will throw `InvalidOperationException: Cannot create a DbSet for 'X' because this type is not included in the model for the context.`
+   - Command: `dotnet ef dbcontext optimize --project 1-Nine.Infrastructure --startup-project 4-Nine --context ApplicationDbContext --output-dir Data/CompiledModels --namespace Nine.Infrastructure.Data.CompiledModels`
+   - **Three steps for every schema change**: `migrations add` → `database update` → `dbcontext optimize`
+3. **SQL Scripts**: Reference scripts in `Data/Scripts/` (not executed, for documentation)
+4. Update `ApplicationDbContext.cs` with DbSet and entity configuration
+5. Connection string in `appsettings.json`: `"DefaultConnection": "DataSource=Infrastructure/Data/app.db;Cache=Shared"`
+6. **Database**: SQLite (not SQL Server) - scripts will be SQLite syntax
 
 ### Development Workflows
 
@@ -760,7 +765,11 @@ Components/PropertyManagement/[Entity]/
 
 1. **Create entity model** inheriting `BaseModel` with `OrganizationId` property
 2. **Add DbSet** to `ApplicationDbContext` with proper relationships and configuration
-3. **Create EF Core migration**: `dotnet ef migrations add [Name] --project Nine`
+3. **Run three-step schema update**:
+   - `dotnet ef migrations add [Name] --project 1-Nine.Infrastructure --startup-project 4-Nine --context ApplicationDbContext --output-dir Data/Migrations`
+   - `dotnet ef database update --project 1-Nine.Infrastructure --startup-project 4-Nine --context ApplicationDbContext`
+   - `dotnet ef dbcontext optimize --project 1-Nine.Infrastructure --startup-project 4-Nine --context ApplicationDbContext --output-dir Data/CompiledModels --namespace Nine.Infrastructure.Data.CompiledModels`
+   - All three steps are required — skipping `dbcontext optimize` will cause a runtime `InvalidOperationException` on first use of the new entity.
 4. **Create entity-specific service** inheriting `BaseService<TEntity>`:
    - Add constructor with dependencies (DbContext, Logger, UserContext, Settings)
    - Override `ValidateEntityAsync()` for business rules
@@ -938,3 +947,10 @@ The database filename and schema version are tracked separately from the applica
 - Allows rapid iteration and entity refactoring
 - Schema migrations managed via EF Core Migrations folder
 - At v1.0.0 release, formalize database versioning with `app_v1.0.0.db`
+
+<!-- mermaid-ai-skills:start -->
+## Mermaid Diagrams
+
+When the user asks to create, edit, or visualize a diagram, follow the
+instructions in `.github/instructions/mermaid.instructions.md`.
+<!-- mermaid-ai-skills:end -->

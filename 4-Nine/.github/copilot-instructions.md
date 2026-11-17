@@ -401,14 +401,19 @@ public async Task<Entity> AddEntityAsync(Entity entity)
 ### Database Changes
 
 1. **EF Core Migrations**: Primary approach for schema changes
-   - Migrations stored in `Data/Migrations/`
-   - Run `dotnet ef migrations add MigrationName --project Nine`
-   - Apply with `dotnet ef database update --project Nine`
+   - Migrations stored in `1-Nine.Infrastructure/Data/Migrations/`
+   - Add migration: `dotnet ef migrations add MigrationName --project 1-Nine.Infrastructure --startup-project 4-Nine --context ApplicationDbContext --output-dir Data/Migrations`
+   - Apply to database: `dotnet ef database update --project 1-Nine.Infrastructure --startup-project 4-Nine --context ApplicationDbContext`
    - Generate SQL script: `dotnet ef migrations script --output schema.sql`
-2. **SQL Scripts**: Reference scripts in `Data/Scripts/` (not executed, for documentation)
-3. Update `ApplicationDbContext.cs` with DbSet and entity configuration
-4. Connection string in `appsettings.json`: `"DefaultConnection": "DataSource=Infrastructure/Data/app.db;Cache=Shared"`
-5. **Database**: SQLite (not SQL Server) - scripts will be SQLite syntax
+2. **Regenerate Compiled Model** (REQUIRED after every schema change):
+   - The app uses a **pre-compiled EF Core model** (`1-Nine.Infrastructure/Data/CompiledModels/`) for performance.
+   - After every migration, regenerate it or EF will throw `InvalidOperationException: Cannot create a DbSet for 'X' because this type is not included in the model for the context.`
+   - Command: `dotnet ef dbcontext optimize --project 1-Nine.Infrastructure --startup-project 4-Nine --context ApplicationDbContext --output-dir Data/CompiledModels --namespace Nine.Infrastructure.Data.CompiledModels`
+   - **Three steps for every schema change**: `migrations add` → `database update` → `dbcontext optimize`
+3. **SQL Scripts**: Reference scripts in `Data/Scripts/` (not executed, for documentation)
+4. Update `ApplicationDbContext.cs` with DbSet and entity configuration
+5. Connection string in `appsettings.json`: `"DefaultConnection": "DataSource=Infrastructure/Data/app.db;Cache=Shared"`
+6. **Database**: SQLite (not SQL Server) - scripts will be SQLite syntax
 
 ### Development Workflows
 

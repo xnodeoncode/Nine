@@ -41,6 +41,7 @@ namespace Nine.Core.Entities {
         public Guid? LeaseId { get; set; }
         public Guid? InvoiceId { get; set; }
         public Guid? PaymentId { get; set; }
+        public Guid? RepairId { get; set; }
 
         // Navigation properties
         [ForeignKey("PropertyId")]
@@ -57,6 +58,9 @@ namespace Nine.Core.Entities {
 
         [ForeignKey("PaymentId")]
         public virtual Payment? Payment { get; set; }
+
+        [ForeignKey("RepairId")]
+        public virtual Repair? Repair { get; set; }
 
         // Computed property
         public string FileSizeFormatted

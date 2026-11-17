@@ -53,5 +53,19 @@ namespace Nine.Core.Entities
         [JsonInclude]
         [Display(Name = "Is Sample Data?")]
         public bool IsSampleData { get; set; } = false;
+
+        [JsonInclude]
+        [Display(Name = "Is Archived?")]
+        public bool IsArchived { get; set; } = false;
+
+        [JsonInclude]
+        [DataType(DataType.DateTime)]
+        [Display(Name = "Archived On")]
+        public DateTime? ArchivedOn { get; set; }
+
+        [JsonInclude]
+        [StringLength(100)]
+        [Display(Name = "Archived By")]
+        public string? ArchivedBy { get; set; }
     }
 }

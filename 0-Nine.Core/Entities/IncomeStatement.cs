@@ -28,9 +28,10 @@ public class IncomeStatement
     public decimal InsuranceExpenses { get; set; }
     public decimal TaxExpenses { get; set; }
     public decimal ManagementFees { get; set; }
+    public decimal MortgageExpenses { get; set; }
     public decimal OtherExpenses { get; set; }
     public decimal TotalExpenses => MaintenanceExpenses + UtilityExpenses + InsuranceExpenses + 
-                                     TaxExpenses + ManagementFees + OtherExpenses;
+                                     TaxExpenses + ManagementFees + MortgageExpenses + OtherExpenses;
 
     // Net Income
     public decimal NetIncome => TotalIncome - TotalExpenses;
@@ -98,7 +99,7 @@ public class TaxReportData
     public decimal Insurance { get; set; }
     public decimal Legal { get; set; }
     public decimal Management { get; set; }
-    public decimal MortgageInterest { get; set; }
+    public decimal MortgageExpense { get; set; }
     public decimal Repairs { get; set; }
     public decimal Supplies { get; set; }
     public decimal Taxes { get; set; }

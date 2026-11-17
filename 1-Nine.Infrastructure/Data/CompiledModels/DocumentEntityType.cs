@@ -2,10 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using Nine.Core.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Nine.Core.Entities;
 
 #pragma warning disable 219, 612, 618
 #nullable disable
@@ -21,10 +21,10 @@ namespace Nine.Infrastructure.Data.CompiledModels
                 "Nine.Core.Entities.Document",
                 typeof(Document),
                 baseEntityType,
-                propertyCount: 22,
-                navigationCount: 5,
-                foreignKeyCount: 6,
-                unnamedIndexCount: 6,
+                propertyCount: 26,
+                navigationCount: 6,
+                foreignKeyCount: 7,
+                unnamedIndexCount: 7,
                 keyCount: 1);
 
             var id = runtimeEntityType.AddProperty(
@@ -34,6 +34,21 @@ namespace Nine.Infrastructure.Data.CompiledModels
                 fieldInfo: typeof(BaseModel).GetField("<Id>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 afterSaveBehavior: PropertySaveBehavior.Throw,
                 sentinel: new Guid("00000000-0000-0000-0000-000000000000"));
+
+            var archivedBy = runtimeEntityType.AddProperty(
+                "ArchivedBy",
+                typeof(string),
+                propertyInfo: typeof(BaseModel).GetProperty("ArchivedBy", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(BaseModel).GetField("<ArchivedBy>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                nullable: true,
+                maxLength: 100);
+
+            var archivedOn = runtimeEntityType.AddProperty(
+                "ArchivedOn",
+                typeof(DateTime?),
+                propertyInfo: typeof(BaseModel).GetProperty("ArchivedOn", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(BaseModel).GetField("<ArchivedOn>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                nullable: true);
 
             var contentType = runtimeEntityType.AddProperty(
                 "ContentType",
@@ -118,6 +133,13 @@ namespace Nine.Infrastructure.Data.CompiledModels
                 fieldInfo: typeof(Document).GetField("<InvoiceId>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
 
+            var isArchived = runtimeEntityType.AddProperty(
+                "IsArchived",
+                typeof(bool),
+                propertyInfo: typeof(BaseModel).GetProperty("IsArchived", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(BaseModel).GetField("<IsArchived>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                sentinel: false);
+
             var isDeleted = runtimeEntityType.AddProperty(
                 "IsDeleted",
                 typeof(bool),
@@ -175,6 +197,13 @@ namespace Nine.Infrastructure.Data.CompiledModels
                 fieldInfo: typeof(Document).GetField("<PropertyId>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
 
+            var repairId = runtimeEntityType.AddProperty(
+                "RepairId",
+                typeof(Guid?),
+                propertyInfo: typeof(Document).GetProperty("RepairId", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(Document).GetField("<RepairId>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                nullable: true);
+
             var tenantId = runtimeEntityType.AddProperty(
                 "TenantId",
                 typeof(Guid?),
@@ -202,6 +231,9 @@ namespace Nine.Infrastructure.Data.CompiledModels
                 new[] { propertyId });
 
             var index4 = runtimeEntityType.AddIndex(
+                new[] { repairId });
+
+            var index5 = runtimeEntityType.AddIndex(
                 new[] { tenantId });
 
             return runtimeEntityType;
@@ -301,6 +333,30 @@ namespace Nine.Infrastructure.Data.CompiledModels
         }
 
         public static RuntimeForeignKey CreateForeignKey6(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
+        {
+            var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("RepairId") },
+                principalEntityType.FindKey(new[] { principalEntityType.FindProperty("Id") }),
+                principalEntityType,
+                deleteBehavior: DeleteBehavior.SetNull);
+
+            var repair = declaringEntityType.AddNavigation("Repair",
+                runtimeForeignKey,
+                onDependent: true,
+                typeof(Repair),
+                propertyInfo: typeof(Document).GetProperty("Repair", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(Document).GetField("<Repair>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
+
+            var documents = principalEntityType.AddNavigation("Documents",
+                runtimeForeignKey,
+                onDependent: false,
+                typeof(ICollection<Document>),
+                propertyInfo: typeof(Repair).GetProperty("Documents", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(Repair).GetField("<Documents>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
+
+            return runtimeForeignKey;
+        }
+
+        public static RuntimeForeignKey CreateForeignKey7(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
         {
             var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("TenantId") },
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("Id") }),

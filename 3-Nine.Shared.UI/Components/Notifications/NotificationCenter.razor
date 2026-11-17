@@ -645,12 +645,9 @@
         SortAndPaginateNotifications();
     }
 
-    private void ViewNotification(Guid id){
-        var notification = notifications.FirstOrDefault(n => n.Id == id);
-        if (notification != null)
-        {
-            // Implement the logic to view the notification details
-        }
+    private async Task ViewNotification(Guid id)
+    {
+        await OpenMessageModal(id);
     }
 
     private async Task ToggleReadStatus(Guid id)

@@ -2,7 +2,7 @@
   "appId": "co.nineapp.nine",
   "productName": "Nine",
   "copyright": "Copyright © 2026",
-  "buildVersion": "1.0.0",
+  "buildVersion": "1.2.0",
   "compression": "normal",
   "files": ["**/*"],
   "mac": {
@@ -46,7 +46,7 @@
     },
     "extraFiles": [
       {
-        "from": "Assets/co.nineapp.nine.appdata.xml",
+        "from": "bin/Assets/co.nineapp.nine.appdata.xml",
         "to": "usr/share/metainfo/co.nineapp.nine.appdata.xml"
       }
     ]

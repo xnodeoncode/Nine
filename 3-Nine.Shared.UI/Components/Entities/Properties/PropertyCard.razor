@@ -58,6 +58,18 @@
                     <button class="btn btn-outline-secondary" @onclick="HandleEdit">
                         <i class="bi bi-pencil"></i> Edit
                     </button>
+                    @if (!ShowArchived && OnArchive.HasDelegate)
+                    {
+                        <button class="btn btn-outline-warning" @onclick="HandleArchive">
+                            <i class="bi bi-archive"></i> Archive
+                        </button>
+                    }
+                    @if (ShowArchived && OnRestore.HasDelegate)
+                    {
+                        <button class="btn btn-outline-success" @onclick="HandleRestore">
+                            <i class="bi bi-arrow-counterclockwise"></i> Unarchive
+                        </button>
+                    }
                     <button class="btn btn-outline-danger" 
                             @onclick="HandleDelete">
                         <i class="bi bi-trash"></i> Delete
@@ -173,6 +185,24 @@
     /// </summary>
     [Parameter]
     public EventCallback<Guid> OnDelete { get; set; }
+
+    /// <summary>
+    /// Callback when Archive button is clicked
+    /// </summary>
+    [Parameter]
+    public EventCallback<Guid> OnArchive { get; set; }
+
+    /// <summary>
+    /// Callback when Unarchive button is clicked
+    /// </summary>
+    [Parameter]
+    public EventCallback<Guid> OnRestore { get; set; }
+
+    /// <summary>
+    /// When true, shows Unarchive button instead of Archive; hides Delete
+    /// </summary>
+    [Parameter]
+    public bool ShowArchived { get; set; }
     
     private string DisplayAddress => string.IsNullOrWhiteSpace(UnitNumber) 
         ? Address 
@@ -191,6 +221,16 @@
     private async Task HandleDelete()
     {
         await OnDelete.InvokeAsync(PropertyId);
+    }
+
+    private async Task HandleArchive()
+    {
+        await OnArchive.InvokeAsync(PropertyId);
+    }
+
+    private async Task HandleRestore()
+    {
+        await OnRestore.InvokeAsync(PropertyId);
     }
     
     private string GetStatusBadgeClass()

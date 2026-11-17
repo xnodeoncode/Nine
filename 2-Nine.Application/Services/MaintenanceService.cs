@@ -1,3 +1,4 @@
+using Nine.Application.Models;
 using Nine.Core.Interfaces.Services;
 using Nine.Application.Services.Workflows;
 using Nine.Core.Constants;
@@ -189,21 +190,36 @@ namespace Nine.Application.Services
         }
 
         /// <summary>
-        /// Deletes a maintenance request and removes the associated calendar event.
+        /// Deletes a maintenance request, nulling out repair associations and removing the calendar event.
         /// </summary>
         public override async Task<bool> DeleteAsync(Guid id)
         {
             var maintenanceRequest = await GetByIdAsync(id);
-            
-            var result = await base.DeleteAsync(id);
 
-            if (result && maintenanceRequest != null)
+            await using var transaction = await _context.Database.BeginTransactionAsync();
+            try
             {
-                // Delete associated calendar event
-                await _calendarEventService.DeleteEventAsync(maintenanceRequest.CalendarEventId);
-            }
+                // Delete repairs associated with this maintenance request
+                var repairs = await _context.Repairs.Where(r => r.MaintenanceRequestId == id).ToListAsync();
+                _context.Repairs.RemoveRange(repairs);
+                await _context.SaveChangesAsync();
 
-            return result;
+                bool result = await base.DeleteAsync(id);
+
+                if (result && maintenanceRequest != null)
+                {
+                    // Delete associated calendar event
+                    await _calendarEventService.DeleteEventAsync(maintenanceRequest.CalendarEventId);
+                }
+
+                await transaction.CommitAsync();
+                return result;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
         }
 
         /// <summary>
@@ -488,5 +504,74 @@ namespace Nine.Application.Services
                 .Select(g => new { PropertyId = g.Key, TotalCost = g.Sum(m => m.ActualCost) })
                 .ToDictionaryAsync(x => x.PropertyId, x => x.TotalCost);
         }
+
+        #region Cascade Summary
+
+        /// <summary>
+        /// Returns a count of related records that would be permanently deleted with this maintenance request.
+        /// </summary>
+        public override async Task<CascadeSummary> GetDeleteCascadeSummaryAsync(Guid id)
+        {
+            var counts = new Dictionary<string, int>
+            {
+                ["Repairs"] = await _context.Repairs.CountAsync(x => x.MaintenanceRequestId == id && !x.IsDeleted),
+            };
+            return new CascadeSummary { EntityName = "Maintenance Request", Counts = counts };
+        }
+
+        /// <summary>
+        /// Returns a count of related records that would be archived with this maintenance request.
+        /// </summary>
+        public override async Task<CascadeSummary> GetArchiveCascadeSummaryAsync(Guid id)
+        {
+            var counts = new Dictionary<string, int>
+            {
+                ["Repairs"] = await _context.Repairs.CountAsync(x => x.MaintenanceRequestId == id && !x.IsDeleted && !x.IsArchived),
+            };
+            return new CascadeSummary { EntityName = "Maintenance Request", Counts = counts };
+        }
+
+        #endregion
+
+        #region Archive / Restore
+
+        /// <summary>
+        /// Archives a maintenance request and cascades to its repairs.
+        /// </summary>
+        public override async Task<bool> ArchiveAsync(Guid id)
+        {
+            var userId = await _userContext.GetUserIdAsync();
+            var now = DateTime.UtcNow;
+
+            await _context.Repairs
+                .Where(r => r.MaintenanceRequestId == id && !r.IsDeleted && !r.IsArchived)
+                .ExecuteUpdateAsync(s => s
+                    .SetProperty(r => r.IsArchived, true)
+                    .SetProperty(r => r.ArchivedOn, now)
+                    .SetProperty(r => r.ArchivedBy, userId));
+
+            int rows = await _context.MaintenanceRequests
+                .Where(m => m.Id == id && !m.IsDeleted && !m.IsArchived)
+                .ExecuteUpdateAsync(s => s
+                    .SetProperty(m => m.IsArchived, true)
+                    .SetProperty(m => m.ArchivedOn, now)
+                    .SetProperty(m => m.ArchivedBy, userId));
+
+            return rows > 0;
+        }
+
+        /// <summary>
+        /// Restores an archived maintenance request. Repairs are not automatically restored.
+        /// </summary>
+        public override async Task<bool> RestoreAsync(Guid id)
+        {
+            int rows = await _context.MaintenanceRequests
+                .Where(m => m.Id == id && m.IsArchived)
+                .ExecuteUpdateAsync(s => s.SetProperty(m => m.IsArchived, false));
+
+            return rows > 0;
+        }
+
+        #endregion
     }
 }

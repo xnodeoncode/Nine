@@ -67,11 +67,11 @@ namespace Nine.Application.Services
                     Name = organization.Name,
                     LateFeeEnabled = true,
                     LateFeeAutoApply = true,
-                    LateFeeGracePeriodDays = 3,
+                    LateFeeGracePeriodDays = 5,
                     LateFeePercentage = 0.05m,
                     MaxLateFeeAmount = 50.00m,
                     PaymentReminderEnabled = true,
-                    PaymentReminderDaysBefore = 3,
+                    PaymentReminderDaysBefore = 10,
                     CreatedOn = DateTime.UtcNow,
                     CreatedBy = ownerId
                 };
@@ -127,11 +127,11 @@ namespace Nine.Application.Services
                     Name = organization.Name,
                     LateFeeEnabled = true,
                     LateFeeAutoApply = true,
-                    LateFeeGracePeriodDays = 3,
+                    LateFeeGracePeriodDays = 5,
                     LateFeePercentage = 0.05m,
                     MaxLateFeeAmount = 50.00m,
                     PaymentReminderEnabled = true,
-                    PaymentReminderDaysBefore = 3,
+                    PaymentReminderDaysBefore = 10,
                     CreatedOn = DateTime.UtcNow,
                     CreatedBy = userId
                 };
@@ -308,7 +308,7 @@ namespace Nine.Application.Services
                 if (currentUserCount >= _settings.MaxOrganizationUsers)
                 {
                     throw new InvalidOperationException(
-                        $"User limit reached. Nine allows maximum {_settings.MaxOrganizationUsers} user accounts (including system account). " +
+                        "User limit reached. Nine allows a maximum of 4 user accounts (3 login accounts plus the system account). " +
                         "Upgrade to Nine Professional for unlimited users.");
                 }
             }

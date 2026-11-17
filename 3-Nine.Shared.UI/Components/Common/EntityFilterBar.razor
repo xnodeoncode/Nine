@@ -68,16 +68,28 @@
         </div>
     }
 
-    @* Group Toggle *@
-    @if (ShowGroupToggle && GroupedDataAvailable)
+    @* Group Toggle and Archived Toggle *@
+    @if (ShowGroupToggle || ShowArchivedToggle)
     {
         <div class="col-md-auto">
-            <div class="form-check form-switch pt-2">
-                <input class="form-check-input" type="checkbox" id="@GroupToggleId"
-                       checked="@GroupByProperty" 
-                       @onchange="HandleGroupToggle">
-                <label class="form-check-label" for="@GroupToggleId">@GroupLabel</label>
-            </div>
+            @if (ShowGroupToggle)
+            {
+                <div class="form-check form-switch pt-2">
+                    <input class="form-check-input" type="checkbox" id="@GroupToggleId"
+                           checked="@GroupByProperty"
+                           @onchange="HandleGroupToggle">
+                    <label class="form-check-label" for="@GroupToggleId">@GroupLabel</label>
+                </div>
+            }
+            @if (ShowArchivedToggle)
+            {
+                <div class="form-check form-switch pt-1">
+                    <input class="form-check-input" type="checkbox" id="@ArchivedToggleId"
+                           checked="@ShowArchived"
+                           @onchange="HandleArchivedToggle">
+                    <label class="form-check-label" for="@ArchivedToggleId">Show Archived</label>
+                </div>
+            }
         </div>
     }
 
@@ -130,12 +142,18 @@
     [Parameter] public bool GroupByProperty { get; set; }
     [Parameter] public EventCallback<bool> OnGroupToggled { get; set; }
 
+    // Archived toggle parameters
+    [Parameter] public bool ShowArchivedToggle { get; set; } = false;
+    [Parameter] public bool ShowArchived { get; set; } = false;
+    [Parameter] public EventCallback<bool> OnShowArchivedToggled { get; set; }
+
     // Clear button parameters
     [Parameter] public bool ShowClearButton { get; set; } = false;
     [Parameter] public EventCallback OnClearFilters { get; set; }
 
-    // Generate unique ID for the toggle to avoid label conflicts
+    // Generate unique IDs for the toggles to avoid label conflicts
     private string GroupToggleId => $"groupToggle_{Guid.NewGuid():N}";
+    private string ArchivedToggleId => $"archivedToggle_{Guid.NewGuid():N}";
 
     private async Task HandleSearchInput(ChangeEventArgs e)
     {
@@ -160,5 +178,10 @@
     private async Task HandleGroupToggle(ChangeEventArgs e)
     {
         await OnGroupToggled.InvokeAsync(e.Value is bool boolValue && boolValue);
+    }
+
+    private async Task HandleArchivedToggle(ChangeEventArgs e)
+    {
+        await OnShowArchivedToggled.InvokeAsync(e.Value is bool boolValue && boolValue);
     }
 }

@@ -1,0 +1,154 @@
+@page "/privacy"
+@inject ApplicationService ApplicationService
+@attribute [AllowAnonymous]
+@rendermode InteractiveServer
+
+@namespace Nine.Features.Administration.Settings.Pages
+
+<PageTitle>Privacy Statement</PageTitle>
+
+@* Keep this page in sync with Documentation/Privacy.md (the repository copy of the same statement). *@
+
+<div class="container py-4">
+    <h1 class="mb-1"><i class="bi bi-shield-lock me-2"></i>Privacy Statement</h1>
+    <p class="text-muted">Nine @ApplicationService.ApplicationSettings.Version &middot; Last updated November 14, 2026</p>
+
+    <div class="alert alert-success" role="alert">
+        <h5 class="alert-heading">Summary</h5>
+        <p class="mb-2">
+            Nine runs entirely on your computer. It stores the information you enter on your computer, and that
+            information stays there. Nine does not transmit it or share it with anyone, and it has no accounts, servers
+            or services of its own.
+        </p>
+        <ul class="mb-0">
+            <li><strong>Your data is stored locally</strong> in a database file on your computer. You can encrypt it.</li>
+            <li>
+                <strong>Nine shares nothing.</strong> It does not send your information anywhere, and it has no analytics,
+                telemetry, advertising or crash-reporting code. The only information it holds is what you enter.
+            </li>
+            <li><strong>Nine makes no outbound network connections.</strong> It works fully offline.</li>
+            <li><strong>You are in control.</strong> You decide what to enter, back up, export or delete.</li>
+        </ul>
+    </div>
+
+    <h2 class="h4 mt-4">What Nine stores</h2>
+    <p>
+        Nine stores the information you enter so that you can manage your rental properties. Depending on how you use it,
+        this can include:
+    </p>
+    <ul>
+        <li>Property details and expenses</li>
+        <li>
+            Tenant details, such as names, email addresses, phone numbers, dates of birth, identification numbers and
+            emergency contacts
+        </li>
+        <li>Leases, invoices, payments, security deposits, inspections, repairs, checklists, notes and calendar events</li>
+        <li>Documents you upload or generate, such as lease and receipt PDFs</li>
+        <li>
+            User accounts for the people who sign in to Nine (names, email addresses, and passwords stored as one-way
+            hashes, not as readable text)
+        </li>
+        <li>Application and organization settings</li>
+    </ul>
+    <p>All of this is stored in a local SQLite database file. It is not sent anywhere.</p>
+
+    <h3 class="h5 mt-3">Where it is stored</h3>
+    <p>Nine keeps its data in a folder in your user profile:</p>
+    <ul>
+        <li><strong>Linux:</strong> <code>~/.config/Nine/</code></li>
+        <li><strong>Windows:</strong> <code>%APPDATA%\Nine\</code></li>
+    </ul>
+    <p>
+        This folder contains the database (<code>app_vX.Y.Z.db</code>), the <code>Backups</code> folder, and the cookies and
+        cache used by the application window. The portable Windows version may keep its data with the program instead.
+    </p>
+
+    <h3 class="h5 mt-3">Database encryption</h3>
+    <p>
+        Database encryption is optional. When you turn it on (Application Settings &rarr; Database Settings), Nine encrypts
+        the database with a password you choose, using SQLCipher. The key is kept in your operating system's credential
+        store (the Windows credential store or the Linux keychain), not in a file. If you lose the password, your data
+        cannot be recovered, so keep it somewhere safe. If you do not turn encryption on, the database file is not
+        encrypted and is protected only by your computer's own security.
+    </p>
+
+    <h3 class="h5 mt-3">Cookies</h3>
+    <p>
+        Nine uses a small number of cookies inside its own application window for signing in, keeping your session, and
+        protecting forms from forged requests. They stay on your computer and are not used for tracking.
+    </p>
+
+    <h2 class="h4 mt-4">What Nine does not do</h2>
+    <ul>
+        <li>
+            It does not collect anything about you or how you use it, such as usage data, analytics or diagnostics. The
+            only information it holds is what you enter.
+        </li>
+        <li>It does not contain advertising or third-party tracking.</li>
+        <li>It does not send crash reports.</li>
+        <li>
+            It does not send email or text messages. No email or SMS provider is configured in Nine, and it has no
+            screens for setting one up.
+        </li>
+        <li>It does not check for updates in the background or contact any server.</li>
+        <li>It does not sell, rent or share your information. It has no information about you to sell or share.</li>
+    </ul>
+
+    <h2 class="h4 mt-4">Network access</h2>
+    <p>
+        Nine runs a small web server that the Nine window uses on your computer. It listens on your local machine only
+        (<code>localhost</code>) and is not reachable from other computers. As with any local service, other programs
+        running on your computer can reach it. The Nine window is set to block its own requests to anything outside
+        your computer.
+    </p>
+    <p>
+        Links to external websites, such as release notes and documentation, are handed to your <strong>default web
+        browser</strong>. When you open one, that is your browser connecting to the website, not Nine, and the website's
+        and your browser's own privacy practices apply.
+    </p>
+
+    <h2 class="h4 mt-4">Backups, exports and documents</h2>
+    <p>
+        Backups, downloaded documents and exports are files on your computer. Nine does not upload them. If you copy them to
+        an external drive or a cloud storage service, you decide where they go and you are responsible for protecting them.
+    </p>
+
+    <h2 class="h4 mt-4">Your responsibilities</h2>
+    <p>
+        If you use Nine to keep information about tenants and applicants, you may have legal obligations for how you
+        collect, store and protect that information. Nine gives you the tools (local storage, optional encryption, backups,
+        and archive or delete), but you decide how to use them. Good practice includes:
+    </p>
+    <ul>
+        <li>Turning on database encryption and using a strong password</li>
+        <li>Keeping your computer's operating system and disk protected</li>
+        <li>Keeping backups in a safe place, and removing ones you no longer need</li>
+        <li>Archiving or deleting records you no longer need to keep</li>
+    </ul>
+
+    <h3 class="h5 mt-3">Removing your data</h3>
+    <p>
+        To remove all Nine data from a computer, uninstall Nine and then delete its data folder (see above). Uninstalling
+        the application may leave that folder in place. Deleting records inside Nine removes them from the database, and
+        deleted records may still exist in older backups until you delete those too.
+    </p>
+
+    <h2 class="h4 mt-4">Third-party software</h2>
+    <p>
+        Nine includes third-party components. See the <a href="licenses">Third-Party Licenses</a> page for the list and
+        their licenses. None of these components is used to send your information anywhere.
+    </p>
+
+    <h2 class="h4 mt-4">Changes to this statement</h2>
+    <p>
+        If a future version of Nine changes how it handles information, for example by adding an optional feature that
+        connects to the internet, this statement will be updated and its version will change. The statement installed with
+        the application describes the version you are running.
+    </p>
+
+    <h2 class="h4 mt-4">Contact</h2>
+    <p>
+        Questions about this statement can be sent to <strong>@ApplicationService.ApplicationSettings.Email</strong>.
+    </p>
+    <p class="text-muted small">This statement is informational and is not legal advice.</p>
+</div>

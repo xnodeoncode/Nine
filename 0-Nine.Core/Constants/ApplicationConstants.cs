@@ -224,15 +224,15 @@ namespace Nine.Core.Constants
             };
         }
        
-        public static class LeaseTypes { 
-            public const string FixedTerm = "Fixed-Term";
-            public const string MonthToMonth = "Month-to-Month";
-            public const string Sublease = "Sublease";
-            public const string Other = "Other";
+        public static class LeaseTypes {
+            public const string Term         = "Term";           // Fixed start/end date (replaces "Fixed-Term")
+            public const string MonthToMonth = "Month-to-Month"; // No fixed end, rolls monthly
+            public const string Sublease     = "Sublease";
+            public const string Other        = "Other";
 
             public static IReadOnlyList<string> AllLeaseTypes { get; } = new List<string>
             {
-                FixedTerm,
+                Term,
                 MonthToMonth,
                 Sublease,
                 Other
@@ -240,19 +240,14 @@ namespace Nine.Core.Constants
 
         }
 
-        public static class LeaseStatuses { 
-            public const string Offered = "Offered";
-            public const string Pending = "Pending";
-            public const string Accepted = "Accepted";
-            public const string AcceptedPendingStart = "Accepted - Pending Start";
-            public const string Active = "Active";
-            public const string Declined = "Declined";
-            public const string Renewed = "Renewed";
-            public const string MonthToMonth = "Month-to-Month";
-            public const string NoticeGiven = "Notice Given";
-            public const string Interrupted = "Interrupted";
-            public const string Terminated = "Terminated";
-            public const string Expired = "Expired";
+        public static class LeaseStatuses {
+            public const string Pending     = "Pending";       // Offered/awaiting start (pre-active)
+            public const string Active      = "Active";        // Lease is in force
+            public const string NoticeGiven = "Notice Given";  // Notice to vacate has been given
+            public const string Expired     = "Expired";       // Term end date passed, tenant still in place
+            public const string Terminated  = "Terminated";    // Fully ended (any reason)
+            public const string Declined    = "Declined";      // Offer rejected before activation
+            public const string Interrupted = "Interrupted";   // Administrative hold/interruption
 
             public static IReadOnlyList<string> RenewalStatuses { get; } = new List<string>
             {
@@ -264,27 +259,32 @@ namespace Nine.Core.Constants
                 "Expired"
             };
 
-            public static IReadOnlyList<string> AllLeaseStatuses { get; } = new List<string>
+            /// <summary>Active leases: IsActive = true</summary>
+            public static IReadOnlyList<string> ActiveStatuses { get; } = new List<string>
             {
-                Offered,
                 Pending,
-                Accepted,
-                AcceptedPendingStart,
                 Active,
-                Declined,
-                Renewed,
-                MonthToMonth,
                 NoticeGiven,
-                Interrupted,
-                Terminated,
-                Expired
             };
 
-            public static IReadOnlyList<string> DefaultStatuses { get; } = new List<string>
+            /// <summary>Inactive leases: IsActive = false</summary>
+            public static IReadOnlyList<string> InactiveStatuses { get; } = new List<string>
             {
+                Declined,
+                Interrupted,
+                Terminated,
+                Expired,
+            };
+
+            public static IReadOnlyList<string> AllLeaseStatuses { get; } = new List<string>
+            {
+                Pending,
                 Active,
-                MonthToMonth,
-                Terminated
+                NoticeGiven,
+                Expired,
+                Terminated,
+                Declined,
+                Interrupted,
             };
         }
 
@@ -332,6 +332,17 @@ namespace Nine.Core.Constants
                 Occupied,
                 MoveOutPending
             };
+
+            /// <summary>
+            /// Statuses that classify a property as Inactive (off-market). User-driven only.
+            /// All other statuses are considered Active.
+            /// </summary>
+            public static IReadOnlyList<string> InactiveStatuses { get; } = new List<string>
+            {
+                OffMarket,
+                UnderRenovation
+            };
+
             public static IReadOnlyList<string> AllPropertyStatuses { get; } = new List<string>
             {
                 Available,
@@ -367,6 +378,56 @@ namespace Nine.Core.Constants
                 Landscaping,
                 PestControl,
                 Other
+            };
+        }
+
+        /// <summary>
+        /// Fixed/recurring expense categories for a property (e.g. mortgage, insurance,
+        /// maintenance). Used by the PropertyExpense entity.
+        /// </summary>
+        public static class PropertyExpenseTypes
+        {
+            public const string Mortgage = "Mortgage";
+            public const string Insurance = "Insurance";
+            public const string PropertyTax = "Property Tax";
+            public const string HOA = "HOA";
+            // Also covers Cleaning for Schedule E purposes — no dedicated type for it.
+            public const string Maintenance = "Maintenance";
+            public const string Utilities = "Utilities";
+            // Also covers Advertising, Legal/professional fees, Supplies, and Management
+            // fees for Schedule E purposes — no dedicated type for these, by design.
+            public const string Other = "Other";
+
+            public static IReadOnlyList<string> AllPropertyExpenseTypes { get; } = new List<string>
+            {
+                Mortgage,
+                Insurance,
+                PropertyTax,
+                HOA,
+                Maintenance,
+                Utilities,
+                Other
+            };
+        }
+
+        /// <summary>
+        /// Recurrence frequency for a PropertyExpense. Used to normalize expenses of
+        /// differing cadences (e.g. an annual insurance premium) into a common monthly
+        /// equivalent for reporting/rollup purposes.
+        /// </summary>
+        public static class ExpenseFrequencies
+        {
+            public const string Monthly = "Monthly";
+            public const string Quarterly = "Quarterly";
+            public const string Annual = "Annual";
+            public const string OneTime = "One-Time";
+
+            public static IReadOnlyList<string> AllExpenseFrequencies { get; } = new List<string>
+            {
+                Monthly,
+                Quarterly,
+                Annual,
+                OneTime
             };
         }
 
@@ -471,6 +532,10 @@ namespace Nine.Core.Constants
             public const string MaintenanceRecord = "Maintenance Record";
             public const string Invoice = "Invoice";
             public const string PaymentReceipt = "Payment Receipt";
+            public const string Receipt = "Receipt";
+            public const string Warranty = "Warranty";
+            public const string UserGuide = "User Guide";
+            public const string Photo = "Photo";
             public const string Other = "Other";
 
             public static IReadOnlyList<string> AllDocumentTypes { get; } = new List<string>
@@ -481,6 +546,27 @@ namespace Nine.Core.Constants
                 MaintenanceRecord,
                 Invoice,
                 PaymentReceipt,
+                Receipt,
+                Warranty,
+                UserGuide,
+                Photo,
+                Other
+            };
+
+            /// <summary>
+            /// Curated subset of document types relevant when attaching supporting
+            /// documentation to a Repair — anything the user would like to keep a
+            /// record of alongside the repair (e.g., the contractor's receipt or
+            /// invoice, a product warranty, a user guide for a replaced appliance/
+            /// fixture, or before/after photos). "Other" remains as a catch-all.
+            /// </summary>
+            public static IReadOnlyList<string> RepairDocumentTypes { get; } = new List<string>
+            {
+                Receipt,
+                Invoice,
+                Warranty,
+                UserGuide,
+                Photo,
                 Other
             };
 

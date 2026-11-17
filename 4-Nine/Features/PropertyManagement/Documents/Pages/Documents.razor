@@ -2,6 +2,7 @@
 
 @using Nine.Features.PropertyManagement
 @using Nine.Core.Entities
+@using Nine.Application.Models
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
 
@@ -19,68 +20,11 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
         <h1><span class="bi bi-files" aria-hidden="true"></span> Documents</h1>
-        <p class="text-muted mb-0">Documents uploaded in the last 30 days</p>
+        @* <p class="text-muted mb-0">@(showArchivedDocuments ? "Archived documents" : "Documents uploaded in the last 30 days")</p> *@
     </div>
 </div>
-
-@if (isLoading)
-{
-    <div class="text-center">
-        <div class="spinner-border" role="status">
-            <span class="visually-hidden">Loading...</span>
-        </div>
-    </div>
-}
-else if (!allDocuments.Any())
-{
-    <div class="alert alert-info">
-        <h4>No Recent Documents</h4>
-        <p>No documents have been uploaded in the last 30 days.</p>
-    </div>
-}
-else
-{
-    <!-- Filters -->
-    <div class="row mb-3">
-        <div class="col-md-3">
-            <div class="input-group">
-                <span class="input-group-text"><i class="bi bi-search"></i></span>
-                <input type="text" class="form-control" placeholder="Search documents..." @bind="searchTerm" @onkeyup="ApplyFilters" />
-            </div>
-        </div>
-        <div class="col-md-3">
-            <select class="form-select" @bind="selectedDocumentType" @bind:after="ApplyFilters">
-                <option value="">All Document Types</option>
-                <option value="Lease Agreement">Lease Agreement</option>
-                <option value="Invoice">Invoice</option>
-                <option value="Payment Receipt">Payment Receipt</option>
-                <option value="Addendum">Addendum</option>
-                <option value="Move-In Inspection">Move-In Inspection</option>
-                <option value="Move-Out Inspection">Move-Out Inspection</option>
-                <option value="Insurance">Insurance</option>
-                <option value="Pet Agreement">Pet Agreement</option>
-                <option value="Parking Agreement">Parking Agreement</option>
-                <option value="Correspondence">Correspondence</option>
-                <option value="Notice">Notice</option>
-                <option value="Other">Other</option>
-            </select>
-        </div>
-        <div class="col-md-3">
-            <div class="form-check form-switch pt-2">
-                <input class="form-check-input" type="checkbox" id="groupByProperty" @bind="groupByProperty" @bind:after="ApplyFilters">
-                <label class="form-check-label" for="groupByProperty">
-                    Group by Property
-                </label>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <button class="btn btn-outline-secondary" @onclick="ClearFilters">
-                <i class="bi bi-x-circle"></i> Clear Filters
-            </button>
-        </div>
-    </div>
-
-    <!-- Summary Cards -->
+<hr />
+ <!-- Summary Cards -->
     <div class="row mb-3">
         <div class="col-md-3">
             <div class="card text-white bg-primary">
@@ -115,6 +59,82 @@ else
             </div>
         </div>
     </div>
+<hr />
+@if (isLoading)
+{
+    <div class="text-center">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+}
+<!-- Filters — always visible so user can toggle archived/active view -->
+<div class="row mb-3">
+    <div class="col-md-3">
+        <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-search"></i></span>
+            <input type="text" class="form-control" placeholder="Search documents..." @bind="searchTerm" @onkeyup="ApplyFilters" />
+        </div>
+    </div>
+    <div class="col-md-3">
+        <select class="form-select" @bind="selectedDocumentType" @bind:after="ApplyFilters">
+            <option value="">All Document Types</option>
+            <option value="Lease Agreement">Lease Agreement</option>
+            <option value="Invoice">Invoice</option>
+            <option value="Payment Receipt">Payment Receipt</option>
+            <option value="Addendum">Addendum</option>
+            <option value="Move-In Inspection">Move-In Inspection</option>
+            <option value="Move-Out Inspection">Move-Out Inspection</option>
+            <option value="Insurance">Insurance</option>
+            <option value="Pet Agreement">Pet Agreement</option>
+            <option value="Parking Agreement">Parking Agreement</option>
+            <option value="Correspondence">Correspondence</option>
+            <option value="Notice">Notice</option>
+            <option value="Other">Other</option>
+        </select>
+    </div>
+    <div class="col-md-3">
+        <div class="form-check form-switch pt-2">
+            <input class="form-check-input" type="checkbox" id="groupByProperty" @bind="groupByProperty" @bind:after="ApplyFilters">
+            <label class="form-check-label" for="groupByProperty">
+                Group by Property
+            </label>
+        </div>
+        <div class="form-check form-switch pt-1">
+            <input class="form-check-input" type="checkbox" id="showArchivedDocuments" @bind="showArchivedDocuments" @bind:after="LoadDocuments">
+            <label class="form-check-label" for="showArchivedDocuments">
+                Show Archived
+            </label>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <button class="btn btn-outline-secondary" @onclick="ClearFilters">
+            <i class="bi bi-x-circle"></i> Clear Filters
+        </button>
+    </div>
+</div>
+
+<hr />
+
+@if (!allDocuments.Any())
+{
+    @if (showArchivedDocuments)
+    {
+        <div class="alert alert-secondary">
+            <h4>No Archived Documents</h4>
+            <p>No archived documents found.</p>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info">
+            <h4>No Recent Documents</h4>
+            <p>No documents have been uploaded in the last 30 days.</p>
+        </div>
+    }
+}
+else
+{
 
     <div class="card">
         <div class="card-body">
@@ -190,13 +210,22 @@ else
                                                         <button class="btn btn-outline-primary" @onclick="() => DownloadDocument(doc)" title="Download">
                                                             <i class="bi bi-download"></i>
                                                         </button>
-                                                        @if (lease != null)
+                                                        <button class="btn btn-outline-secondary" @onclick="() => GoToRelatedRecord(doc)" title="@GetRelatedRecordLabel(doc)">
+                                                            <i class="bi @GetRelatedRecordIcon(doc)"></i>
+                                                        </button>
+                                                        @if (!doc.IsArchived)
                                                         {
-                                                            <button class="btn btn-outline-secondary" @onclick="() => GoToLease(lease.Id)" title="View Lease">
-                                                                <i class="bi bi-file-text"></i>
+                                                            <button class="btn btn-outline-warning" @onclick="() => ArchiveDocument(doc)" title="Archive">
+                                                                <i class="bi bi-archive"></i>
                                                             </button>
                                                         }
-                                                        <button class="btn btn-outline-danger" @onclick="() => DeleteDocument(doc)" title="Delete">
+                                                        else
+                                                        {
+                                                            <button class="btn btn-outline-success" @onclick="() => UnarchiveDocument(doc)" title="Restore">
+                                                                <i class="bi bi-arrow-counterclockwise"></i>
+                                                            </button>
+                                                        }
+                                                        <button class="btn btn-outline-danger" @onclick="() => ShowDeleteModal(doc.Id)" title="Delete">
                                                             <i class="bi bi-trash"></i>
                                                         </button>
                                                     </div>
@@ -234,7 +263,15 @@ else
                                         }
                                     </button>
                                 </th>
-                                <th>Property</th>
+                                <th>
+                                    <button class="btn btn-link p-0 text-decoration-none text-dark fw-bold" @onclick='() => SortBy("PropertyAddress")'>
+                                        Property
+                                        @if (sortColumn == "PropertyAddress")
+                                        {
+                                            <i class="bi @(sortAscending ? "bi-caret-up" : "bi-caret-down")"></i>
+                                        }
+                                    </button>
+                                </th>
                                 <th>Lease</th>
                                 <th>Size</th>
                                 <th>
@@ -258,6 +295,10 @@ else
                                     <td>
                                         <i class="bi @GetFileIcon(doc.FileExtension) me-2"></i>
                                         <strong>@doc.FileName</strong>
+                                        @if (showArchivedDocuments)
+                                        {
+                                            <span class="badge bg-secondary ms-1">Archived</span>
+                                        }
                                         @if (!string.IsNullOrEmpty(doc.Description))
                                         {
                                             <br /><small class="text-muted">@doc.Description</small>
@@ -291,15 +332,24 @@ else
                                             <button class="btn btn-outline-primary" @onclick="() => DownloadDocument(doc)" title="Download">
                                                 <i class="bi bi-download"></i>
                                             </button>
-                                            @if (lease != null)
+                                            <button class="btn btn-outline-secondary" @onclick="() => GoToRelatedRecord(doc)" title="@GetRelatedRecordLabel(doc)">
+                                                <i class="bi @GetRelatedRecordIcon(doc)"></i>
+                                            </button>
+                                            @if (!doc.IsArchived)
                                             {
-                                                <button class="btn btn-outline-secondary" @onclick="() => GoToLease(lease.Id)" title="View Lease">
-                                                    <i class="bi bi-file-text"></i>
+                                                <button class="btn btn-outline-warning" @onclick="() => ArchiveDocument(doc)" title="Archive">
+                                                    <i class="bi bi-archive"></i>
                                                 </button>
                                             }
-                                            <button class="btn btn-outline-danger" @onclick="() => DeleteDocument(doc)" title="Delete">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
+                                            else
+                                            {
+                                                <button class="btn btn-outline-success" @onclick="() => UnarchiveDocument(doc)" title="Restore">
+                                                    <i class="bi bi-arrow-counterclockwise"></i>
+                                                </button>
+                                            }
+                                            <button class="btn btn-outline-danger" @onclick="() => ShowDeleteModal(doc.Id)" title="Delete">
+                                <i class="bi bi-trash"></i>
+                            </button>
                                         </div>
                                     </td>
                                 </tr>
@@ -334,8 +384,19 @@ else
     </div>
 }
 
+<ActionConfirmModal IsVisible="@_showDeleteModal" Variant="danger"
+    Title="Delete Document" ConfirmText="Delete Permanently"
+    Cascade="@_cascade" IsProcessing="@_isProcessing"
+    OnConfirm="ConfirmDelete" OnCancel="CloseDeleteModal" />
+
 @code {
+    private Guid _pendingDocId;
+    private CascadeSummary? _cascade;
+    private bool _showDeleteModal;
+    private bool _isProcessing;
+
     private bool isLoading = true;
+    private bool showArchivedDocuments = false;
     private List<Document> allDocuments = new();
     private List<Document> filteredDocuments = new();
     private List<Document> pagedDocuments = new();
@@ -383,20 +444,37 @@ else
                 return;
             }
 
-            // Get all documents from last 30 days for the user
-            var allUserDocs = await DocumentService.GetAllAsync();
-            var thirtyDaysAgo = DateTime.UtcNow.AddDays(-30);
-            allDocuments = allUserDocs
-                .Where(d => d.CreatedOn >= thirtyDaysAgo && !d.IsDeleted)
-                .OrderByDescending(d => d.CreatedOn)
+            // Load documents with navigation properties included. Using GetDocumentsWithRelationsAsync
+            // ensures property/lease info is available even for archived properties — documents
+            // associated with an archived property should still be visible and grouped correctly.
+            var allUserDocs = await DocumentService.GetDocumentsWithRelationsAsync(showArchivedDocuments);
+            if (showArchivedDocuments)
+            {
+                allDocuments = allUserDocs
+                    .Where(d => d.IsArchived)
+                    .OrderByDescending(d => d.ArchivedOn)
+                    .ToList();
+            }
+            else
+            {
+                allDocuments = allUserDocs
+                    .OrderByDescending(d => d.CreatedOn)
+                    .ToList();
+            }
+
+            // Derive properties and leases from the loaded documents so that archived
+            // properties are included for grouping and display purposes.
+            properties = allDocuments
+                .Where(d => d.Property != null)
+                .Select(d => d.Property!)
+                .DistinctBy(p => p.Id)
                 .ToList();
 
-            // Load all leases and properties
-            var allLeases = await LeaseService.GetAllAsync();
-            leases = allLeases.Where(l => !l.IsDeleted).ToList();
-            
-            var allProperties = await PropertyService.GetAllAsync();
-            properties = allProperties.Where(p => !p.IsDeleted).ToList();
+            leases = allDocuments
+                .Where(d => d.Lease != null)
+                .Select(d => d.Lease!)
+                .DistinctBy(l => l.Id)
+                .ToList();
 
             ApplyFilters();
         }
@@ -468,6 +546,9 @@ else
             nameof(Document.CreatedOn) => sortAscending
                 ? filteredDocuments.OrderBy(d => d.CreatedOn).ToList()
                 : filteredDocuments.OrderByDescending(d => d.CreatedOn).ToList(),
+            "PropertyAddress" => sortAscending
+                ? filteredDocuments.OrderBy(d => properties.FirstOrDefault(p => p.Id == d.PropertyId)?.Address ?? string.Empty).ToList()
+                : filteredDocuments.OrderByDescending(d => properties.FirstOrDefault(p => p.Id == d.PropertyId)?.Address ?? string.Empty).ToList(),
             _ => filteredDocuments.OrderByDescending(d => d.CreatedOn).ToList()
         };
     }
@@ -536,27 +617,62 @@ else
         await JSRuntime.InvokeVoidAsync("downloadFile", fileName, Convert.ToBase64String(fileData), mimeType);
     }
 
-    private void GoToLease(Guid leaseId)
+    private void GoToRelatedRecord(Document doc)
     {
-        Navigation.NavigateTo($"/propertymanagement/leases/{leaseId}");
+        if (doc.LeaseId.HasValue)
+            Navigation.NavigateTo($"/propertymanagement/leases/{doc.LeaseId.Value}");
+        else if (doc.TenantId.HasValue)
+            Navigation.NavigateTo($"/propertymanagement/tenants/{doc.TenantId.Value}");
+        else if (doc.InvoiceId.HasValue)
+            Navigation.NavigateTo($"/propertymanagement/invoices/{doc.InvoiceId.Value}");
+        else if (doc.PaymentId.HasValue)
+            Navigation.NavigateTo($"/propertymanagement/payments/{doc.PaymentId.Value}");
+        else if (doc.RepairId.HasValue)
+            Navigation.NavigateTo($"/propertymanagement/repairs/{doc.RepairId.Value}");
+        else if (doc.PropertyId.HasValue)
+            Navigation.NavigateTo($"/propertymanagement/properties/{doc.PropertyId.Value}");
     }
 
-    private async Task DeleteDocument(Document doc)
+    private string GetRelatedRecordLabel(Document doc)
     {
-        var confirmed = await JSRuntime.InvokeAsync<bool>("confirm", $"Are you sure you want to delete '{doc.FileName}'? This action cannot be undone.");
-        
-        if (confirmed)
-        {
-            try
-            {
-                await DocumentService.DeleteAsync(doc.Id);
-                await LoadDocuments();
-            }
-            catch (Exception ex)
-            {
-                await JSRuntime.InvokeVoidAsync("alert", $"Error deleting document: {ex.Message}");
-            }
-        }
+        if (doc.LeaseId.HasValue) return "View Lease";
+        if (doc.TenantId.HasValue) return "View Tenant";
+        if (doc.InvoiceId.HasValue) return "View Invoice";
+        if (doc.PaymentId.HasValue) return "View Payment";
+        if (doc.RepairId.HasValue) return "View Repair";
+        return "View Property";
+    }
+
+    private string GetRelatedRecordIcon(Document doc)
+    {
+        if (doc.LeaseId.HasValue) return "bi-file-text";
+        if (doc.TenantId.HasValue) return "bi-person";
+        if (doc.InvoiceId.HasValue) return "bi-receipt";
+        if (doc.PaymentId.HasValue) return "bi-cash";
+        if (doc.RepairId.HasValue) return "bi-tools";
+        return "bi-house";
+    }
+
+    private async Task ShowDeleteModal(Guid id)
+    {
+        _pendingDocId = id;
+        _cascade = await DocumentService.GetDeleteCascadeSummaryAsync(id);
+        _showDeleteModal = true;
+    }
+
+    private async Task ConfirmDelete()
+    {
+        _isProcessing = true;
+        await DocumentService.DeleteAsync(_pendingDocId);
+        _isProcessing = false;
+        CloseDeleteModal();
+        await LoadDocuments();
+    }
+
+    private void CloseDeleteModal()
+    {
+        _showDeleteModal = false;
+        _cascade = null;
     }
 
     private string GetFileIcon(string extension)
@@ -582,5 +698,31 @@ else
             "Move-In Inspection" or "Move-Out Inspection" => "bg-secondary",
             _ => "bg-secondary"
         };
+    }
+
+    private async Task ArchiveDocument(Document doc)
+    {
+        try
+        {
+            await DocumentService.ArchiveAsync(doc.Id);
+            await LoadDocuments();
+        }
+        catch (Exception ex)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", $"Error archiving document: {ex.Message}");
+        }
+    }
+
+    private async Task UnarchiveDocument(Document doc)
+    {
+        try
+        {
+            await DocumentService.RestoreAsync(doc.Id);
+            await LoadDocuments();
+        }
+        catch (Exception ex)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", $"Error unarchiving document: {ex.Message}");
+        }
     }
 }

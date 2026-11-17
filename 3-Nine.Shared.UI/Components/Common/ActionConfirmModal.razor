@@ -1,0 +1,103 @@
+@namespace Nine.Shared.UI.Components.Common
+@using Nine.Application.Models
+
+@if (IsVisible)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog modal-dialog-centered" @onclick:stopPropagation="true">
+            <div class="modal-content">
+                <div class="modal-header @HeaderClass">
+                    <h5 class="modal-title text-white">
+                        <i class="bi @IconClass me-2"></i>@Title
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" @onclick="HandleCancel"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-0">@Message</p>
+
+                    @if (Cascade is { HasRelatedRecords: true })
+                    {
+                        <div class="alert alert-warning mt-3 mb-0">
+                            <strong>@CascadeLabel</strong>
+                            <ul class="mb-0 mt-1">
+                                @foreach (var (label, count) in Cascade.Counts.Where(c => c.Value > 0))
+                                {
+                                    <li>@count @label</li>
+                                }
+                            </ul>
+                        </div>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="HandleCancel" disabled="@IsProcessing">
+                        Cancel
+                    </button>
+                    @if (!string.IsNullOrEmpty(SecondaryConfirmText))
+                    {
+                        <button type="button" class="btn btn-outline-secondary" @onclick="HandleSecondaryConfirm" disabled="@IsProcessing">
+                            @SecondaryConfirmText
+                        </button>
+                    }
+                    <button type="button" class="btn @ConfirmButtonClass" @onclick="HandleConfirm" disabled="@IsProcessing">
+                        @if (IsProcessing)
+                        {
+                            <span class="spinner-border spinner-border-sm me-1" role="status"></span>
+                        }
+                        @ConfirmText
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    /// <summary>Controls the visibility of the modal.</summary>
+    [Parameter] public bool IsVisible { get; set; }
+
+    /// <summary>Modal title text.</summary>
+    [Parameter] public string Title { get; set; } = "Confirm";
+
+    /// <summary>Body message displayed to the user.</summary>
+    [Parameter] public string Message { get; set; } = "Are you sure?";
+
+    /// <summary>Text for the confirm button.</summary>
+    [Parameter] public string ConfirmText { get; set; } = "Confirm";
+
+    /// <summary>
+    /// Visual variant: "danger" (red, for delete) or "warning" (yellow, for archive).
+    /// </summary>
+    [Parameter] public string Variant { get; set; } = "danger";
+
+    /// <summary>Optional cascade summary showing related records that will be affected.</summary>
+    [Parameter] public CascadeSummary? Cascade { get; set; }
+
+    /// <summary>Whether an async operation is in progress (shows spinner, disables buttons).</summary>
+    [Parameter] public bool IsProcessing { get; set; }
+
+    /// <summary>Fired when the user confirms the primary action.</summary>
+    [Parameter] public EventCallback OnConfirm { get; set; }
+
+    /// <summary>Fired when the user cancels.</summary>
+    [Parameter] public EventCallback OnCancel { get; set; }
+
+    /// <summary>
+    /// Optional text for a secondary confirm button (e.g., "Property Only" in an unarchive prompt).
+    /// When set, a second button is shown between Cancel and the primary confirm.
+    /// </summary>
+    [Parameter] public string? SecondaryConfirmText { get; set; }
+
+    /// <summary>Fired when the user selects the secondary confirm action.</summary>
+    [Parameter] public EventCallback OnSecondaryConfirm { get; set; }
+
+    /// <summary>Label shown above the cascade record list. Defaults to "Related records affected:".</summary>
+    [Parameter] public string CascadeLabel { get; set; } = "Related records affected:";
+
+    private string HeaderClass => Variant == "warning" ? "bg-warning text-dark" : "bg-danger";
+    private string ConfirmButtonClass => Variant == "warning" ? "btn-warning" : "btn-danger";
+    private string IconClass => Variant == "warning" ? "bi-archive" : "bi-trash";
+
+    private async Task HandleConfirm() => await OnConfirm.InvokeAsync();
+    private async Task HandleCancel() => await OnCancel.InvokeAsync();
+    private async Task HandleSecondaryConfirm() => await OnSecondaryConfirm.InvokeAsync();
+}

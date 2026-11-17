@@ -1,8 +1,8 @@
-# Nine Compatibility Matrix
+# Nine. Compatibility Matrix
 
-**Last Updated:** March 1, 2026  
-**Current Release: v1.0.0
-**Next Release: v1.1.0 (planned)
+**Last Updated:** November 11, 2026  
+**Current Release:** v1.2.0  
+**Next Release:** v1.2.1 (in development)
 
 ---
 
@@ -10,26 +10,35 @@
 
 This matrix tracks version compatibility across Nine releases, enabling you to:
 
-- ✅ **Verify upgrade/downgrade compatibility** - Check if app versions work with your database
-- ✅ **Identify component versions** - Know which dependencies are installed
-- ✅ **Plan rollbacks safely** - Understand which versions can coexist
-- ✅ **Troubleshoot version mismatches** - Diagnose compatibility issues
-- ✅ **Track breaking changes** - See when incompatibilities were introduced
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> **Verify upgrade/downgrade compatibility** - Check if app versions work with your database
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> **Identify component versions** - Know which dependencies are installed
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> **Plan rollbacks safely** - Understand which versions can coexist
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> **Troubleshoot version mismatches** - Diagnose compatibility issues
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> **Track breaking changes** - See when incompatibilities were introduced
 
-**For detailed release information**, see version-specific Release Notes in `Documentation/vX.X.X/`.
+**For detailed release information**, see version-specific [Release Notes](#support--resources).
 
 ---
 
-## Nine Version History
+## Version History
 
-| Release Date | App Version | Database Schema | .NET SDK | ElectronNET | Bootstrap | QuestPDF  | Migration Required | Breaking Changes | Status             | Download                                                           |
-| ------------ | ----------- | --------------- | -------- | ----------- | --------- | --------- | ------------------ | ---------------- | ------------------ | ------------------------------------------------------------------ |
-| TBD          | **1.2.0**   | v1.2.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | Yes (v1.1.0→1.2.0) | TBD              | **In Development** | -                                                                  |
-| 2026-03-01   | 1.1.2       | v1.1.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | No                 | No               | **Current**        | [Release](https://github.com/xnodeoncode/nine/releases/tag/v1.1.2) |
-| 2026-02-28   | 1.1.1       | v1.1.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | No                 | No               | Previous           | [Release](https://github.com/xnodeoncode/nine/releases/tag/v1.1.1) |
-| 2026-02-18   | 1.1.0       | v1.1.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | Yes (v1.0.0→1.1.0) | New tables/cols  | Superseded         | [Release](https://github.com/xnodeoncode/nine/releases/tag/v1.1.0) |
-| 2026-01-29   | 1.0.1       | v1.0.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | No                 | No               | Superseded         | [Release](https://github.com/xnodeoncode/nine/releases/tag/v1.0.1) |
-| 2026-01-28   | 1.0.0       | v1.0.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | No                 | No               | Superseded         | [Release](https://github.com/xnodeoncode/nine/releases/tag/v1.0.0) |
+| Release Date | Product | App Version | Database Schema | .NET SDK | ElectronNET | Bootstrap | QuestPDF  | Migration Required   | Breaking Changes | Status        | Download                                                               |
+| ------------ | ------- | ----------- | --------------- | -------- | ----------- | --------- | --------- | -------------------- | ---------------- | ------------- | ---------------------------------------------------------------------- |
+| 2026-11-11   | Nine    | **1.2.0**   | v1.2.0          | 10.0.1   | Core 0.4.1  | 5.3.3     | 2025.12.1 | Yes (v1.1.0→1.2.0)   | New tables/cols  | **Current**   | [Release](https://github.com/xnodeoncode/Nine/releases/tag/v1.2.0)     |
+| 2026-04-04   | Nine    | 1.1.0       | v1.1.0          | 10.0.1   | Core 0.4.1  | 5.3.3     | 2025.12.1 | Auto (EF migrations) | No               | Previous      | [Release](https://github.com/xnodeoncode/Nine/releases/tag/v1.1.0)     |
+| 2026-03-17   | Aquiis  | 1.1.3       | v1.1.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | No                   | No               | Latest Aquiis | [Release](https://github.com/xnodeoncode/Aquiis/releases/tag/v1.1.3)   |
+| 2026-03-11   | Nine    | 1.0.0       | v1.0.0          | 10.0.1   | Core 0.4.1  | 5.3.3     | 2025.12.1 | No                   | No               | Superseded    | [Release](https://github.com/xnodeoncode/Nine/releases/tag/v1.0.0)     |
+| 2026-03-02   | Aquiis  | 1.1.2       | v1.1.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | No                   | No               | Superseded    | [Release](https://github.com/xnodeoncode/Aquiis/releases/tag/v1.1.2)   |
+| 2026-03-01   | Aquiis  | 1.1.1       | v1.1.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | No                   | No               | Superseded    | [Release](https://github.com/xnodeoncode/Aquiis/releases/tag/v1.1.1.0) |
+| 2026-02-19   | Aquiis  | 1.1.0       | v1.1.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | Yes (v1.0.0→1.1.0)   | New tables/cols  | Superseded    | [Release](https://github.com/xnodeoncode/Aquiis/releases/tag/v1.1.0)   |
+| 2026-01-29   | Aquiis  | 1.0.1       | v1.0.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | No                   | No               | Superseded    | [Release](https://github.com/xnodeoncode/Aquiis/releases/tag/v1.0.1)   |
+| 2026-01-28   | Aquiis  | 1.0.0       | v1.0.0          | 10.0.1   | 23.6.2      | 5.3.3     | 2025.12.1 | No                   | No               | Superseded    | [Release](https://github.com/xnodeoncode/Aquiis/releases/tag/v1.0.0)   |
+
+> **Note:** Nine began as a fork of Aquiis at v1.0.0. Releases listed under the **Product** column as Aquiis were published in the
+> [Aquiis repository](https://github.com/xnodeoncode/Aquiis). Check the
+> **Database Schema** column when importing data from an Aquiis version into Nine, because the schemas differ between versions.
+> Schema versions follow the application's MAJOR.MINOR version (`MAJOR.MINOR.0`), and patch releases never change the schema,
+> so app v1.1.x always uses schema v1.1.0.
 
 ## Professional Version History
 
@@ -59,26 +68,26 @@ This matrix tracks version compatibility across Nine releases, enabling you to:
 
 ### Desktop Integration
 
-| Component            | Current Version | Purpose           | Upgrade Notes                                                    |
-| -------------------- | --------------- | ----------------- | ---------------------------------------------------------------- |
-| **ElectronNET.API**  | 23.6.2          | Desktop framework | Major version changes may require electron.manifest.json updates |
-| **electron-builder** | 26.4.0          | Build/packaging   | Controls AppImage/exe generation                                 |
+| Component               | Current Version | Purpose           | Upgrade Notes                                                                                            |
+| ----------------------- | --------------- | ----------------- | -------------------------------------------------------------------------------------------------------- |
+| **ElectronNET Core**    | 0.4.1           | Desktop framework | Major version changes may require electron.manifest.json updates                                         |
+| ~~**ElectronNET.API**~~ | 23.6.2          | Desktop framework | (deprecated - used in earlier releases) Major version changes may require electron.manifest.json updates |
+| **electron-builder**    | 26.4.0          | Build/packaging   | Controls AppImage/exe generation                                                                         |
 
 ### Database & Storage
 
-| Component           | Current Version       | Purpose         | Upgrade Notes                                  |
-| ------------------- | --------------------- | --------------- | ---------------------------------------------- |
-| **SQLite**          | 3.46.0                | Database engine | Via Microsoft.Data.Sqlite                      |
-| **EF Core**         | 10.0.1                | ORM             | Breaking changes uncommon in minor versions    |
-| **Database Schema** | v1.0.0 (Nine)         | Data structure  | Tracks with app version MAJOR.MINOR milestones |
-|                     | v0.0.0 (Professional) | Data structure  | Pre-v1.0.0 rapid iteration phase               |
+| Component           | Current Version | Purpose         | Upgrade Notes                                  |
+| ------------------- | --------------- | --------------- | ---------------------------------------------- |
+| **SQLite**          | 3.46.0          | Database engine | Via Microsoft.Data.Sqlite                      |
+| **EF Core**         | 10.0.1          | ORM             | Breaking changes uncommon in minor versions    |
+| **Database Schema** | v1.2.0 (Nine)   | Data structure  | Tracks with app version MAJOR.MINOR milestones |
 
 ### UI & Front-end
 
 | Component                 | Current Version | Purpose       | Upgrade Notes                 |
 | ------------------------- | --------------- | ------------- | ----------------------------- |
-| **Bootstrap**             | 5.3.3           | CSS framework | Generally backward compatible |
-| **Bootstrap Icons**       | 1.11.3          | Icon font     | Additive changes only         |
+| **Bootstrap**             | 5.3.8           | CSS framework | Generally backward compatible |
+| **Bootstrap Icons**       | 1.13.1          | Icon font     | Additive changes only         |
 | **Material Design Icons** | 7.4.47          | Icon font     | Additive changes only         |
 
 ### Document Generation
@@ -87,23 +96,22 @@ This matrix tracks version compatibility across Nine releases, enabling you to:
 | ------------ | --------------- | -------------- | -------------------------------------------------- |
 | **QuestPDF** | 2025.12.1       | PDF generation | Annual major versions, breaking changes documented |
 
-### External Services (Optional)
-
-| Component    | Current Version | Purpose        | Upgrade Notes                                      |
-| ------------ | --------------- | -------------- | -------------------------------------------------- |
-| **SendGrid** | 9.29.3          | Email delivery | API key required for email notifications           |
-| **Twilio**   | 7.14.0          | SMS delivery   | Account credentials required for SMS notifications |
-
 ---
 
 ## Database Schema Versioning
 
 **Current Schema:**
 
-- **Nine:** v1.1.0 (current)
+- **Nine:** v1.2.0 (current)
 - **Professional:** v0.0.0 (pre-release)
 
 ### Schema Version Strategy
+
+- **v1.2.0** (Nine)
+  - Added tables for tracking property expenses
+  - Added columns to support data archiving
+  - Modified/removed columns to support updates to lease management
+  - Database filename: `app_v1.2.0.db`
 
 - **v1.1.0** (Nine): Database encryption and sample data features
   - Added DatabaseSettings table for encryption state tracking
@@ -128,18 +136,18 @@ This matrix tracks version compatibility across Nine releases, enabling you to:
 
 #### Schema Change Classification
 
-| Change Type                                          | Version | DB File Changes | EF Compatible | Notes                                                                                             |
-| ---------------------------------------------------- | ------- | --------------- | ------------- | ------------------------------------------------------------------------------------------------- |
-| Add nullable column                                  | PATCH   | No              | ✅ Yes        | Existing rows get NULL automatically                                                              |
-| Add new table                                        | PATCH   | No              | ✅ Yes        | No impact on existing data                                                                        |
-| Add new index                                        | PATCH   | No              | ✅ Yes        | No impact on existing data                                                                        |
-| Remove column (unused/obsolete)                      | MINOR   | Yes             | ✅ Yes        | EF generates `DropColumn`; data lost                                                              |
-| Remove table                                         | MINOR   | Yes             | ✅ Yes        | EF generates `DropTable`; data lost                                                               |
-| Add non-nullable column with default/backfill        | MINOR   | Yes             | ✅ Yes        | EF adds column + default; migration review required                                               |
-| Rename column or table                               | MAJOR   | Yes             | ⚠️ Partial    | EF generates drop+add (data loss); must hand-edit migration to use `RenameColumn` / `RenameTable` |
-| Change column type (compatible, e.g. int → bigint)   | MAJOR   | Yes             | ✅ Yes        | EF generates `AlterColumn`; verify data integrity                                                 |
-| Change column type (incompatible, e.g. string → int) | MAJOR   | Yes             | ❌ No         | EF cannot convert data; manual migration script needed                                            |
-| Restructure relationship or foreign key              | MAJOR   | Yes             | ⚠️ Partial    | May require data migration depending on cardinality                                               |
+| Change Type                                          | Version | DB File Changes | EF Compatible                                                                                                                                                      | Notes                                                                                             |
+| ---------------------------------------------------- | ------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------- |
+| Add nullable column                                  | PATCH   | No              | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> Yes             | Existing rows get NULL automatically                                                              |
+| Add new table                                        | PATCH   | No              | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> Yes             | No impact on existing data                                                                        |
+| Add new index                                        | PATCH   | No              | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> Yes             | No impact on existing data                                                                        |
+| Remove column (unused/obsolete)                      | MINOR   | Yes             | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> Yes             | EF generates `DropColumn`; data lost                                                              |
+| Remove table                                         | MINOR   | Yes             | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> Yes             | EF generates `DropTable`; data lost                                                               |
+| Add non-nullable column with default/backfill        | MINOR   | Yes             | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> Yes             | EF adds column + default; migration review required                                               |
+| Rename column or table                               | MAJOR   | Yes             | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/exclamation-triangle-fill.svg" width="16" height="16" alt=""> Partial | EF generates drop+add (data loss); must hand-edit migration to use `RenameColumn` / `RenameTable` |
+| Change column type (compatible, e.g. int → bigint)   | MAJOR   | Yes             | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> Yes             | EF generates `AlterColumn`; verify data integrity                                                 |
+| Change column type (incompatible, e.g. string → int) | MAJOR   | Yes             | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/x-circle-fill.svg" width="16" height="16" alt=""> No                  | EF cannot convert data; manual migration script needed                                            |
+| Restructure relationship or foreign key              | MAJOR   | Yes             | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/exclamation-triangle-fill.svg" width="16" height="16" alt=""> Partial | May require data migration depending on cardinality                                               |
 
 > **Rollback note:** PATCH releases share the same DB file across all patch versions. Rolling back from v1.0.3 → v1.0.1 leaves any patch-added columns in place. SQLite ignores unknown columns on reads and leaves them NULL on writes — safe but unsupported.
 
@@ -149,30 +157,32 @@ This matrix tracks version compatibility across Nine releases, enabling you to:
 
 ### Rollback Safety
 
-| From Version | To Version | Database Compatible  | Safe Rollback | Notes                                 |
-| ------------ | ---------- | -------------------- | ------------- | ------------------------------------- |
-| v1.1.0       | v1.0.1     | ❌ No (v1.1.0→1.0.0) | ❌ No         | v1.0.1 missing DatabaseSettings table |
-| v1.0.1       | v1.0.0     | ✅ Yes (v1.0.0)      | ✅ Yes        | Drop-in replacement                   |
-| v1.1.0       | v1.0.0     | ❌ No (v1.1.0→1.0.0) | ❌ No         | v1.0.0 missing DatabaseSettings table |
+| From Version | To Version | Database Compatible                                                                                                                                              | Safe Rollback                                                                                                                                          | Notes                                 |
+| ------------ | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------- |
+| v1.1.0       | v1.0.1     | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/x-circle-fill.svg" width="16" height="16" alt=""> No (v1.1.0→1.0.0) | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/x-circle-fill.svg" width="16" height="16" alt=""> No      | v1.0.1 missing DatabaseSettings table |
+| v1.0.1       | v1.0.0     | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> Yes (v1.0.0)  | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> Yes | Drop-in replacement                   |
+| v1.1.0       | v1.0.0     | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/x-circle-fill.svg" width="16" height="16" alt=""> No (v1.1.0→1.0.0) | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/x-circle-fill.svg" width="16" height="16" alt=""> No      | v1.0.0 missing DatabaseSettings table |
 
 ### Upgrade Compatibility
 
-| From Version | To Version | Migration Type | Breaking Changes | Notes                                            |
-| ------------ | ---------- | -------------- | ---------------- | ------------------------------------------------ |
-| v1.0.1       | v1.1.0     | Automatic      | Schema v1.1.0    | New DatabaseSettings table, IsSampleData columns |
-| v1.0.0       | v1.0.1     | None           | No               | Drop-in replacement                              |
-| v0.3.0       | v0.3.1     | Automatic      | Database path    | Same migration as Nine                           |
-| v1.x.x       | v2.0.0     | Automatic      | Schema changes   | Future: Major version, backup enforced           |
+| From Version | To Version | Migration Type | Breaking Changes | Notes                                                |
+| ------------ | ---------- | -------------- | ---------------- | ---------------------------------------------------- |
+| v1.1.0       | v1.2.0     | Automatic      | Schema v1.2.0    | New tables, new columns, dropped columns and indexes |
+| v1.0.1       | v1.1.0     | Automatic      | Schema v1.1.0    | New DatabaseSettings table, IsSampleData columns     |
+| v1.0.0       | v1.0.1     | None           | No               | Drop-in replacement                                  |
+| v0.3.0       | v0.3.1     | Automatic      | Database path    | Same migration as Nine                               |
+| v1.x.x       | v2.0.0     | Automatic      | Schema changes   | Future: Major version, backup enforced               |
 
 ---
 
 ## Breaking Changes Summary
 
-| Version | Breaking Changes       | Impact                  | Migration Strategy      |
-| ------- | ---------------------- | ----------------------- | ----------------------- |
-| v1.1.0  | Schema v1.1.0 required | Cannot run on v1.0.0 DB | Automatic EF migrations |
-| v1.0.1  | None                   | Backward compatible     | Drop-in replacement     |
-| v1.0.0  | Org structure          | Pre-release users only  | Manual migration        |
+| Version | Breaking Changes       | Impact                                                | Migration Strategy      |
+| ------- | ---------------------- | ----------------------------------------------------- | ----------------------- |
+| v1.2.0  | Schema v1.2.0 required | Application version v1.1.0 cannot run on db v1.2.0 DB | Automatic EF migrations |
+| v1.1.0  | Schema v1.1.0 required | Application version v1.1.0 cannot run on db v1.0.0 DB | Automatic EF migrations |
+| v1.0.1  | None                   | Backward compatible                                   | Drop-in replacement     |
+| v1.0.0  | Org structure          | Pre-release users only                                | Manual migration        |
 
 **For detailed migration procedures**, see version-specific Release Notes.
 
@@ -180,11 +190,11 @@ This matrix tracks version compatibility across Nine releases, enabling you to:
 
 ## Platform Support
 
-| Platform                | v1.0.0 | v1.0.1 | v1.1.0 | Notes                               |
-| ----------------------- | ------ | ------ | ------ | ----------------------------------- |
-| **Linux (AppImage)**    | ✅     | ✅     | ✅     | Ubuntu 20.04+, Debian 11+ tested    |
-| **Windows 10/11 (x64)** | ✅     | ✅     | ✅     | Portable exe, no installer required |
-| **macOS**               | ❌     | ❌     | ❌     | Planned for v1.2.0+                 |
+| Platform                | v1.0.0                                                                                                                                                | v1.0.1                                                                                                                                                | v1.1.0                                                                                                                                                | v1.2.0                                                                                                                                                | Notes                                              |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| **Linux (AppImage)**    | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt="Yes"> | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt="Yes"> | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt="Yes"> | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt="Yes"> | Red Hat Enterprise Linux 10 (RHEL 10) tested       |
+| **Windows 10/11 (x64)** | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt="Yes"> | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt="Yes"> | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt="Yes"> | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt="Yes"> | Portable exe, Windows Installer, Windows 11 tested |
+| **macOS**               | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/x-circle-fill.svg" width="16" height="16" alt="No">      | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/x-circle-fill.svg" width="16" height="16" alt="No">      | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/x-circle-fill.svg" width="16" height="16" alt="No">      | <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt="No">  | Currently not supported                            |
 
 ---
 
@@ -192,28 +202,27 @@ This matrix tracks version compatibility across Nine releases, enabling you to:
 
 ### Minimum
 
-- **OS:** Linux (Ubuntu 20.04+) or Windows 10 (64-bit)
-- **CPU:** 2-core, 1.5 GHz
-- **RAM:** 2 GB
-- **Disk:** 500 MB (application + data)
+- **OS:** Linux (RHEL 10 tested) or Windows 11 (64-bit)
+- **CPU:** 4-core, 2.5 GHz
+- **RAM:** 8 GB
+- **Disk:** 2G MB (application + data)
 
 ### Recommended
 
 - **CPU:** 4-core, 2.5 GHz
-- **RAM:** 4 GB
-- **Disk:** 1 GB
+- **RAM:** 16 GB
+- **Disk:** 4 GB
 - **Display:** 1920x1080
 
 ---
 
 ## Database Schema Compatibility
 
-| App Version | Database Schema | Database File | Forward Compatible | Backward Compatible | Notes                           |
-| ----------- | --------------- | ------------- | ------------------ | ------------------- | ------------------------------- |
-| v1.1.0      | v1.1.0          | app_v1.1.0.db | No                 | No                  | Requires DatabaseSettings table |
-| v1.0.1      | v1.0.0          | app_v1.0.0.db | Yes                | Yes                 | Path: ~/.config/Electron/       |
-| v1.0.0      | v1.0.0          | app_v1.0.0.db | Yes                | Yes                 | Path: ~/.config/Electron/       |
-| v0.3.0      | v0.0.0          | app_v0.0.0.db | No                 | No                  | Pre-release, rapid iteration    |
+| App Version | Database Schema | Database File | Forward Compatible  | Backward Compatible | Notes                                                             |
+| ----------- | --------------- | ------------- | ------------------- | ------------------- | ----------------------------------------------------------------- |
+| v1.2.0      | v1.2.0          | app_v1.2.0.db | Yes (auto-migrated) | No                  | Path: Linux - ~/.config/Nine/, Windows - ~\APPDATA\Roaming\Nine\  |
+| v1.1.0      | v1.1.0          | app_v1.1.0.db | Yes (auto-migrated) | No                  | Path: Linux - ~/.config/Nine/, Windows - ~\APPDATA\Roaming\Nine\  |
+| v1.0.0      | v1.0.0          | app_v1.0.0.db | Yes (auto-migrated) | NO                  | Path: Linux - ~/.config/Nine/, Windows - ~\APPDATA\Roaming\Nine\  |
 
 **Key:**
 
@@ -222,48 +231,42 @@ This matrix tracks version compatibility across Nine releases, enabling you to:
 
 ---
 
-## Known Limitations
+## Known Limitations (\* Limits enforced by design)
 
-| Limitation             | All Versions           | Reason                       |
-| ---------------------- | ---------------------- | ---------------------------- |
-| **Maximum Properties** | 9 (Nine)               | Simple Start tier constraint |
-| **Maximum Users**      | 3 (1 system + 3 login) | Simplified access control    |
-| **Organizations**      | 1                      | Desktop application scope    |
-| **File Upload Size**   | 10 MB per file         | Performance management       |
-| **SQLite Concurrency** | Single writer          | SQLite WAL mode limitation   |
+| Limitation                | All Versions           | Reason                       |
+| ------------------------- | ---------------------- | ---------------------------- |
+| **Maximum Properties** \* | 9 (Nine)               | Simple Start tier constraint |
+| **Maximum Users** \*      | 4 (1 system + 3 login) | Simplified access control    |
+| **Organizations** \*      | 1                      | Desktop application scope    |
+| **File Upload Size** \*   | 10 MB per file         | Performance management       |
+| **SQLite Concurrency**    | Single writer          | SQLite WAL mode limitation   |
 
 ---
 
 ## Third-Party Licenses
 
-| Component     | License Type          | Eligibility Notes                                                  |
-| ------------- | --------------------- | ------------------------------------------------------------------ |
-| **QuestPDF**  | Community (Free)      | Free for <$1M revenue, individuals, non-profits, FOSS. Honor-based |
-| **.NET**      | MIT                   | Open source, commercial use allowed                                |
-| **Bootstrap** | MIT                   | Open source, commercial use allowed                                |
-| **Electron**  | MIT                   | Open source, commercial use allowed                                |
-| **SendGrid**  | Commercial (Optional) | Requires API key and account                                       |
-| **Twilio**    | Commercial (Optional) | Requires credentials and account                                   |
-
-**QuestPDF Community License**: Nine (max 9 properties) qualifies as most users will be under $1M annual revenue. Professional edition users must verify eligibility.
+| Component     | License Type     | Eligibility Notes                                                  |
+| ------------- | ---------------- | ------------------------------------------------------------------ |
+| **QuestPDF**  | Community (Free) | Free for <$1M revenue, individuals, non-profits, FOSS. Honor-based |
+| **.NET**      | MIT              | Open source, commercial use allowed                                |
+| **Bootstrap** | MIT              | Open source, commercial use allowed                                |
+| **Electron**  | MIT              | Open source, commercial use allowed                                |
 
 ---
 
 ## Support & Resources
 
-### Detailed Release Information
+### Release Notes
 
-- **v1.1.0:** [Release Notes](v1.1.0/v1.1.0-Release-Notes.md) - What's new, migration procedures, testing
-- **v1.0.1:** [Release Notes](v1.0.1/v1.0.1-Release-Notes.md) - Bug fixes and improvements
-- **v1.0.0:** [Release Notes](v1.0.0/v1.0.0-Release-Notes.md) - Initial production release
+- **v1.2.0:** [Release Notes](https://github.com/xnodeoncode/Nine/releases/tag/v1.2.0)
+- **v1.1.0:** [Release Notes](https://github.com/xnodeoncode/Nine/releases/tag/v1.1.0)
+- **v1.0.0:** [Release Notes](https://github.com/xnodeoncode/Nine/releases/tag/v1.0.0)
 
 ### Getting Help
 
-- 📧 **Email:** cisguru@outlook.com
-- 🐛 **Bug Reports:** [GitHub Issues](https://github.com/xnodeoncode/nine/issues)
-- 💡 **Feature Requests:** [GitHub Discussions](https://github.com/xnodeoncode/nine/discussions)
-- 📖 **Documentation:** [/Documentation/](https://github.com/xnodeoncode/nine/tree/main/Documentation)
-- 🏛️ **Roadmap:** [/Documentation/Roadmap/](https://github.com/xnodeoncode/nine/tree/main/Documentation/Roadmap)
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/envelope.svg" width="16" height="16" alt=""> **Email:** [cisguru@outlook.com](mailto:cisguru@outlook.com?subject=Nine%20Support%20-%20Compatibility%20Matrix)
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/bug.svg" width="16" height="16" alt=""> **Bug Reports:** [GitHub Issues](https://github.com/xnodeoncode/Nine/issues)
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/book.svg" width="16" height="16" alt=""> **Documentation:** [/Documentation/](https://github.com/xnodeoncode/Nine/tree/main/Documentation)
 
 ---
 
@@ -271,6 +274,7 @@ This matrix tracks version compatibility across Nine releases, enabling you to:
 
 | Date       | Change                            | Updated By   |
 | ---------- | --------------------------------- | ------------ |
+| 2026-11-11 | Updated added v1.2.0 information  | Release Team |
 | 2026-02-01 | Refocused as Compatibility Matrix | Release Team |
 | 2026-02-01 | Added v1.1.0 compatibility info   | Release Team |
 | 2026-01-29 | Added v1.0.1 entry                | Release Team |
@@ -279,4 +283,4 @@ This matrix tracks version compatibility across Nine releases, enabling you to:
 ---
 
 **Maintained by:** Nine Development Team  
-**Document Version:** 2.0 - Compatibility Matrix
+**Document Version:** 1.2.0 (version aligned with release version) - Compatibility Matrix

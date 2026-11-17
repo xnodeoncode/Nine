@@ -2,10 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using Nine.Core.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Nine.Core.Entities;
 
 #pragma warning disable 219, 612, 618
 #nullable disable
@@ -21,7 +21,7 @@ namespace Nine.Infrastructure.Data.CompiledModels
                 "Nine.Core.Entities.Payment",
                 typeof(Payment),
                 baseEntityType,
-                propertyCount: 15,
+                propertyCount: 18,
                 navigationCount: 2,
                 foreignKeyCount: 3,
                 unnamedIndexCount: 3,
@@ -44,6 +44,21 @@ namespace Nine.Infrastructure.Data.CompiledModels
                 scale: 2,
                 sentinel: 0m);
             amount.AddAnnotation("Relational:ColumnType", "decimal(18,2)");
+
+            var archivedBy = runtimeEntityType.AddProperty(
+                "ArchivedBy",
+                typeof(string),
+                propertyInfo: typeof(BaseModel).GetProperty("ArchivedBy", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(BaseModel).GetField("<ArchivedBy>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                nullable: true,
+                maxLength: 100);
+
+            var archivedOn = runtimeEntityType.AddProperty(
+                "ArchivedOn",
+                typeof(DateTime?),
+                propertyInfo: typeof(BaseModel).GetProperty("ArchivedOn", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(BaseModel).GetField("<ArchivedOn>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                nullable: true);
 
             var createdBy = runtimeEntityType.AddProperty(
                 "CreatedBy",
@@ -72,6 +87,13 @@ namespace Nine.Infrastructure.Data.CompiledModels
                 propertyInfo: typeof(Payment).GetProperty("InvoiceId", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Payment).GetField("<InvoiceId>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: new Guid("00000000-0000-0000-0000-000000000000"));
+
+            var isArchived = runtimeEntityType.AddProperty(
+                "IsArchived",
+                typeof(bool),
+                propertyInfo: typeof(BaseModel).GetProperty("IsArchived", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(BaseModel).GetField("<IsArchived>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                sentinel: false);
 
             var isDeleted = runtimeEntityType.AddProperty(
                 "IsDeleted",

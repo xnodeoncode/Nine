@@ -22,6 +22,13 @@ namespace Nine.Infrastructure.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ArchivedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ArchivedOn")
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime?>("BackgroundCheckCompletedOn")
                         .HasColumnType("TEXT");
 
@@ -63,6 +70,9 @@ namespace Nine.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<int?>("CreditScore")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsArchived")
                         .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsDeleted")
@@ -110,6 +120,13 @@ namespace Nine.Infrastructure.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ArchivedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ArchivedOn")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Color")
                         .IsRequired()
                         .HasMaxLength(20)
@@ -142,6 +159,9 @@ namespace Nine.Infrastructure.Migrations
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsArchived")
+                        .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("INTEGER");
@@ -208,6 +228,13 @@ namespace Nine.Infrastructure.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ArchivedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ArchivedOn")
+                        .HasColumnType("TEXT");
+
                     b.Property<bool>("AutoCreateEvents")
                         .HasColumnType("INTEGER");
 
@@ -231,6 +258,9 @@ namespace Nine.Infrastructure.Migrations
                     b.Property<string>("EntityType")
                         .IsRequired()
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsArchived")
+                        .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("INTEGER");
@@ -266,6 +296,13 @@ namespace Nine.Infrastructure.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ArchivedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ArchivedOn")
+                        .HasColumnType("TEXT");
+
                     b.Property<Guid>("ChecklistTemplateId")
                         .HasColumnType("TEXT");
 
@@ -295,6 +332,9 @@ namespace Nine.Infrastructure.Migrations
                     b.Property<string>("GeneralNotes")
                         .HasMaxLength(2000)
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsArchived")
+                        .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("INTEGER");
@@ -352,6 +392,13 @@ namespace Nine.Infrastructure.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ArchivedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ArchivedOn")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("CategorySection")
                         .HasMaxLength(100)
                         .HasColumnType("TEXT");
@@ -366,6 +413,9 @@ namespace Nine.Infrastructure.Migrations
 
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsArchived")
+                        .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsChecked")
                         .HasColumnType("INTEGER");
@@ -424,6 +474,13 @@ namespace Nine.Infrastructure.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ArchivedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ArchivedOn")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Category")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -440,6 +497,9 @@ namespace Nine.Infrastructure.Migrations
                     b.Property<string>("Description")
                         .HasMaxLength(500)
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsArchived")
+                        .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("INTEGER");
@@ -481,6 +541,7 @@ namespace Nine.Infrastructure.Migrations
                             CreatedBy = "",
                             CreatedOn = new DateTime(2025, 11, 30, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Standard property showing checklist",
+                            IsArchived = false,
                             IsDeleted = false,
                             IsSampleData = false,
                             IsSystemTemplate = true,
@@ -494,6 +555,7 @@ namespace Nine.Infrastructure.Migrations
                             CreatedBy = "",
                             CreatedOn = new DateTime(2025, 11, 30, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Move-in inspection checklist",
+                            IsArchived = false,
                             IsDeleted = false,
                             IsSampleData = false,
                             IsSystemTemplate = true,
@@ -507,6 +569,7 @@ namespace Nine.Infrastructure.Migrations
                             CreatedBy = "",
                             CreatedOn = new DateTime(2025, 11, 30, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Move-out inspection checklist",
+                            IsArchived = false,
                             IsDeleted = false,
                             IsSampleData = false,
                             IsSystemTemplate = true,
@@ -520,6 +583,7 @@ namespace Nine.Infrastructure.Migrations
                             CreatedBy = "",
                             CreatedOn = new DateTime(2025, 11, 30, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Open house event checklist",
+                            IsArchived = false,
                             IsDeleted = false,
                             IsSampleData = false,
                             IsSystemTemplate = true,
@@ -536,6 +600,13 @@ namespace Nine.Infrastructure.Migrations
                     b.Property<bool>("AllowsNotes")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("ArchivedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ArchivedOn")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("CategorySection")
                         .HasMaxLength(100)
                         .HasColumnType("TEXT");
@@ -550,6 +621,9 @@ namespace Nine.Infrastructure.Migrations
 
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsArchived")
+                        .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("INTEGER");
@@ -599,6 +673,7 @@ namespace Nine.Infrastructure.Migrations
                             ChecklistTemplateId = new Guid("00000000-0000-0000-0001-000000000001"),
                             CreatedBy = "",
                             CreatedOn = new DateTime(2025, 11, 30, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsArchived = false,
                             IsDeleted = false,
                             IsRequired = true,
                             IsSampleData = false,
@@ -616,6 +691,7 @@ namespace Nine.Infrastructure.Migrations
                             ChecklistTemplateId = new Guid("00000000-0000-0000-0001-000000000001"),
                             CreatedBy = "",
                             CreatedOn = new DateTime(2025, 11, 30, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsArchived = false,
                             IsDeleted = false,
                             IsRequired = true,
                             IsSampleData = false,
@@ -633,6 +709,7 @@ namespace Nine.Infrastructure.Migrations
                             ChecklistTemplateId = new Guid("00000000-0000-0000-0001-000000000001"),
                             CreatedBy = "",
                             CreatedOn = new DateTime(2025, 11, 30, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsArchived = false,
                             IsDeleted = false,
                             IsRequired = true,
                             IsSampleData = false,
@@ -650,6 +727,7 @@ namespace Nine.Infrastructure.Migrations
                             ChecklistTemplateId = new Guid("00000000-0000-0000-0001-000000000001"),
                             CreatedBy = "",
                             CreatedOn = new DateTime(2025, 11, 30, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsArchived = false,
                             IsDeleted = false,
                             IsRequired = true,
                             IsSampleData = false,
@@ -667,6 +745,7 @@ namespace Nine.Infrastructure.Migrations
                             ChecklistTemplateId = new Guid("00000000-0000-0000-0001-000000000001"),
                             CreatedBy = "",
                             CreatedOn = new DateTime(2025, 11, 30, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsArchived = false,
                             IsDeleted = false,
                             IsRequired = true,
                             IsSampleData = false,
@@ -684,6 +763,7 @@ namespace Nine.Infrastructure.Migrations
                             ChecklistTemplateId = new Guid("00000000-0000-0000-0001-000000000001"),
                             CreatedBy = "",
                             CreatedOn = new DateTime(2025, 11, 30, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsArchived = false,
                             IsDeleted = false,
                             IsRequired = true,
                             IsSampleData = false,
@@ -701,6 +781,7 @@ namespace Nine.Infrastructure.Migrations
                             ChecklistTemplateId = new Guid("00000000-0000-0000-0001-000000000001"),
                             CreatedBy = "",
                             CreatedOn = new DateTime(2025, 11, 30, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsArchived = false,
                             IsDeleted = false,
                             IsRequired = true,
                             IsSampleData = false,
@@ -718,6 +799,7 @@ namespace Nine.Infrastructure.Migrations
                             ChecklistTemplateId = new Guid("00000000-0000-0000-0001-000000000001"),
                             CreatedBy = "",
                             CreatedOn = new DateTime(2025, 11, 30, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsArchived = false,
                             IsDeleted = false,
                             IsRequired = true,
                             IsSampleData = false,
@@ -735,6 +817,7 @@ namespace Nine.Infrastructure.Migrations
                             ChecklistTemplateId = new Guid("00000000-0000-0000-0001-000000000001"),
                             CreatedBy = "",
                             CreatedOn = new DateTime(2025, 11, 30, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsArchived = false,
                             IsDeleted = false,
                             IsRequired = true,
                             IsSampleData = false,
@@ -752,6 +835,7 @@ namespace Nine.Infrastructure.Migrations
                             ChecklistTemplateId = new Guid("00000000-0000-0000-0001-000000000001"),
                             CreatedBy = "",
                             CreatedOn = new DateTime(2025, 11, 30, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsArchived = false,
                             IsDeleted = false,
                             IsRequired = true,
                             IsSampleData = false,
@@ -769,6 +853,7 @@ namespace Nine.Infrastructure.Migrations
                             ChecklistTemplateId = new Guid("00000000-0000-0000-0001-000000000001"),
                             CreatedBy = "",
                             CreatedOn = new DateTime(2025, 11, 30, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsArchived = false,
                             IsDeleted = false,
                             IsRequired = true,
                             IsSampleData = false,
@@ -786,6 +871,7 @@ namespace Nine.Infrastructure.Migrations
                             ChecklistTemplateId = new Guid("00000000-0000-0000-0001-000000000001"),
                             CreatedBy = "",
                             CreatedOn = new DateTime(2025, 11, 30, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsArchived = false,
                             IsDeleted = false,
                             IsRequired = true,
                             IsSampleData = false,
@@ -803,6 +889,7 @@ namespace Nine.Infrastructure.Migrations
                             ChecklistTemplateId = new Guid("00000000-0000-0000-0001-000000000001"),
                             CreatedBy = "",
                             CreatedOn = new DateTime(2025, 11, 30, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsArchived = false,
                             IsDeleted = false,
                             IsRequired = true,
                             IsSampleData = false,
@@ -820,6 +907,7 @@ namespace Nine.Infrastructure.Migrations
                             ChecklistTemplateId = new Guid("00000000-0000-0000-0001-000000000001"),
                             CreatedBy = "",
                             CreatedOn = new DateTime(2025, 11, 30, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsArchived = false,
                             IsDeleted = false,
                             IsRequired = true,
                             IsSampleData = false,
@@ -837,6 +925,7 @@ namespace Nine.Infrastructure.Migrations
                             ChecklistTemplateId = new Guid("00000000-0000-0000-0001-000000000001"),
                             CreatedBy = "",
                             CreatedOn = new DateTime(2025, 11, 30, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsArchived = false,
                             IsDeleted = false,
                             IsRequired = true,
                             IsSampleData = false,
@@ -854,6 +943,7 @@ namespace Nine.Infrastructure.Migrations
                             ChecklistTemplateId = new Guid("00000000-0000-0000-0001-000000000001"),
                             CreatedBy = "",
                             CreatedOn = new DateTime(2025, 11, 30, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsArchived = false,
                             IsDeleted = false,
                             IsRequired = true,
                             IsSampleData = false,
@@ -871,6 +961,7 @@ namespace Nine.Infrastructure.Migrations
                             ChecklistTemplateId = new Guid("00000000-0000-0000-0001-000000000001"),
                             CreatedBy = "",
                             CreatedOn = new DateTime(2025, 11, 30, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsArchived = false,
                             IsDeleted = false,
                             IsRequired = true,
                             IsSampleData = false,
@@ -888,6 +979,7 @@ namespace Nine.Infrastructure.Migrations
                             ChecklistTemplateId = new Guid("00000000-0000-0000-0001-000000000001"),
                             CreatedBy = "",
                             CreatedOn = new DateTime(2025, 11, 30, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsArchived = false,
                             IsDeleted = false,
                             IsRequired = true,
                             IsSampleData = false,
@@ -905,6 +997,7 @@ namespace Nine.Infrastructure.Migrations
                             ChecklistTemplateId = new Guid("00000000-0000-0000-0001-000000000001"),
                             CreatedBy = "",
                             CreatedOn = new DateTime(2025, 11, 30, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsArchived = false,
                             IsDeleted = false,
                             IsRequired = true,
                             IsSampleData = false,
@@ -922,6 +1015,7 @@ namespace Nine.Infrastructure.Migrations
                             ChecklistTemplateId = new Guid("00000000-0000-0000-0001-000000000001"),
                             CreatedBy = "",
                             CreatedOn = new DateTime(2025, 11, 30, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsArchived = false,
                             IsDeleted = false,
                             IsRequired = true,
                             IsSampleData = false,
@@ -939,6 +1033,7 @@ namespace Nine.Infrastructure.Migrations
                             ChecklistTemplateId = new Guid("00000000-0000-0000-0001-000000000001"),
                             CreatedBy = "",
                             CreatedOn = new DateTime(2025, 11, 30, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsArchived = false,
                             IsDeleted = false,
                             IsRequired = true,
                             IsSampleData = false,
@@ -956,6 +1051,7 @@ namespace Nine.Infrastructure.Migrations
                             ChecklistTemplateId = new Guid("00000000-0000-0000-0001-000000000001"),
                             CreatedBy = "",
                             CreatedOn = new DateTime(2025, 11, 30, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsArchived = false,
                             IsDeleted = false,
                             IsRequired = true,
                             IsSampleData = false,
@@ -973,6 +1069,7 @@ namespace Nine.Infrastructure.Migrations
                             ChecklistTemplateId = new Guid("00000000-0000-0000-0001-000000000001"),
                             CreatedBy = "",
                             CreatedOn = new DateTime(2025, 11, 30, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsArchived = false,
                             IsDeleted = false,
                             IsRequired = true,
                             IsSampleData = false,
@@ -990,6 +1087,7 @@ namespace Nine.Infrastructure.Migrations
                             ChecklistTemplateId = new Guid("00000000-0000-0000-0001-000000000002"),
                             CreatedBy = "",
                             CreatedOn = new DateTime(2025, 11, 30, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsArchived = false,
                             IsDeleted = false,
                             IsRequired = true,
                             IsSampleData = false,
@@ -1007,6 +1105,7 @@ namespace Nine.Infrastructure.Migrations
                             ChecklistTemplateId = new Guid("00000000-0000-0000-0001-000000000002"),
                             CreatedBy = "",
                             CreatedOn = new DateTime(2025, 11, 30, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsArchived = false,
                             IsDeleted = false,
                             IsRequired = true,
                             IsSampleData = false,
@@ -1024,6 +1123,7 @@ namespace Nine.Infrastructure.Migrations
                             ChecklistTemplateId = new Guid("00000000-0000-0000-0001-000000000002"),
                             CreatedBy = "",
                             CreatedOn = new DateTime(2025, 11, 30, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsArchived = false,
                             IsDeleted = false,
                             IsRequired = true,
                             IsSampleData = false,
@@ -1041,6 +1141,7 @@ namespace Nine.Infrastructure.Migrations
                             ChecklistTemplateId = new Guid("00000000-0000-0000-0001-000000000003"),
                             CreatedBy = "",
                             CreatedOn = new DateTime(2025, 11, 30, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsArchived = false,
                             IsDeleted = false,
                             IsRequired = true,
                             IsSampleData = false,
@@ -1058,6 +1159,7 @@ namespace Nine.Infrastructure.Migrations
                             ChecklistTemplateId = new Guid("00000000-0000-0000-0001-000000000003"),
                             CreatedBy = "",
                             CreatedOn = new DateTime(2025, 11, 30, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsArchived = false,
                             IsDeleted = false,
                             IsRequired = true,
                             IsSampleData = false,
@@ -1075,6 +1177,7 @@ namespace Nine.Infrastructure.Migrations
                             ChecklistTemplateId = new Guid("00000000-0000-0000-0001-000000000003"),
                             CreatedBy = "",
                             CreatedOn = new DateTime(2025, 11, 30, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsArchived = false,
                             IsDeleted = false,
                             IsRequired = true,
                             IsSampleData = false,
@@ -1092,6 +1195,7 @@ namespace Nine.Infrastructure.Migrations
                             ChecklistTemplateId = new Guid("00000000-0000-0000-0001-000000000004"),
                             CreatedBy = "",
                             CreatedOn = new DateTime(2025, 11, 30, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsArchived = false,
                             IsDeleted = false,
                             IsRequired = true,
                             IsSampleData = false,
@@ -1109,6 +1213,7 @@ namespace Nine.Infrastructure.Migrations
                             ChecklistTemplateId = new Guid("00000000-0000-0000-0001-000000000004"),
                             CreatedBy = "",
                             CreatedOn = new DateTime(2025, 11, 30, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsArchived = false,
                             IsDeleted = false,
                             IsRequired = true,
                             IsSampleData = false,
@@ -1126,6 +1231,7 @@ namespace Nine.Infrastructure.Migrations
                             ChecklistTemplateId = new Guid("00000000-0000-0000-0001-000000000004"),
                             CreatedBy = "",
                             CreatedOn = new DateTime(2025, 11, 30, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsArchived = false,
                             IsDeleted = false,
                             IsRequired = true,
                             IsSampleData = false,
@@ -1169,6 +1275,13 @@ namespace Nine.Infrastructure.Migrations
             modelBuilder.Entity("Nine.Core.Entities.Document", b =>
                 {
                     b.Property<Guid>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ArchivedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ArchivedOn")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ContentType")
@@ -1224,6 +1337,9 @@ namespace Nine.Infrastructure.Migrations
                     b.Property<Guid?>("InvoiceId")
                         .HasColumnType("TEXT");
 
+                    b.Property<bool>("IsArchived")
+                        .HasColumnType("INTEGER");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("INTEGER");
 
@@ -1249,6 +1365,9 @@ namespace Nine.Infrastructure.Migrations
                     b.Property<Guid?>("PropertyId")
                         .HasColumnType("TEXT");
 
+                    b.Property<Guid?>("RepairId")
+                        .HasColumnType("TEXT");
+
                     b.Property<Guid?>("TenantId")
                         .HasColumnType("TEXT");
 
@@ -1264,9 +1383,151 @@ namespace Nine.Infrastructure.Migrations
 
                     b.HasIndex("PropertyId");
 
+                    b.HasIndex("RepairId");
+
                     b.HasIndex("TenantId");
 
                     b.ToTable("Documents");
+                });
+
+            modelBuilder.Entity("Nine.Core.Entities.ExpenseDue", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("AmountDue")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("ArchivedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ArchivedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("DueDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsArchived")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsSampleData")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(2000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("OrganizationId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("PropertyExpenseId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("PropertyId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("WaivedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("WaivedReason")
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DueDate");
+
+                    b.HasIndex("OrganizationId");
+
+                    b.HasIndex("PropertyExpenseId");
+
+                    b.HasIndex("PropertyId");
+
+                    b.ToTable("ExpenseDues");
+                });
+
+            modelBuilder.Entity("Nine.Core.Entities.ExpensePayment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("AmountPaid")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("ArchivedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ArchivedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("ExpenseDueId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsArchived")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsSampleData")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("OrganizationId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("PaidOn")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ExpenseDueId");
+
+                    b.HasIndex("OrganizationId");
+
+                    b.HasIndex("PaidOn");
+
+                    b.ToTable("ExpensePayments");
                 });
 
             modelBuilder.Entity("Nine.Core.Entities.Inspection", b =>
@@ -1276,6 +1537,13 @@ namespace Nine.Infrastructure.Migrations
 
                     b.Property<string>("ActionItemsRequired")
                         .HasMaxLength(2000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ArchivedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ArchivedOn")
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("BathroomSinkGood")
@@ -1416,6 +1684,9 @@ namespace Nine.Infrastructure.Migrations
                     b.Property<string>("InteriorWindowsNotes")
                         .HasColumnType("TEXT");
 
+                    b.Property<bool>("IsArchived")
+                        .HasColumnType("INTEGER");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("INTEGER");
 
@@ -1511,6 +1782,13 @@ namespace Nine.Infrastructure.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<string>("ArchivedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ArchivedOn")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("CreatedBy")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -1537,6 +1815,9 @@ namespace Nine.Infrastructure.Migrations
 
                     b.Property<DateTime>("InvoicedOn")
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsArchived")
+                        .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("INTEGER");
@@ -1606,6 +1887,13 @@ namespace Nine.Infrastructure.Migrations
                     b.Property<DateTime?>("ActualMoveOutDate")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ArchivedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ArchivedOn")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("CreatedBy")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -1617,9 +1905,6 @@ namespace Nine.Infrastructure.Migrations
                     b.Property<DateTime?>("DeclinedOn")
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid?>("DocumentId")
-                        .HasColumnType("TEXT");
-
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("TEXT");
 
@@ -1628,6 +1913,12 @@ namespace Nine.Infrastructure.Migrations
 
                     b.Property<DateTime?>("ExpiresOn")
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsArchived")
+                        .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("INTEGER");
@@ -1643,6 +1934,11 @@ namespace Nine.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<Guid?>("LeaseOfferId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("LeaseType")
+                        .IsRequired()
+                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.Property<decimal>("MonthlyRent")
@@ -1727,7 +2023,7 @@ namespace Nine.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DocumentId");
+                    b.HasIndex("IsActive");
 
                     b.HasIndex("OrganizationId");
 
@@ -1741,6 +2037,13 @@ namespace Nine.Infrastructure.Migrations
             modelBuilder.Entity("Nine.Core.Entities.LeaseOffer", b =>
                 {
                     b.Property<Guid>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ArchivedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ArchivedOn")
                         .HasColumnType("TEXT");
 
                     b.Property<Guid?>("ConvertedLeaseId")
@@ -1759,6 +2062,9 @@ namespace Nine.Infrastructure.Migrations
 
                     b.Property<DateTime>("ExpiresOn")
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsArchived")
+                        .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("INTEGER");
@@ -1839,6 +2145,13 @@ namespace Nine.Infrastructure.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<string>("ArchivedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ArchivedOn")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("AssignedTo")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -1866,6 +2179,9 @@ namespace Nine.Infrastructure.Migrations
                     b.Property<decimal>("EstimatedCost")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("IsArchived")
+                        .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("INTEGER");
@@ -1955,6 +2271,13 @@ namespace Nine.Infrastructure.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ArchivedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ArchivedOn")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Content")
                         .IsRequired()
                         .HasMaxLength(5000)
@@ -1975,6 +2298,9 @@ namespace Nine.Infrastructure.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsArchived")
+                        .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("INTEGER");
@@ -2004,6 +2330,13 @@ namespace Nine.Infrastructure.Migrations
             modelBuilder.Entity("Nine.Core.Entities.NotificationPreferences", b =>
                 {
                     b.Property<Guid>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ArchivedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ArchivedOn")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("CreatedBy")
@@ -2052,6 +2385,9 @@ namespace Nine.Infrastructure.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<bool>("EnableWeeklyDigest")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsArchived")
                         .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsDeleted")
@@ -2155,6 +2491,13 @@ namespace Nine.Infrastructure.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ArchivedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ArchivedOn")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("CreatedBy")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -2185,6 +2528,9 @@ namespace Nine.Infrastructure.Migrations
                     b.Property<string>("FromName")
                         .HasMaxLength(200)
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsArchived")
+                        .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("INTEGER");
@@ -2278,6 +2624,13 @@ namespace Nine.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ArchivedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ArchivedOn")
+                        .HasColumnType("TEXT");
+
                     b.Property<decimal?>("CostPerSMS")
                         .HasPrecision(18, 4)
                         .HasColumnType("TEXT");
@@ -2292,6 +2645,9 @@ namespace Nine.Infrastructure.Migrations
 
                     b.Property<DateTime?>("DailyCountResetOn")
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsArchived")
+                        .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("INTEGER");
@@ -2375,6 +2731,13 @@ namespace Nine.Infrastructure.Migrations
                     b.Property<bool>("ApplicationFeeEnabled")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("ArchivedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ArchivedOn")
+                        .HasColumnType("TEXT");
+
                     b.Property<bool>("AutoCalculateSecurityDeposit")
                         .HasColumnType("INTEGER");
 
@@ -2396,6 +2759,9 @@ namespace Nine.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<int>("DividendDistributionMonth")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsArchived")
                         .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsDeleted")
@@ -2536,6 +2902,13 @@ namespace Nine.Infrastructure.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<string>("ArchivedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ArchivedOn")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("CreatedBy")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -2549,6 +2922,9 @@ namespace Nine.Infrastructure.Migrations
 
                     b.Property<Guid>("InvoiceId")
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsArchived")
+                        .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("INTEGER");
@@ -2607,6 +2983,13 @@ namespace Nine.Infrastructure.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ArchivedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ArchivedOn")
+                        .HasColumnType("TEXT");
+
                     b.Property<decimal>("Bathrooms")
                         .HasMaxLength(3)
                         .HasColumnType("decimal(3,1)");
@@ -2634,6 +3017,9 @@ namespace Nine.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("IsActive")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsArchived")
                         .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsDeleted")
@@ -2702,9 +3088,100 @@ namespace Nine.Infrastructure.Migrations
                     b.ToTable("Properties");
                 });
 
+            modelBuilder.Entity("Nine.Core.Entities.PropertyExpense", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("ArchivedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ArchivedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("EffectiveDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("EndReason")
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ExpenseType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsArchived")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsSampleData")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Notes")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("OrganizationId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("PropertyId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EffectiveDate");
+
+                    b.HasIndex("ExpenseType");
+
+                    b.HasIndex("OrganizationId");
+
+                    b.HasIndex("PropertyId");
+
+                    b.ToTable("PropertyExpenses");
+                });
+
             modelBuilder.Entity("Nine.Core.Entities.ProspectiveTenant", b =>
                 {
                     b.Property<Guid>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ArchivedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ArchivedOn")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("CreatedBy")
@@ -2744,6 +3221,9 @@ namespace Nine.Infrastructure.Migrations
 
                     b.Property<Guid?>("InterestedPropertyId")
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsArchived")
+                        .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("INTEGER");
@@ -2819,6 +3299,13 @@ namespace Nine.Infrastructure.Migrations
                     b.Property<DateTime>("AppliedOn")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ArchivedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ArchivedOn")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("CreatedBy")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -2872,6 +3359,9 @@ namespace Nine.Infrastructure.Migrations
 
                     b.Property<DateTime?>("ExpiresOn")
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsArchived")
+                        .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("INTEGER");
@@ -2966,6 +3456,13 @@ namespace Nine.Infrastructure.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ArchivedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ArchivedOn")
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime?>("CompletedOn")
                         .HasColumnType("TEXT");
 
@@ -3008,6 +3505,9 @@ namespace Nine.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<int>("DurationMinutes")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsArchived")
                         .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsDeleted")
@@ -3106,6 +3606,13 @@ namespace Nine.Infrastructure.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<string>("ArchivedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ArchivedOn")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("CreatedBy")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -3126,6 +3633,9 @@ namespace Nine.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("InInvestmentPool")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsArchived")
                         .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsDeleted")
@@ -3208,6 +3718,13 @@ namespace Nine.Infrastructure.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ArchivedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ArchivedOn")
+                        .HasColumnType("TEXT");
+
                     b.Property<decimal>("BaseDividendAmount")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
@@ -3229,6 +3746,9 @@ namespace Nine.Infrastructure.Migrations
 
                     b.Property<Guid>("InvestmentPoolId")
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsArchived")
+                        .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("INTEGER");
@@ -3315,6 +3835,13 @@ namespace Nine.Infrastructure.Migrations
                     b.Property<int>("ActiveLeaseCount")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("ArchivedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ArchivedOn")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("CreatedBy")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -3336,6 +3863,9 @@ namespace Nine.Infrastructure.Migrations
                     b.Property<decimal>("EndingBalance")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("IsArchived")
+                        .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("INTEGER");
@@ -3406,6 +3936,13 @@ namespace Nine.Infrastructure.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ArchivedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ArchivedOn")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("CreatedBy")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -3442,6 +3979,9 @@ namespace Nine.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("IsActive")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsArchived")
                         .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsDeleted")
@@ -3496,6 +4036,13 @@ namespace Nine.Infrastructure.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ArchivedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ArchivedOn")
+                        .HasColumnType("TEXT");
+
                     b.Property<Guid?>("CalendarEventId")
                         .HasColumnType("TEXT");
 
@@ -3524,6 +4071,9 @@ namespace Nine.Infrastructure.Migrations
                     b.Property<string>("InterestLevel")
                         .HasMaxLength(50)
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsArchived")
+                        .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("INTEGER");
@@ -3580,6 +4130,13 @@ namespace Nine.Infrastructure.Migrations
                     b.Property<Guid?>("ActiveOrganizationId")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ArchivedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ArchivedOn")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("CreatedBy")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -3595,6 +4152,9 @@ namespace Nine.Infrastructure.Migrations
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsArchived")
+                        .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("INTEGER");
@@ -3648,6 +4208,13 @@ namespace Nine.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ArchivedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ArchivedOn")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("CreatedBy")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -3665,6 +4232,9 @@ namespace Nine.Infrastructure.Migrations
 
                     b.Property<string>("FromStatus")
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsArchived")
+                        .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("INTEGER");
@@ -3723,6 +4293,13 @@ namespace Nine.Infrastructure.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ArchivedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ArchivedOn")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Category")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -3745,6 +4322,9 @@ namespace Nine.Infrastructure.Migrations
 
                     b.Property<DateTime?>("EmailSentOn")
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsArchived")
+                        .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("INTEGER");
@@ -3934,6 +4514,11 @@ namespace Nine.Infrastructure.Migrations
                         .HasForeignKey("PropertyId")
                         .OnDelete(DeleteBehavior.SetNull);
 
+                    b.HasOne("Nine.Core.Entities.Repair", "Repair")
+                        .WithMany("Documents")
+                        .HasForeignKey("RepairId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("Nine.Core.Entities.Tenant", "Tenant")
                         .WithMany()
                         .HasForeignKey("TenantId")
@@ -3947,7 +4532,31 @@ namespace Nine.Infrastructure.Migrations
 
                     b.Navigation("Property");
 
+                    b.Navigation("Repair");
+
                     b.Navigation("Tenant");
+                });
+
+            modelBuilder.Entity("Nine.Core.Entities.ExpenseDue", b =>
+                {
+                    b.HasOne("Nine.Core.Entities.PropertyExpense", "PropertyExpense")
+                        .WithMany("ExpenseDues")
+                        .HasForeignKey("PropertyExpenseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PropertyExpense");
+                });
+
+            modelBuilder.Entity("Nine.Core.Entities.ExpensePayment", b =>
+                {
+                    b.HasOne("Nine.Core.Entities.ExpenseDue", "ExpenseDue")
+                        .WithMany("Payments")
+                        .HasForeignKey("ExpenseDueId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ExpenseDue");
                 });
 
             modelBuilder.Entity("Nine.Core.Entities.Inspection", b =>
@@ -4001,11 +4610,6 @@ namespace Nine.Infrastructure.Migrations
 
             modelBuilder.Entity("Nine.Core.Entities.Lease", b =>
                 {
-                    b.HasOne("Nine.Core.Entities.Document", "Document")
-                        .WithMany()
-                        .HasForeignKey("DocumentId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
                     b.HasOne("Nine.Core.Entities.Organization", null)
                         .WithMany("Leases")
                         .HasForeignKey("OrganizationId")
@@ -4023,8 +4627,6 @@ namespace Nine.Infrastructure.Migrations
                         .HasForeignKey("TenantId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.Navigation("Document");
 
                     b.Navigation("Property");
 
@@ -4150,6 +4752,47 @@ namespace Nine.Infrastructure.Migrations
                         .WithMany("Properties")
                         .HasForeignKey("OrganizationId")
                         .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Nine.Core.Entities.PropertyExpense", b =>
+                {
+                    b.HasOne("Nine.Core.Entities.Property", "Property")
+                        .WithMany("Expenses")
+                        .HasForeignKey("PropertyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.OwnsOne("Nine.Core.Entities.RecurrencePattern", "RecurrencePattern", b1 =>
+                        {
+                            b1.Property<Guid>("PropertyExpenseId")
+                                .HasColumnType("TEXT");
+
+                            b1.Property<int?>("AnchorMonth")
+                                .HasColumnType("INTEGER")
+                                .HasColumnName("RecurrenceAnchorMonth");
+
+                            b1.Property<int?>("DueDayOfMonth")
+                                .HasColumnType("INTEGER")
+                                .HasColumnName("RecurrenceDueDayOfMonth");
+
+                            b1.Property<string>("Frequency")
+                                .IsRequired()
+                                .HasMaxLength(20)
+                                .HasColumnType("TEXT")
+                                .HasColumnName("RecurrenceFrequency");
+
+                            b1.HasKey("PropertyExpenseId");
+
+                            b1.ToTable("PropertyExpenses");
+
+                            b1.WithOwner()
+                                .HasForeignKey("PropertyExpenseId");
+                        });
+
+                    b.Navigation("Property");
+
+                    b.Navigation("RecurrencePattern")
                         .IsRequired();
                 });
 
@@ -4318,6 +4961,11 @@ namespace Nine.Infrastructure.Migrations
                     b.Navigation("Items");
                 });
 
+            modelBuilder.Entity("Nine.Core.Entities.ExpenseDue", b =>
+                {
+                    b.Navigation("Payments");
+                });
+
             modelBuilder.Entity("Nine.Core.Entities.Invoice", b =>
                 {
                     b.Navigation("Payments");
@@ -4350,11 +4998,18 @@ namespace Nine.Infrastructure.Migrations
                 {
                     b.Navigation("Documents");
 
+                    b.Navigation("Expenses");
+
                     b.Navigation("Leases");
 
                     b.Navigation("MaintenanceRequests");
 
                     b.Navigation("Repairs");
+                });
+
+            modelBuilder.Entity("Nine.Core.Entities.PropertyExpense", b =>
+                {
+                    b.Navigation("ExpenseDues");
                 });
 
             modelBuilder.Entity("Nine.Core.Entities.ProspectiveTenant", b =>
@@ -4367,6 +5022,11 @@ namespace Nine.Infrastructure.Migrations
             modelBuilder.Entity("Nine.Core.Entities.RentalApplication", b =>
                 {
                     b.Navigation("Screening");
+                });
+
+            modelBuilder.Entity("Nine.Core.Entities.Repair", b =>
+                {
+                    b.Navigation("Documents");
                 });
 
             modelBuilder.Entity("Nine.Core.Entities.SecurityDeposit", b =>

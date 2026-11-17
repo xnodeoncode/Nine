@@ -1,9 +1,11 @@
 @page "/propertymanagement/leases"
 
 @using Microsoft.AspNetCore.Components.Authorization
-@using Nine.Core.Entities
 @using Nine.Application.Services
+@using Nine.Core.Constants
+@using Nine.Core.Entities
 @using Nine.Shared.UI.Components.Entities.Leases
+@using static Nine.Core.Constants.ApplicationConstants
 @inject NavigationManager NavigationManager
 @inject LeaseService LeaseService
 @inject TenantService TenantService
@@ -58,6 +60,7 @@
     </div>
 </div>
 
+<hr />
 @if (leases == null)
 {
     <div class="text-center">
@@ -66,7 +69,7 @@
         </div>
     </div>
 }
-else if (!leases.Any())
+else if (!leases.Any() && !_showArchived)
 {
     <div class="alert alert-info">
         @if (filterTenant != null)
@@ -93,7 +96,7 @@ else if (!leases.Any())
 }
 else
 {
-    <LeaseListView 
+<LeaseListView 
         Leases="@(groupByProperty ? filteredLeases : pagedLeases)"
         GroupedLeases="@groupedLeases"
         AvailableTenants="@(availableTenants ?? new())"
@@ -114,11 +117,15 @@ else
         OnStatusFilterChanged="@HandleStatusFilterChanged"
         OnTenantFilterChanged="@HandleTenantFilterChanged"
         OnGroupByPropertyChanged="@HandleGroupByPropertyChanged"
+        OnShowArchivedChanged="@HandleShowArchivedChanged"
         OnSort="@HandleSort"
         OnTogglePropertyGroup="@HandleTogglePropertyGroup"
         OnView="@HandleView"
         OnEdit="@HandleEdit"
-        OnDelete="@HandleDelete" />
+        OnDelete="@HandleDelete"
+        OnArchive="@HandleArchive"
+        OnRestore="@HandleRestore"
+        ShowArchived="@_showArchived" />
     
     @if (totalPages > 1 && !groupByProperty)
     {
@@ -164,6 +171,28 @@ else
     }
 }
 
+<ActionConfirmModal
+    IsVisible="@_showArchiveModal"
+    Variant="warning"
+    Title="Archive Lease"
+    Message="This record will be hidden from daily operations. You can restore it at any time."
+    ConfirmText="Archive"
+    Cascade="@_cascade"
+    IsProcessing="@_isProcessing"
+    OnConfirm="ConfirmArchive"
+    OnCancel="CloseModals" />
+
+<ActionConfirmModal
+    IsVisible="@_showDeleteModal"
+    Variant="danger"
+    Title="Delete Lease"
+    Message="This action is permanent and cannot be undone. Be sure to create a backup of your data if needed."
+    ConfirmText="Delete Permanently"
+    Cascade="@_cascade"
+    IsProcessing="@_isProcessing"
+    OnConfirm="ConfirmDelete"
+    OnCancel="CloseModals" />
+
 @code {
     [Parameter]
     [SupplyParameterFromQuery]
@@ -186,7 +215,7 @@ else
     private IEnumerable<IGrouping<Guid, Lease>> groupedLeases = Enumerable.Empty<IGrouping<Guid, Lease>>();
     private HashSet<int> expandedProperties = new();
     private string searchTerm = string.Empty;
-    private string selectedLeaseStatus = string.Empty;
+    private string selectedLeaseStatus = LeaseStatuses.Active;
     private Guid? selectedTenantId;
     private List<Tenant>? availableTenants;
     private int activeCount = 0;
@@ -198,6 +227,14 @@ else
     
     // Paging variables
     private int currentPage = 1;
+
+    // Archive/Delete modal state
+    private Guid _pendingId;
+    private CascadeSummary? _cascade;
+    private bool _showArchiveModal;
+    private bool _showDeleteModal;
+    private bool _isProcessing;
+    private bool _showArchived;
     private int pageSize = 10;
     private int totalPages = 1;
     private int totalRecords = 0;
@@ -262,7 +299,9 @@ else
             return;
         }
 
-        var allLeases = await LeaseService.GetLeasesWithRelationsAsync();
+        var allLeases = _showArchived
+            ? await LeaseService.GetArchivedLeasesWithRelationsAsync()
+            : await LeaseService.GetLeasesWithRelationsAsync();
         leases = allLeases
             .Where(l => 
                    (!TenantId.HasValue || l.TenantId == TenantId.Value) &&
@@ -360,6 +399,13 @@ else
         FilterLeases();
         await Task.CompletedTask;
     }
+
+    private async Task HandleShowArchivedChanged(bool value)
+    {
+        _showArchived = value;
+        await LoadLeases();
+        FilterLeases();
+    }
     
     private async Task HandleSort((string Column, bool Ascending) sort)
     {
@@ -390,7 +436,19 @@ else
     
     private async Task HandleDelete(Guid leaseId)
     {
-        await DeleteLease(leaseId);
+        await ShowDeleteModal(leaseId);
+    }
+
+    private async Task HandleArchive(Guid leaseId)
+    {
+        await ShowArchiveModal(leaseId);
+    }
+
+    private async Task HandleRestore(Guid leaseId)
+    {
+        await LeaseService.RestoreAsync(leaseId);
+        await LoadLeases();
+        FilterLeases();
     }
     
     private void TogglePropertyGroup(Guid propertyId)
@@ -444,15 +502,15 @@ else
     {
         if (filteredLeases != null && filteredLeases.Any())
         {
-            activeCount = filteredLeases.Count(l => l.Status == "Active");
+            activeCount = filteredLeases.Count(l => ApplicationConstants.LeaseStatuses.ActiveStatuses.Contains(l.Status));
             
             // Expiring within 90 days
             var ninetyDaysFromNow = DateTime.Now.AddDays(90);
             expiringSoonCount = filteredLeases.Count(l => 
-                l.Status == "Active" && l.EndDate <= ninetyDaysFromNow);
+                ApplicationConstants.LeaseStatuses.ActiveStatuses.Contains(l.Status) && l.EndDate <= ninetyDaysFromNow);
             
             totalMonthlyRent = filteredLeases
-                .Where(l => l.Status == "Active")
+                .Where(l => ApplicationConstants.LeaseStatuses.ActiveStatuses.Contains(l.Status))
                 .Sum(l => l.MonthlyRent);
         }
         else
@@ -463,24 +521,33 @@ else
         }
     }
 
-    private void ViewLeaseOffers()
-    {
-        NavigationManager.NavigateTo("/propertymanagement/leaseoffers");
-    }
-
     private void CreateLease()
     {
-        NavigationManager.NavigateTo("/propertymanagement/leaseoffers");
+        NavigationManager.NavigateTo("/propertymanagement/leases/create");
     }
 
     private void CreateLeaseForTenant()
     {
-        NavigationManager.NavigateTo("/propertymanagement/leaseoffers");
+        if (TenantId.HasValue)
+        {
+            NavigationManager.NavigateTo($"/propertymanagement/leases/create?tenantId={TenantId.Value}");
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/propertymanagement/leases/create");
+        }
     }
 
     private void CreateLeaseForProperty()
     {
-        NavigationManager.NavigateTo("/propertymanagement/leaseoffers");
+        if (PropertyId.HasValue)
+        {
+            NavigationManager.NavigateTo($"/propertymanagement/leases/create?propertyId={PropertyId.Value}");
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/propertymanagement/leases/create");
+        }
     }
 
     private void ClearFilter()
@@ -507,17 +574,47 @@ else
 
     private async Task DeleteLease(Guid id)
     {
-        var authState = await AuthenticationStateTask;
-        var userId = authState.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-        
-        if (string.IsNullOrEmpty(userId))
-            return;
+        await ShowDeleteModal(id);
+    }
 
-        var confirmed = await JSRuntime.InvokeAsync<bool>("confirm", $"Are you sure you want to delete lease {id}?");
-        if (!confirmed)
-            return;
+    private async Task ShowArchiveModal(Guid id)
+    {
+        _pendingId = id;
+        _cascade = await LeaseService.GetArchiveCascadeSummaryAsync(id);
+        _showArchiveModal = true;
+    }
 
-        await LeaseService.DeleteAsync(id);
+    private async Task ShowDeleteModal(Guid id)
+    {
+        _pendingId = id;
+        _cascade = await LeaseService.GetDeleteCascadeSummaryAsync(id);
+        _showDeleteModal = true;
+    }
+
+    private async Task ConfirmArchive()
+    {
+        _isProcessing = true;
+        await LeaseService.ArchiveAsync(_pendingId);
+        _isProcessing = false;
+        CloseModals();
         await LoadLeases();
+        FilterLeases();
+    }
+
+    private async Task ConfirmDelete()
+    {
+        _isProcessing = true;
+        await LeaseService.DeleteAsync(_pendingId);
+        _isProcessing = false;
+        CloseModals();
+        await LoadLeases();
+        FilterLeases();
+    }
+
+    private void CloseModals()
+    {
+        _showArchiveModal = false;
+        _showDeleteModal = false;
+        _cascade = null;
     }
 }

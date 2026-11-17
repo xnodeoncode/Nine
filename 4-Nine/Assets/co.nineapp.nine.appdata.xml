@@ -4,7 +4,7 @@
   <metadata_license>MIT</metadata_license>
   <project_license>MIT</project_license>
   <name>Nine</name>
-  <summary>Property management perfected for portfolios of up to nine properties</summary>
+  <summary>Property management for portfolios of up to nine properties</summary>
   
   <description>
     <p>
@@ -14,18 +14,15 @@
     </p>
     <p>Key Features:</p>
     <ul>
-      <li>Property Management - Track up to 9 residential properties with photos and documents</li>
-      <li>Tenant Lifecycle - Complete prospect-to-tenant journey with digital applications and screening</li>
-      <li>Lease Management - Digital lease creation with acceptance tracking and multi-lease support</li>
-      <li>Financial Management - Automated rent invoicing, payment tracking, and late fee application</li>
-      <li>Maintenance Tracking - Work order management with vendor assignment and scheduling</li>
-      <li>Inspections - Comprehensive 26-item checklist with PDF report generation</li>
-      <li>Security Deposit Investment - Track annual dividends distributed to tenants</li>
-      <li>Multi-user Support - Role-based access control for administrators and property managers</li>
+      <li>Property Management - Track up to 9 residential properties</li>
+      <li>Tenant Management</li>
+      <li>Lease Management</li>
+      <li>Financial Management - Invoicing, payment tracking, and late fee application</li>
+      <li>Repairs Tracking - Capture and track repair requests</li>
+      <li>Inspections - Comprehensive checklist with PDF report generation</li>
     </ul>
     <p>
-      Perfect for independent landlords, property owners who self-manage their rentals, and anyone seeking 
-      affordable, easy-to-use property management software.
+      Perfect for independent landlords, property owners who self-manage their rentals, and anyone seeking an easy-to-use property management software.
     </p>
   </description>
   
@@ -34,33 +31,33 @@
   <screenshots>
     <screenshot type="default">
       <caption>Dashboard with property overview and metrics</caption>
-      <image>https://raw.githubusercontent.com/xnodeoncode/nine/main/Documentation/Screenshots/dashboard.png</image>
+      <image>https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/Screenshots/dashboard.png</image>
     </screenshot>
     <screenshot>
       <caption>Property management interface</caption>
-      <image>https://raw.githubusercontent.com/xnodeoncode/nine/main/Documentation/Screenshots/properties.png</image>
+      <image>https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/Screenshots/properties.png</image>
     </screenshot>
     <screenshot>
       <caption>Lease workflow and tenant management</caption>
-      <image>https://raw.githubusercontent.com/xnodeoncode/nine/main/Documentation/Screenshots/lease.png</image>
+      <image>https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/Screenshots/lease.png</image>
     </screenshot>
     <screenshot>
       <caption>Invoice and payment tracking</caption>
-      <image>https://raw.githubusercontent.com/xnodeoncode/nine/main/Documentation/Screenshots/invoice.png</image>
+      <image>https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/Screenshots/invoice.png</image>
     </screenshot>
      <screenshot>
       <caption>Calendar list</caption>
-      <image>https://raw.githubusercontent.com/xnodeoncode/nine/main/Documentation/Screenshots/calendar.png</image>
+      <image>https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/Screenshots/calendar.png</image>
     </screenshot>
      <screenshot>
       <caption>Routine Inspections</caption>
-      <image>https://raw.githubusercontent.com/xnodeoncode/nine/main/Documentation/Screenshots/inspection.png</image>
+      <image>https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/Screenshots/inspection.png</image>
     </screenshot>
   </screenshots>
   
   <url type="homepage">https://www.nineapp.co</url>
-  <url type="bugtracker">https://github.com/xnodeoncode/nine/issues</url>
-  <url type="help">https://github.com/xnodeoncode/nine/blob/main/README.md</url>
+  <url type="bugtracker">https://github.com/xnodeoncode/Nine/issues</url>
+  <url type="help">https://github.com/xnodeoncode/Nine/blob/main/README.md</url>
   
   <developer id="com.github.xnodeoncode">
     <name>xnodeoncode</name>
@@ -71,17 +68,15 @@
   </provides>
   
   <releases>
-    <release version="1.0.0" date="2026-03-02">
+    <release version="1.2.0" date="2026-11-11">
       <description>
-        <p>Initial release of Nine. — property management desktop application.</p>
+        <p>Nine — property management desktop application.</p>
         <ul>
           <li>Complete property, tenant, and lease management</li>
-          <li>Automated invoicing and payment tracking</li>
-          <li>Maintenance request tracking with vendor management</li>
+          <li>Invoicing and payment tracking</li>
+          <li>Repair tracking</li>
           <li>Comprehensive property inspections with PDF reports</li>
-          <li>Security deposit investment tracking with dividends</li>
-          <li>Multi-user support with role-based access control</li>
-          <li>Linux AppImage with 2-second startup (performance optimized)</li>
+          <li>Role-based access control</li>
         </ul>
       </description>
     </release>

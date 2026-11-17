@@ -55,98 +55,6 @@
                 </div>
             </div>
 
-            <!-- Email Notifications -->
-            <div class="card mb-4 opacity-75">
-                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">
-                        <i class="bi bi-envelope-fill me-2"></i>Email Notifications
-                    </h5>
-                    <span class="badge bg-warning text-dark">
-                        <i class="bi bi-clock-history me-1"></i>Coming Soon
-                    </span>
-                </div>
-                <div class="card-body">
-                    <div class="alert alert-warning mb-3">
-                        <i class="bi bi-info-circle me-2"></i>
-                        <strong>Email notifications are coming soon!</strong> This feature requires email service integration and will be enabled in a future release.
-                    </div>
-                    <div class="form-check form-switch mb-3">
-                        <input class="form-check-input" type="checkbox" id="enableEmail" disabled />
-                        <label class="form-check-label text-muted" for="enableEmail">
-                            <strong>Enable email notifications</strong>
-                            <small class="d-block">Receive notifications via email (Coming Soon)</small>
-                        </label>
-                    </div>
-                </div>
-            </div>
-
-            <!-- SMS Notifications -->
-            <div class="card mb-4 opacity-75">
-                <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">
-                        <i class="bi bi-phone-fill me-2"></i>SMS Notifications
-                    </h5>
-                    <span class="badge bg-warning text-dark">
-                        <i class="bi bi-clock-history me-1"></i>Coming Soon
-                    </span>
-                </div>
-                <div class="card-body">
-                    <div class="alert alert-warning mb-3">
-                        <i class="bi bi-info-circle me-2"></i>
-                        <strong>SMS notifications are coming soon!</strong> This feature requires SMS service integration and will be enabled in a future release.
-                    </div>
-                    <div class="form-check form-switch mb-3">
-                        <input class="form-check-input" type="checkbox" id="enableSMS" disabled />
-                        <label class="form-check-label text-muted" for="enableSMS">
-                            <strong>Enable SMS notifications</strong>
-                            <small class="d-block">Receive urgent notifications via text message (Coming Soon)</small>
-                        </label>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Digest Preferences -->
-            <div class="card mb-4 opacity-75">
-                <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">
-                        <i class="bi bi-newspaper me-2"></i>Digest Preferences
-                    </h5>
-                    <span class="badge bg-warning text-dark">
-                        <i class="bi bi-clock-history me-1"></i>Coming Soon
-                    </span>
-                </div>
-                <div class="card-body">
-                    <div class="alert alert-warning">
-                        <i class="bi bi-info-circle me-2"></i>
-                        <strong>Digest notifications are coming soon!</strong> This feature requires email service integration and will be enabled in a future release.
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-4">
-                            <h6 class="mb-3">Daily Digest</h6>
-                            <div class="form-check form-switch mb-3">
-                                <input type="checkbox" class="form-check-input" id="enableDaily" disabled />
-                                <label class="form-check-label" for="enableDaily">
-                                    <strong>Enable daily digest</strong>
-                                    <small class="d-block text-muted">Receive a summary of notifications once per day (Coming Soon)</small>
-                                </label>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6 mb-4">
-                            <h6 class="mb-3">Weekly Digest</h6>
-                            <div class="form-check form-switch mb-3">
-                                <input type="checkbox" class="form-check-input" id="enableWeekly" disabled />
-                                <label class="form-check-label" for="enableWeekly">
-                                    <strong>Enable weekly digest</strong>
-                                    <small class="d-block text-muted">Receive a summary of notifications once per week (Coming Soon)</small>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <!-- Action Buttons -->
             <div class="card">
                 <div class="card-body">
@@ -185,13 +93,6 @@
     private bool isLoading = true;
     private bool isSaving = false;
 
-    // Helper property for time binding (InputDate doesn't bind TimeSpan directly)
-    private DateTime DailyDigestTimeValue
-    {
-        get => DateTime.Today.Add(preferences?.DailyDigestTime ?? new TimeSpan(9, 0, 0));
-        set => preferences!.DailyDigestTime = value.TimeOfDay;
-    }
-
     protected override async Task OnInitializedAsync()
     {
         try
@@ -217,14 +118,11 @@
         
         try
         {
-            Console.WriteLine($"Saving preferences - EnableInApp: {preferences.EnableInAppNotifications}, EnableEmail: {preferences.EnableEmailNotifications}");
-            await NotificationService.UpdateUserPreferencesAsync(preferences);
-            Console.WriteLine("Preferences saved successfully");
+                await NotificationService.UpdateUserPreferencesAsync(preferences);
             ToastService.ShowSuccess("Notification preferences saved successfully!");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error saving preferences: {ex.Message}");
             ToastService.ShowError($"Failed to save preferences: {ex.Message}");
         }
         finally
@@ -243,21 +141,6 @@
 
         // Reset to defaults
         preferences.EnableInAppNotifications = true;
-        preferences.EnableEmailNotifications = true;
-        preferences.EnableSMSNotifications = false;
-        preferences.EmailLeaseExpiring = true;
-        preferences.EmailPaymentDue = true;
-        preferences.EmailPaymentReceived = true;
-        preferences.EmailApplicationStatusChange = true;
-        preferences.EmailMaintenanceUpdate = true;
-        preferences.EmailInspectionScheduled = true;
-        preferences.SMSPaymentDue = false;
-        preferences.SMSMaintenanceEmergency = true;
-        preferences.SMSLeaseExpiringUrgent = false;
-        preferences.EnableDailyDigest = false;
-        preferences.DailyDigestTime = new TimeSpan(9, 0, 0);
-        preferences.EnableWeeklyDigest = false;
-        preferences.WeeklyDigestDay = DayOfWeek.Monday;
 
         await SavePreferences();
     }

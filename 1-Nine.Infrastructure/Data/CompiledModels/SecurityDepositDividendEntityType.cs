@@ -2,10 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using Nine.Core.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Nine.Core.Entities;
 
 #pragma warning disable 219, 612, 618
 #nullable disable
@@ -21,7 +21,7 @@ namespace Nine.Infrastructure.Data.CompiledModels
                 "Nine.Core.Entities.SecurityDepositDividend",
                 typeof(SecurityDepositDividend),
                 baseEntityType,
-                propertyCount: 24,
+                propertyCount: 27,
                 navigationCount: 4,
                 foreignKeyCount: 4,
                 unnamedIndexCount: 6,
@@ -34,6 +34,21 @@ namespace Nine.Infrastructure.Data.CompiledModels
                 fieldInfo: typeof(BaseModel).GetField("<Id>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 afterSaveBehavior: PropertySaveBehavior.Throw,
                 sentinel: new Guid("00000000-0000-0000-0000-000000000000"));
+
+            var archivedBy = runtimeEntityType.AddProperty(
+                "ArchivedBy",
+                typeof(string),
+                propertyInfo: typeof(BaseModel).GetProperty("ArchivedBy", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(BaseModel).GetField("<ArchivedBy>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                nullable: true,
+                maxLength: 100);
+
+            var archivedOn = runtimeEntityType.AddProperty(
+                "ArchivedOn",
+                typeof(DateTime?),
+                propertyInfo: typeof(BaseModel).GetProperty("ArchivedOn", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(BaseModel).GetField("<ArchivedOn>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                nullable: true);
 
             var baseDividendAmount = runtimeEntityType.AddProperty(
                 "BaseDividendAmount",
@@ -82,6 +97,13 @@ namespace Nine.Infrastructure.Data.CompiledModels
                 propertyInfo: typeof(SecurityDepositDividend).GetProperty("InvestmentPoolId", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(SecurityDepositDividend).GetField("<InvestmentPoolId>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: new Guid("00000000-0000-0000-0000-000000000000"));
+
+            var isArchived = runtimeEntityType.AddProperty(
+                "IsArchived",
+                typeof(bool),
+                propertyInfo: typeof(BaseModel).GetProperty("IsArchived", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(BaseModel).GetField("<IsArchived>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                sentinel: false);
 
             var isDeleted = runtimeEntityType.AddProperty(
                 "IsDeleted",

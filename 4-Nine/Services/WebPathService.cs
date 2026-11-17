@@ -40,7 +40,7 @@ public class WebPathService : IPathService
         
         if (string.IsNullOrEmpty(dbPath))
         {
-            dbPath = "aquiis.db"; // Default
+            dbPath = "nine.db"; // Default
         }
         
         // Make absolute path if relative

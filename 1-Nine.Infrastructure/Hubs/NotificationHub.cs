@@ -26,7 +26,7 @@ public class NotificationHub : Hub
     public override async Task OnConnectedAsync()
     {
         var userId = Context.User?.Identity?.Name;
-        _logger.LogInformation($"User {userId} connected to NotificationHub with ConnectionId: {Context.ConnectionId}");
+        _logger.LogDebug($"User {userId} connected to NotificationHub with ConnectionId: {Context.ConnectionId}");
         await base.OnConnectedAsync();
     }
 
@@ -37,7 +37,7 @@ public class NotificationHub : Hub
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
         var userId = Context.User?.Identity?.Name;
-        _logger.LogInformation($"User {userId} disconnected from NotificationHub. ConnectionId: {Context.ConnectionId}");
+        _logger.LogDebug($"User {userId} disconnected from NotificationHub. ConnectionId: {Context.ConnectionId}");
         if (exception != null)
         {
             _logger.LogError(exception, $"User {userId} disconnected with error");

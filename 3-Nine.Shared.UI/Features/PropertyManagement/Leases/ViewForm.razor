@@ -268,7 +268,7 @@ else
                         <button class="btn btn-outline-secondary" @onclick="ViewDocuments">
                             <i class="bi bi-folder"></i> View Documents
                         </button>
-                        @if (lease.DocumentId == null)
+                        @if (document == null)
                         {
                             <button class="btn btn-outline-warning" @onclick="GenerateLeaseDocument" disabled="@isGenerating">
                                 @if (isGenerating)
@@ -740,11 +740,9 @@ else
             .Take(5)
             .ToList();
 
-        // Load the document if it exists
-        if (lease.DocumentId != null)
-        {
-            document = await DocumentService.GetByIdAsync(lease.DocumentId.Value);
-        }
+        // Load the lease agreement document if one has been generated
+        var leaseDocuments = await DocumentService.GetDocumentsByLeaseIdAsync(lease.Id);
+        document = leaseDocuments.FirstOrDefault(d => d.DocumentType == ApplicationConstants.DocumentTypes.LeaseAgreement);
     }
 
     private string GetStatusBadgeClass(string status)
@@ -1198,11 +1196,6 @@ else
 
             // Save to database
             await DocumentService.CreateAsync(document);
-
-            // Update lease with DocumentId
-            lease.DocumentId = document.Id;
-            
-            await LeaseService.UpdateAsync(lease);
 
             // Reload lease and document
             await LoadLease();

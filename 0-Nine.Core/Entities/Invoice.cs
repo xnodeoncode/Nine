@@ -65,7 +65,7 @@ namespace Nine.Core.Entities
     public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
 
         // Computed properties
-        public decimal BalanceDue => Amount - AmountPaid;
+        public decimal BalanceDue => Amount + (LateFeeAmount ?? 0) - AmountPaid;
         public bool IsOverdue => Status != "Paid" && DueOn < DateTime.Now;
         public int DaysOverdue => IsOverdue ? (DateTime.Now - DueOn).Days : 0;
     }

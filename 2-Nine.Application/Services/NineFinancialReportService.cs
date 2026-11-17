@@ -20,6 +20,35 @@ public class NineFinancialReportService
     }
 
     /// <summary>
+    /// Raw sums of actual ExpensePayment amounts by PropertyExpense.ExpenseType for
+    /// the given period. This app only captures and sums what was recorded — it
+    /// does not compute tax-deductible portions (e.g. mortgage interest vs.
+    /// principal); export these sums to a proper financial/tax tool for that.
+    /// </summary>
+    private static async Task<Dictionary<string, decimal>> GetActualFixedExpensesByCategoryAsync(
+        ApplicationDbContext context, Guid organizationId, Guid? propertyId, DateTime startDate, DateTime endDate)
+    {
+        var query = context.Set<ExpensePayment>()
+            .Include(p => p.ExpenseDue)
+            .ThenInclude(d => d!.PropertyExpense)
+            .Where(p => !p.IsDeleted &&
+                       p.OrganizationId == organizationId &&
+                       p.PaidOn >= startDate &&
+                       p.PaidOn <= endDate);
+
+        if (propertyId.HasValue)
+        {
+            query = query.Where(p => p.ExpenseDue!.PropertyId == propertyId.Value);
+        }
+
+        var payments = await query.ToListAsync();
+
+        return payments
+            .GroupBy(p => p.ExpenseDue!.PropertyExpense!.ExpenseType)
+            .ToDictionary(g => g.Key, g => g.Sum(p => p.AmountPaid));
+    }
+
+    /// <summary>
     /// Generate income statement for a specific period and optional property.
     /// Uses Repairs for expense tracking (Nine approach).
     /// </summary>
@@ -80,15 +109,19 @@ public class NineFinancialReportService
 
         var repairs = await repairsQuery.ToListAsync();
 
-        // All repair costs go to MaintenanceExpenses
-        statement.MaintenanceExpenses = repairs.Sum(r => r.Cost);
+        var fixedExpenses = await GetActualFixedExpensesByCategoryAsync(context, organizationId, propertyId, startDate, endDate);
+        decimal GetCategory(string type) => fixedExpenses.TryGetValue(type, out var amt) ? amt : 0m;
 
-        // Other expense categories are currently zero (no data tracked for these yet)
-        statement.UtilityExpenses = 0;
-        statement.InsuranceExpenses = 0;
-        statement.TaxExpenses = 0;
-        statement.ManagementFees = 0;
-        statement.OtherExpenses = 0;
+        // Maintenance & Repairs combines ad hoc Repairs with recurring PropertyExpense
+        // "Maintenance" entries (e.g. a lawn/pest contract) — both are genuine upkeep
+        // costs, not a double count of the same expense.
+        statement.MaintenanceExpenses = repairs.Sum(r => r.Cost) + GetCategory(ApplicationConstants.PropertyExpenseTypes.Maintenance);
+        statement.UtilityExpenses = GetCategory(ApplicationConstants.PropertyExpenseTypes.Utilities);
+        statement.InsuranceExpenses = GetCategory(ApplicationConstants.PropertyExpenseTypes.Insurance);
+        statement.TaxExpenses = GetCategory(ApplicationConstants.PropertyExpenseTypes.PropertyTax);
+        statement.ManagementFees = 0; // No PropertyExpense category maps to this yet
+        statement.MortgageExpenses = GetCategory(ApplicationConstants.PropertyExpenseTypes.Mortgage);
+        statement.OtherExpenses = GetCategory(ApplicationConstants.PropertyExpenseTypes.HOA) + GetCategory(ApplicationConstants.PropertyExpenseTypes.Other);
 
         return statement;
     }
@@ -122,8 +155,8 @@ public class NineFinancialReportService
                            p.PaidOn <= endDate)
                 .SumAsync(p => p.Amount);
 
-            // Calculate expenses from repairs (Nine approach)
-            var expenses = await context.Repairs
+            // Calculate expenses from repairs (Nine approach) plus actual fixed expenses
+            var repairCost = await context.Repairs
                 .Where(r => !r.IsDeleted &&
                            r.PropertyId == property.Id &&
                            r.OrganizationId == organizationId &&
@@ -133,16 +166,17 @@ public class NineFinancialReportService
                            r.Cost > 0)
                 .SumAsync(r => r.Cost);
 
+            var fixedExpenses = await GetActualFixedExpensesByCategoryAsync(context, organizationId, property.Id, startDate, endDate);
+            var expenses = repairCost + fixedExpenses.Values.Sum();
+
             // Calculate occupancy days
-            // Include occupied lease statuses: Active, Renewed, Month-to-Month, Notice Given
-            // Also include Terminated to count actual days occupied before move-out
+            // Include active leases (IsActive covers Accepted/MonthToMonth/NoticeGiven/Pending/Offered),
+            // renewed (historical), and terminated (to count actual days occupied before move-out)
             var leases = await context.Leases
                 .Where(l => l.PropertyId == property.Id &&
                            !l.IsDeleted &&
-                           (l.Status == ApplicationConstants.LeaseStatuses.Active || 
-                            l.Status == ApplicationConstants.LeaseStatuses.Renewed ||
-                            l.Status == ApplicationConstants.LeaseStatuses.MonthToMonth ||
-                            l.Status == ApplicationConstants.LeaseStatuses.NoticeGiven ||
+                           (l.IsActive ||
+                            l.Status == ApplicationConstants.LeaseStatuses.Terminated ||
                             l.Status == ApplicationConstants.LeaseStatuses.Terminated) &&
                            l.StartDate <= endDate)
                 .ToListAsync();
@@ -236,6 +270,18 @@ public class NineFinancialReportService
 
             var totalRepairCost = repairExpenses.Sum(r => r.Cost);
 
+            var fixedExpenses = await GetActualFixedExpensesByCategoryAsync(context, organizationId, property.Id, startDate, endDate);
+            decimal GetCategory(string type) => fixedExpenses.TryGetValue(type, out var amt) ? amt : 0m;
+
+            var insurance = GetCategory(ApplicationConstants.PropertyExpenseTypes.Insurance);
+            var taxes = GetCategory(ApplicationConstants.PropertyExpenseTypes.PropertyTax);
+            var utilities = GetCategory(ApplicationConstants.PropertyExpenseTypes.Utilities);
+            // Raw captured Mortgage amount (principal + interest) — use Form 1098, Box 1
+            // for the actual tax-deductible interest portion; this app does not compute amortization.
+            var mortgage = GetCategory(ApplicationConstants.PropertyExpenseTypes.Mortgage);
+            var repairs = totalRepairCost + GetCategory(ApplicationConstants.PropertyExpenseTypes.Maintenance);
+            var other = GetCategory(ApplicationConstants.PropertyExpenseTypes.HOA) + GetCategory(ApplicationConstants.PropertyExpenseTypes.Other);
+
             var taxReport = new TaxReportData
             {
                 Year = year,
@@ -244,21 +290,24 @@ public class NineFinancialReportService
                 TotalRentIncome = rentIncome,
                 DepreciationAmount = depreciationAmount,
 
-                // Currently only repairs are tracked
+                // Advertising, Cleaning, Legal, Management, and Supplies have no dedicated
+                // PropertyExpenseType by design — Cleaning rolls into Repairs (Maintenance type)
+                // and the rest roll into Other if entered; Auto/travel is a business-level
+                // expense, out of scope for per-property tracking, so it stays $0.
                 Advertising = 0,
                 Cleaning = 0,
-                Insurance = 0,
+                Insurance = insurance,
                 Legal = 0,
                 Management = 0,
-                MortgageInterest = 0,
-                Repairs = totalRepairCost, // All repair costs
+                MortgageExpense = mortgage,
+                Repairs = repairs,
                 Supplies = 0,
-                Taxes = 0,
-                Utilities = 0,
-                Other = 0
+                Taxes = taxes,
+                Utilities = utilities,
+                Other = other
             };
 
-            taxReport.TotalExpenses = totalRepairCost;
+            taxReport.TotalExpenses = insurance + taxes + utilities + mortgage + repairs + other;
 
             taxReports.Add(taxReport);
         }

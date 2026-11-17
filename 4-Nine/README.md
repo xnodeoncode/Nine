@@ -1,4 +1,4 @@
-# Nine - Property Management System
+# Nine. Property Management System
 
 ![.NET 10.0](https://img.shields.io/badge/.NET-10.0-blue)
 ![ASP.NET Core](https://img.shields.io/badge/ASP.NET%20Core-10.0-blueviolet)
@@ -6,86 +6,80 @@
 ![Entity Framework](https://img.shields.io/badge/Entity%20Framework-10.0-green)
 ![SQLite](https://img.shields.io/badge/Database-SQLite-lightblue)
 
-A comprehensive web-based property management system built with ASP.NET Core 10.0 and Blazor Server. Nine streamlines rental property management for property owners and managers with an intuitive interface and robust feature set.
+A comprehensive property management solution built with ASP.NET Core and Blazor Server. Nine streamlines rental property management for property owners and managers with an intuitive interface and robust feature set.
 
-## 🏢 Overview
+## Overview
 
-Nine is designed to simplify property management operations through a centralized platform that handles everything from property, tenant, and lease tracking to document storage and rental invoice and expense tracking. Built with modern web technologies including AI (GitHub Copilot and Claude Sonnet), it provides a responsive, secure, and scalable solution for DIY landlords and property managers.
+Nine. is designed to simplify property management operations through a centralized platform that handles everything from property, tenant, and lease tracking to document storage and rental invoice and expense tracking. Built with modern web technologies including AI (GitHub Copilot and Claude Sonnet), it provides a responsive, secure, and scalable solution for DIY landlords and property managers.
 
-## ✨ Key Features
+## Key Features
 
-### 🏠 Property Management
+### Property Management
 
 - **Property Portfolio** - Comprehensive property listings with detailed information
 - **Property Details** - Address, type, rent, bedrooms, bathrooms, square footage
 - **Availability Tracking** - Real-time property availability status
-- **Property Photos** - Image management and gallery support
-- **Search & Filter** - Advanced property search and filtering capabilities
-- **Property Analytics** - Dashboard with property performance metrics
+- **Property Analytics** - Dashboard with property performance metrics and reports
 
-### 👥 Tenant Management
+### Tenant Management
 
-- **Tenant Profiles** - Complete tenant information management
-- **Contact Management** - Phone, email, emergency contacts
-- **Tenant History** - Track tenant interactions and lease history
-- **Communication Tools** - Built-in messaging and notification system
+- **Tenant Profiles** - Complete tenant information management with phone, email, emergency contacts
+- **Communication Tools** - Automated in-app notifications on lease status and other events
 
-### 📄 Lease Management
+### Lease Management
 
 - **Lease Creation** - Digital lease agreement generation
 - **Lease Tracking** - Active, pending, expired, and terminated lease monitoring
 - **Rent Tracking** - Monthly rent amounts and payment schedules
-- **Security Deposits** - Deposit tracking and management
-- **Lease Renewals** - Manual lease renewal tracking
-- **Terms Management** - Flexible lease terms and conditions
+- **Security Deposits** - Security deposit tracking
+- **Lease Renewals** - Lease renewals and conversions to month-to-month tenancy
 
-### 💰 Financial Management
+### Financial Management
 
-- **Payment Tracking** - Rent payment monitoring and history
-- **Invoice Generation** - Automated invoice creation and delivery
-- **Payment Methods** - Multiple payment option support
-- **Financial Reporting** - Revenue and expense reporting
-- **Late Fee Management** - Automatic late fee calculation and tracking
-- **Security Deposit Tracking** - Deposit handling and return processing
+- **Payment Tracking** - Rent payment capture and generated PDF receipts.
+- **Invoice Generation** - Create invoices and generated PDF files for print and email delivery
+- **Payment Methods** - Record payments with multiple payment types
+- **Financial Reporting** - Revenue and expense reporting, property performance reporting
+- **Late Fee Management** - Automatic late fee calculation and invoice application
 
-### 📁 Document Management
+### Document Management
 
-- **File Storage** - Secure document upload and storage
-- **Document Categories** - Organized by type (leases, receipts, photos, etc.)
+- **File Storage** - Document generation, upload and storage
+- **Document Categories** - Organized by type (leases, receipts, inspections etc.)
 
-### 🔐 User Management & Security
+### User Management & Security
 
-- **Role-Based Access** - Administrator and Property Manager roles
+- **Role-Based Access** - Owner, Administrator and Property Manager roles
 - **Authentication** - Secure login with ASP.NET Core Identity
-- **User Profiles** - Comprehensive user account management
-- **Permission Management** - Granular access control
-- **Activity Tracking** - User login and activity monitoring
-- **Data Security** - Encrypted data storage and transmission
+- **User Profiles** - Comprehensive user account management with role management and lockout capabilities
+- **Permission Management** - Gated access control via role-based access
+- **Data Security** - Encrypted data storage
 
-### 🎛️ Administration Features
+### Administration Features
 
-- **User Administration** - Complete user account management
+- **User Administration** - Create, lockout, and revoke access for user accounts
 - **System Configuration** - Application settings and preferences
-- **Application Monitoring** - System health and performance tracking
-- **Backup Management** - Data backup and recovery tools
-- **Audit Logging** - Comprehensive activity and change tracking
+- **Application Monitoring** - Database health checks at startup and on demand
+- **Backup Management** - In-app data backup, recovery, and encryption features
+- **Audit Logging** - Record creation and change tracking
 
-## 🛠️ Technology Stack
+---
+
+## Technology Stack
 
 ### Backend
 
-- **Backend**: ASP.NET Core 10.0
+- **Backend**: ASP.NET Core
 - **UI Framework**: Blazor Server
-- **Database**: SQLite with Entity Framework Core 10.0
+- **Database**: SQLCipher (SQLite) with Entity Framework Core
 - **Authentication**: ASP.NET Core Identity
-- **Architecture**: Clean Architecture with vertical slice organization
 
 ### Frontend
 
 - **UI Components**: Blazor Server Components
 - **Styling**: Bootstrap 5 with custom CSS
 - **Icons**: Bootstrap Icons
-- **Responsive Design**: Mobile-first responsive layout
+- **Responsive Design**: Responsive layout compatible with some mobile environments
 - **Real-time Updates**: Blazor Server SignalR integration
 
 ### Development Tools
@@ -93,23 +87,37 @@ Nine is designed to simplify property management operations through a centralize
 - **IDE**: Visual Studio Code with C# extension
 - **Database Tools**: Entity Framework Core Tools
 - **Version Control**: Git with GitHub integration
-- **Package Management**: NuGet
+- **Package Management**: NuGet, libman
 - **Build System**: .NET SDK build system
 - **AI Assisted Coding**: GitHub Copilot, Claude Sonnet, GPT
 
-## 📋 Prerequisites
+### Distribution Channels
+
+- [GitHub Releases](https://github.com/xnodeoncode/Nine/releases)
+- [AppImagePool](https://appimage.github.io/AppImagePool/)
+
+---
+
+## Prerequisites
 
 - [.NET 10.0 SDK](https://dotnet.microsoft.com/download/dotnet/10.0)
+- [Node.js](https://nodejs.org/) (LTS) and npm, used once to download the Electron binary (see step 2)
 - [Git](https://git-scm.com/)
 - [Visual Studio Code](https://code.visualstudio.com/) (recommended) or Visual Studio 2022
 - [C# Dev Kit Extension](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csdevkit) for VS Code
+- A graphical desktop session. Nine runs in an Electron window and cannot run headless.
+- Development is supported on **Linux x64** and **Windows x64**.
 
-## 🚀 Quick Start
+**Optional tools:** [`dotnet-ef`](https://learn.microsoft.com/ef/core/cli/dotnet) (`dotnet tool install --global dotnet-ef`), only needed to change the database schema.
+
+---
+
+## Quick Start
 
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/xnodeoncode/nine.git
+git clone https://github.com/xnodeoncode/Nine.git
 cd Nine
 ```
 
@@ -119,189 +127,75 @@ cd Nine
 dotnet build
 ```
 
-### 3. Run Database Migrations
+**First build only:** if the build prints `[ElectronRestore] SETUP REQUIRED`, the Electron binary has not been downloaded yet. Run the following once, then build again:
+
+```bash
+cd 4-Nine/bin/Debug/net10.0/linux-x64/.electron   # on Windows, use the matching win-x64 output folder
+npm install
+cd ../../../../../..
+dotnet build
+```
+
+The exact folder is shown in the warning message. The downloaded Electron binary is cached in `~/.cache/electron` on Linux and `%LOCALAPPDATA%\electron\Cache` (`C:\Users\<username>\AppData\Local\electron\Cache`) on Windows, so later builds reuse it.
+
+### 3. Start the Electron application
 
 ```bash
 cd 4-Nine
-dotnet ef database update
-```
-
-### 4. Start the Development Server
-
-```bash
 dotnet run
 ```
 
-### 5. Access the Application
+The database is created and migrated automatically on first run.
 
-Open your browser and navigate to:
+### 4. Access the Application
 
-- **HTTPS**: https://localhost:7244
-- **HTTP**: http://localhost:5244
+The Electron splash screen, and then the application window, should load automatically. A new database opens to the home page, where you log in or register an account. The [Quick Start Guide](https://github.com/xnodeoncode/Nine/blob/main/Documentation/Quick-Start-Guide.md) walks through creating your first organization, property and lease.
 
-## 🔧 Development Setup
+To start over with a clean database, close Nine and delete the database file (`~/.config/Nine/app_v1.2.0.db` on Linux, `%APPDATA%\Nine\app_v1.2.0.db` on Windows, which is `C:\Users\<username>\AppData\Roaming\Nine`), or use **Reset Database** on the Manage Database page.
 
-### Visual Studio Code Setup
-
-The project includes pre-configured VS Code settings:
-
-1. Open the workspace file: `Nine.code-workspace`
-2. Install recommended extensions when prompted
-3. Use **F5** to start debugging
-4. Use **Ctrl+Shift+P** → "Tasks: Run Task" for build operations
-
-### Available Tasks
-
-- **build** - Debug build (default)
-- **build-release** - Release build
-- **watch** - Hot reload development
-- **publish** - Production publish
-- **clean** - Clean build artifacts
-
-### Database Management
-
-#### Manual Database Scripts
-
-SQL scripts for manual database operations are located in:
+### 5. Testing
 
 ```bash
-cd Infrastructure/Data/Scripts
-# Available scripts:
-# 00_InitialSchema.sql - Initial database schema
-# updateTenant.sql - Tenant table updates
+dotnet test Nine.sln
 ```
 
-#### Entity Framework Commands
+### Changing the database schema
 
-```bash
-# Create new migration
-dotnet ef migrations add [MigrationName]
+If you change an entity, you must add a migration, update the database, and regenerate the compiled model. Skipping the last step causes a runtime error. See **Schema Migrations & Model Optimization** in the [Database Management Guide](https://github.com/xnodeoncode/Nine/blob/main/Documentation/Database-Management-Guide.md) for the commands.
 
-# Update database
-dotnet ef database update
-
-# Remove last migration
-dotnet ef migrations remove
-```
-
-## 📁 Project Structure
-
-The application follows Clean Architecture principles with clear separation of concerns:
+## Project Structure
 
 ```
-4-Nine/
-├── Core/                                # Domain Layer (no dependencies)
-│   ├── Entities/                        # Domain models & business entities
-│   │   ├── BaseModel.cs                # Base entity with common properties
-│   │   ├── Property.cs                 # Property entity
-│   │   ├── Tenant.cs                   # Tenant entity
-│   │   ├── Lease.cs                    # Lease entity
-│   │   ├── SecurityDeposit.cs          # Security deposit entity
-│   │   └── ...                         # Other domain entities
-│   └── Constants/                       # Application constants
-│       ├── ApplicationConstants.cs
-│       └── ApplicationSettings.cs
-│
-├── Infrastructure/                      # Infrastructure Layer
-│   ├── Data/                           # Database & persistence
-│   │   ├── ApplicationDbContext.cs    # EF Core DbContext
-│   │   ├── Migrations/                # EF Core migrations (44 files)
-│   │   ├── Scripts/                   # SQL scripts for manual operations
-│   │   └── Backups/                   # Database backups
-│   └── Services/                       # External service implementations
-│
-├── Application/                         # Application Layer (business logic)
-│   └── Services/                       # Domain services
-│       ├── PropertyManagementService.cs
-│       ├── SecurityDepositService.cs
-│       ├── TenantConversionService.cs
-│       ├── FinancialReportService.cs
-│       ├── ChecklistService.cs
-│       ├── CalendarEventService.cs
-│       ├── NoteService.cs
-│       └── PdfGenerators/             # PDF generation services
-│           ├── LeasePdfGenerator.cs
-│           ├── InvoicePdfGenerator.cs
-│           ├── PaymentPdfGenerator.cs
-│           └── ...
-│
-├── Features/                          # Presentation Layer (Vertical Slices)
-│   ├── PropertyManagement/            # Property management features
-│   │   ├── Properties/                # Property CRUD & management
-│   │   ├── Tenants/                   # Tenant management
-│   │   ├── Leases/                    # Lease management
-│   │   ├── SecurityDeposits/          # Security deposit tracking
-│   │   ├── Payments/                  # Payment processing
-│   │   ├── Invoices/                  # Invoice management
-│   │   ├── Documents/                 # Document management
-│   │   ├── Inspections/               # Property inspections
-│   │   ├── MaintenanceRequests/       # Maintenance tracking
-│   │   ├── Applications/              # Rental applications
-│   │   ├── Checklists/                # Checklists & templates
-│   │   ├── Reports/                   # Financial & operational reports
-│   │   └── Calendar.razor             # Calendar view
-│   └── Administration/                # Admin features
-│       ├── Application/               # Application screening
-│       ├── PropertyManagement/        # Property admin
-│       ├── Settings/                  # System settings
-│       ├── Users/                     # User management
-│       └── Dashboard.razor
-│
-├── Shared/                            # Shared UI Layer
-│   ├── Layout/                        # Layout components
-│   │   ├── MainLayout.razor
-│   │   └── NavMenu.razor
-│   ├── Components/                    # Reusable UI components
-│   │   ├── Account/                   # Authentication components
-│   │   ├── Pages/                     # Shared pages (Home, About, Error)
-│   │   ├── NotesTimeline.razor
-│   │   ├── SessionTimeoutModal.razor
-│   │   └── ToastContainer.razor
-│   └── Services/                      # UI-specific services
-│       ├── ToastService.cs
-│       ├── ThemeService.cs
-│       ├── SessionTimeoutService.cs
-│       ├── UserContextService.cs
-│       └── DocumentService.cs
-│
-├── Components/                        # Root Blazor components
-│   ├── App.razor                      # App root component
-│   ├── Routes.razor                   # Routing configuration
-│   └── _Imports.razor                 # Global using directives
-│
-├── Utilities/                         # Helper utilities
-│   ├── CalendarEventRouter.cs
-│   └── SchedulableEntityRegistry.cs
-│
-├── wwwroot/                           # Static files
-│   ├── assets/                        # Images & static assets
-│   ├── js/                            # JavaScript files
-│   └── lib/                           # Client libraries
-│
-├── Program.cs                         # Application entry point
-├── appsettings.json                   # Configuration
-└── appsettings.Development.json       # Development config
+Nine/
+├── 0-Nine.Core/           # Domain entities and interfaces
+├── 1-Nine.Infrastructure/ # Data access and external services
+├── 2-Nine.Application/    # Business logic and services
+├── 3-Nine.Shared.UI/      # Shared Blazor components
+├── 4-Nine/                # Desktop application (Electron host)
+└── 6-Tests/               # Unit and integration tests
 ```
 
 ### Architecture Principles
 
-**Clean Architecture Layers:**
+**Layered Architecture:**
+
+Arrows mean "depends on". Every project can also use Core directly.
 
 ```
-Features → Application → Core
-    ↓
-Infrastructure → Core
-    ↓
-Shared → Core
+4-Nine (Features, Shared, Electron host)
+   └─▶ 3-Nine.Shared.UI
+          └─▶ 2-Nine.Application
+                 └─▶ 1-Nine.Infrastructure
+                        └─▶ 0-Nine.Core
 ```
 
 **Dependency Rules:**
 
-- ✅ **Core** has NO dependencies (pure domain logic)
-- ✅ **Infrastructure** depends only on Core (data access)
-- ✅ **Application** depends only on Core (business logic)
-- ✅ **Features** depends on Application + Core (UI features)
-- ✅ **Shared** depends on Core (cross-cutting UI)
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> **0-Nine.Core** has no dependencies (pure domain entities)
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> **1-Nine.Infrastructure** depends on Core (data access)
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> **2-Nine.Application** depends on Core and Infrastructure (business logic)
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> **3-Nine.Shared.UI** depends on Application and Core (reusable UI components)
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/check-circle-fill.svg" width="16" height="16" alt=""> **4-Nine** depends on Shared.UI, Application and Core (features, shared UI and the Electron host)
 
 **Benefits:**
 
@@ -311,18 +205,25 @@ Shared → Core
 - **Scalability**: Simple to add new features as vertical slices
 - **Reusability**: Domain and application layers can be shared across projects
 
-## 🔑 Default User Roles
+## User Roles
 
-The system includes two primary user roles:
+The system includes three user roles:
 
-### Administrator
+### Owner (first account created, represents business owner)
 
 - Full system access
 - User management capabilities
 - System configuration
 - All property management features
 
-### Property Manager
+### Administrator (same as owner, serves as a backup/co-owner account)
+
+- Full system access
+- User management capabilities
+- System configuration
+- All property management features
+
+### Property Manager (no access to application and organization management features)
 
 - Property portfolio management
 - Tenant management
@@ -330,105 +231,57 @@ The system includes two primary user roles:
 - Financial tracking
 - Document management
 
-## 🎯 Key Components
+## Application Limits
 
-### Property Management Service
+Nine. is intentionally constrained for an optimal user experience:
 
-Core business logic service in the Application layer:
+| Items             | Limit                          | Reason                                |
+| ----------------- | ------------------------------ | ------------------------------------- |
+| **Properties**    | Maximum 9                      | Focused workflows — it's our identity |
+| **Users**         | Maximum 4 (1 system + 3 login) | Simplified access control             |
+| **Organizations** | 1                              | Desktop application scope             |
+| **File uploads**  | 10 MB per file                 | Performance management                |
 
-- Property CRUD operations
-- Tenant management workflows
-- Lease tracking and renewals
-- Document handling and storage
-- Financial calculations
-- Entity relationship management
+## Contributing
 
-### Authentication & Authorization
+`main` is reserved for releases and is maintained by the project owner. Do not branch from it or open pull requests against it. All contributions go through `development`.
 
-- ASP.NET Core Identity integration
-- Role-based access control
-- Secure session management
-- Password policies
-- Account lockout protection
+1. **Fork** [xnodeoncode/Nine](https://github.com/xnodeoncode/Nine) on GitHub, clone your fork, and add the original repository as `upstream`:
 
-### Database Architecture
+   ```bash
+   git clone https://github.com/<your-account>/Nine.git
+   cd Nine
+   git remote add upstream https://github.com/xnodeoncode/Nine.git
+   ```
 
-- Entity Framework Core with SQLite
-- Code-first approach with migrations
-- Optimized indexing for performance
-- Foreign key constraints
-- Soft delete patterns
+2. **Start from an up-to-date `development`** and create a feature branch:
 
-## 📊 Dashboard Features
+   ```bash
+   git checkout development
+   git pull upstream development
+   git checkout -b feature/your-feature
+   ```
 
-### Property Manager Dashboard
+3. **Read [copilot-instructions.md](../.github/copilot-instructions.md)** before changing code. It describes the architecture, service patterns, organization isolation, soft delete, constants, dependency-injection registration and the database schema change process.
+4. **Make your changes** and add tests for new functionality.
+5. **Merge your feature branch into your fork's `development`, then build and test there.** Everything must pass before you submit:
 
-- Total properties count
-- Available properties metrics
-- Active lease tracking
-- Tenant statistics
-- Recent activity feed
-- Quick action buttons
+   ```bash
+   git checkout development
+   git merge feature/your-feature
+   dotnet build Nine.sln
+   dotnet test Nine.sln
+   git push origin development
+   ```
 
-### Administrator Dashboard
+6. **Open a pull request** from your fork's `development` to `development` in `xnodeoncode/Nine`.
 
-- User account metrics
-- System health monitoring
-- Application statistics
-- Administrative quick actions
-- Recent system activity
+**Branch flow:**
 
-## 🔧 Configuration
-
-### Application Settings
-
-Configuration is managed through:
-
-- `appsettings.json` - Base configuration
-- `appsettings.Development.json` - Development overrides
-- Environment variables
-- User secrets (for sensitive data)
-
-### Key Configuration Areas
-
-- Database connection strings
-- Authentication settings
-- File storage configuration
-- Email service settings
-- Application-specific settings
-
-## 🚀 Deployment
-
-### Prerequisites for Production
-
-- Windows/Linux server with .NET 10.0 runtime
-- IIS or reverse proxy (nginx/Apache)
-- SSL certificate for HTTPS
-- Database server (or SQLite for smaller deployments)
-
-### Build for Production
-
-```bash
-dotnet publish -c Release -o ./publish
 ```
-
-### Environment Variables
-
-Set the following for production:
-
-```bash
-ASPNETCORE_ENVIRONMENT=Production
-ASPNETCORE_URLS=https://+:443;http://+:80
-ConnectionStrings__DefaultConnection=[your-connection-string]
+feature/your-feature  ──merge──▶  your fork: development  ──pull request──▶  xnodeoncode/Nine: development
+                                  (build and test here)
 ```
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
 
 ### Development Guidelines
 
@@ -438,54 +291,60 @@ ConnectionStrings__DefaultConnection=[your-connection-string]
 - Add unit tests for new functionality
 - Ensure responsive design compatibility
 
-## 📄 License
+**Build and run:**
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+```bash
+dotnet build Nine.sln
 
-## 🆘 Support
+cd 4-Nine && dotnet watch
+```
 
-### Documentation
+**Linux note:** `dotnet watch` may fail with `The configured user limit (128) on the number of inotify instances has been reached`. This is the default on some distros. Raise the limit and run it again:
 
-- Check the `REVISIONS.md` file for recent changes
-- Review component-specific README files in subdirectories
-- Refer to ASP.NET Core and Blazor documentation
+```bash
+sudo sysctl fs.inotify.max_user_instances=512
+```
 
-### Common Issues
+This lasts until the next reboot. To make it permanent, add `fs.inotify.max_user_instances=512` to a file in `/etc/sysctl.d/`. See [inotify(7)](https://man7.org/linux/man-pages/man7/inotify.7.html) for what these limits control.
 
-1. **Database Connection Issues**: Verify SQLite file permissions and path
-2. **Build Errors**: Ensure .NET 10.0 SDK is installed
-3. **Authentication Problems**: Check Identity configuration and user roles
-4. **Performance Issues**: Review database indexing and query optimization
+## Versioning
 
-### Getting Help
+[Semantic Versioning](https://semver.org/):
 
-- Create an issue on GitHub for bugs
-- Check existing issues for known problems
-- Review the project documentation
-- Contact the development team
+- **MAJOR** = breaking/schema changes
+- **MINOR** = new features
+- **PATCH** = bug fixes
 
-## 🏗️ Roadmap
+**Current version:** 1.2.0 · **Database schema:** 1.2.0
 
-### Upcoming Features via Nine Professional
+## License
 
-- Mobile application support
-- Advanced reporting and analytics
-- Integration with accounting software
-- Automated rent collection
-- Multi-language support
-- IoT device integration
-- API for third-party integrations
+Copyright © 2026 CIS Guru. Licensed under the **MIT License** — see [LICENSE](https://github.com/xnodeoncode/Nine/blob/main/LICENSE) for details.
 
-### Performance Improvements
+### Third-Party Licenses
 
-- Database optimization
-- Caching implementation
-- Background job processing
-- File storage optimization
-- Search performance enhancements
+Nine. includes third-party components that are licensed separately. The full list, with the license text for each
+component, is in [Documentation/Third-Party-Licensing-Notices.md](https://github.com/xnodeoncode/Nine/blob/main/Documentation/Third-Party-Licensing-Notices.md), and the
+license texts are also installed with the application (see the About page, "Third-Party Licenses").
 
----
+**QuestPDF (PDF generation).** Nine. uses [QuestPDF](https://www.questpdf.com) to generate its PDF documents (leases,
+invoices, receipts, inspections, checklists and reports). QuestPDF is not covered by Nine's MIT license and has its own
+[license terms](https://www.questpdf.com/license/community.html). In summary, QuestPDF is free for organizations and
+individuals with annual gross revenue under USD 1,000,000, for charitable and qualifying academic organizations, and for
+open-source projects. Government and public-sector organizations and publicly traded companies require a paid QuestPDF
+license.
 
-**Nine** - Streamlining Property Management for the Modern World
+**You are responsible for confirming that you are eligible to use QuestPDF before installing or operating Nine.** If you
+are not eligible, obtain a license from QuestPDF or do not use Nine. This notice is informational and is not legal advice.
 
-Built with ❤️ using ASP.NET Core 10.0, Blazor Server, and AI Tools (GitHub Copilot and Claude Sonnet)
+## Support
+
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/globe.svg" width="16" height="16" alt=""> **Website:** [nineapp.co](https://nineapp.co/)
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/book.svg" width="16" height="16" alt=""> **Documentation:** [project documentation](https://github.com/xnodeoncode/Nine/tree/main/Documentation) and the [release notes](https://github.com/xnodeoncode/Nine/releases)
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/bug.svg" width="16" height="16" alt=""> **Bug Reports:** [GitHub Issues](https://github.com/xnodeoncode/Nine/issues)
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/lightbulb.svg" width="16" height="16" alt=""> **Feature Requests:** [GitHub Discussions](https://github.com/xnodeoncode/Nine/discussions)
+- <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/envelope.svg" width="16" height="16" alt=""> **Other Questions:** [cisguru@outlook.com](mailto:cisguru@outlook.com?subject=Nine%20Support%20-%20README) (private)
+
+## **Start with Nine.** <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/house.svg" width="16" height="16" alt="">
+
+Built with <img src="https://raw.githubusercontent.com/xnodeoncode/Nine/main/Documentation/images/icons/heart-fill.svg" width="16" height="16" alt=""> using ASP.NET Core 10.0, Blazor Server, and AI Tools (GitHub Copilot and Claude Sonnet)

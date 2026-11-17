@@ -23,6 +23,22 @@ public class RepairService : BaseService<Repair>
     }
 
     /// <summary>
+    /// Gets a repair by id with its Property eagerly loaded. Overridden because
+    /// BaseService.GetByIdAsync does not include any navigation properties by
+    /// default; without this, Repair.Property is only populated when another
+    /// already-Included query (e.g., the Repairs list) happens to have loaded
+    /// the same Property into this request's change tracker first.
+    /// </summary>
+    public override async Task<Repair?> GetByIdAsync(Guid id)
+    {
+        var organizationId = await _userContext.GetActiveOrganizationIdAsync();
+
+        return await _context.Repairs
+            .Include(r => r.Property)
+            .FirstOrDefaultAsync(r => r.Id == id && !r.IsDeleted && r.OrganizationId == organizationId);
+    }
+
+    /// <summary>
     /// Validates repair business rules before create/update.
     /// </summary>
     protected override async Task ValidateEntityAsync(Repair entity)
@@ -130,7 +146,21 @@ public class RepairService : BaseService<Repair>
         var orgId = await _userContext.GetActiveOrganizationIdAsync();
 
         return await _dbSet
-            .Where(r => !r.IsDeleted && r.OrganizationId == orgId)
+            .Where(r => !r.IsDeleted && !r.IsArchived && r.OrganizationId == orgId)
+            .Include(r => r.Property)
+            .OrderByDescending(r => r.CompletedOn ?? r.CreatedOn)
+            .ToListAsync();
+    }
+
+    /// <summary>
+    /// Gets all archived repairs for the active organization with Property navigation included.
+    /// </summary>
+    public override async Task<List<Repair>> GetArchivedAsync()
+    {
+        var orgId = await _userContext.GetActiveOrganizationIdAsync();
+
+        return await _dbSet
+            .Where(r => !r.IsDeleted && r.IsArchived && r.OrganizationId == orgId)
             .Include(r => r.Property)
             .OrderByDescending(r => r.CompletedOn ?? r.CreatedOn)
             .ToListAsync();

@@ -1,3 +1,4 @@
+using Nine.Application.Models;
 using Nine.Core.Interfaces.Services;
 using System.ComponentModel.DataAnnotations;
 using Nine.Core.Constants;
@@ -141,6 +142,20 @@ namespace Nine.Application.Services
                 throw new ValidationException($"A property with address '{property.Address}' already exists in this location.");
             }
 
+            // Inactive properties must have an inactive status (Off Market or Under Renovation)
+            if (!property.IsActive && !ApplicationConstants.PropertyStatuses.InactiveStatuses.Contains(property.Status))
+            {
+                throw new ValidationException(
+                    $"An inactive property must have a status of '{ApplicationConstants.PropertyStatuses.OffMarket}' or '{ApplicationConstants.PropertyStatuses.UnderRenovation}'.");
+            }
+
+            // Properties with an inactive status must be marked inactive
+            if (property.IsActive && ApplicationConstants.PropertyStatuses.InactiveStatuses.Contains(property.Status))
+            {
+                throw new ValidationException(
+                    $"A property with status '{property.Status}' must be marked as inactive.");
+            }
+
             await base.ValidateEntityAsync(property);
         }
 
@@ -211,7 +226,7 @@ namespace Nine.Application.Services
                                p.OrganizationId == organizationId)
                     .Where(p => !_context.Leases.Any(l =>
                         l.PropertyId == p.Id &&
-                        l.Status == Core.Constants.ApplicationConstants.LeaseStatuses.Active &&
+                        l.IsActive &&
                         !l.IsDeleted))
                     .ToListAsync();
             }
@@ -250,7 +265,7 @@ namespace Nine.Application.Services
                                     p.OrganizationId == organizationId &&
                                     _context.Leases.Any(l =>
                                         l.PropertyId == p.Id &&
-                                        l.Status == Core.Constants.ApplicationConstants.LeaseStatuses.Active &&
+                                        l.IsActive &&
                                         !l.IsDeleted));
 
                 return (decimal)occupiedProperties / totalProperties * 100;
@@ -280,15 +295,13 @@ namespace Nine.Application.Services
                 var endDate = startDate.AddYears(1).AddDays(-1);
 
                 // Get all leases for this property that overlap with the period
-                // Include all occupied statuses: Active, Renewed, Month-to-Month, Notice Given, Terminated
+                // Include active leases, renewed (historical), and terminated (for actual move-out)
                 var leases = await _context.Leases
                     .Where(l => l.PropertyId == propertyId &&
                                l.OrganizationId == organizationId &&
                                !l.IsDeleted &&
-                               (l.Status == ApplicationConstants.LeaseStatuses.Active || 
-                                l.Status == ApplicationConstants.LeaseStatuses.Renewed ||
-                                l.Status == ApplicationConstants.LeaseStatuses.MonthToMonth ||
-                                l.Status == ApplicationConstants.LeaseStatuses.NoticeGiven ||
+                               (l.IsActive ||
+                                l.Status == ApplicationConstants.LeaseStatuses.Terminated ||
                                 l.Status == ApplicationConstants.LeaseStatuses.Terminated) &&
                                l.StartDate <= endDate)
                     .ToListAsync();
@@ -381,10 +394,8 @@ namespace Nine.Application.Services
                         .Where(l => l.PropertyId == propertyId &&
                                    l.OrganizationId == organizationId &&
                                    !l.IsDeleted &&
-                                   (l.Status == ApplicationConstants.LeaseStatuses.Active || 
-                                    l.Status == ApplicationConstants.LeaseStatuses.Renewed ||
-                                    l.Status == ApplicationConstants.LeaseStatuses.MonthToMonth ||
-                                    l.Status == ApplicationConstants.LeaseStatuses.NoticeGiven ||
+                                   (l.IsActive ||
+                                    l.Status == ApplicationConstants.LeaseStatuses.Terminated ||
                                     l.Status == ApplicationConstants.LeaseStatuses.Terminated) &&
                                    l.StartDate <= endDate)
                         .ToListAsync();
@@ -556,7 +567,353 @@ namespace Nine.Application.Services
             }
         }
 
-       
+
+
+        #endregion
+
+        #region Archive / Unarchive Overrides
+
+        /// <summary>
+        /// Archives the property, sets it inactive with Off Market status, and cascade-archives
+        /// all active related records (leases, inspections, maintenance requests, documents).
+        /// </summary>
+        public override async Task<bool> ArchiveAsync(Guid id)
+        {
+            var result = await base.ArchiveAsync(id);
+
+            if (result)
+            {
+                var property = await _dbSet.FirstOrDefaultAsync(p => p.Id == id);
+                if (property != null)
+                {
+                    property.IsActive = false;
+                    property.Status = ApplicationConstants.PropertyStatuses.OffMarket;
+                    await _context.SaveChangesAsync();
+                }
+
+                // Cascade archive all active related records
+                var userId = await _userContext.GetUserIdAsync();
+                var now = DateTime.UtcNow;
+
+                await _context.Leases
+                    .Where(x => x.PropertyId == id && !x.IsDeleted && !x.IsArchived)
+                    .ExecuteUpdateAsync(s => s
+                        .SetProperty(x => x.IsArchived, true)
+                        .SetProperty(x => x.ArchivedOn, now)
+                        .SetProperty(x => x.ArchivedBy, userId));
+
+                await _context.Inspections
+                    .Where(x => x.PropertyId == id && !x.IsDeleted && !x.IsArchived)
+                    .ExecuteUpdateAsync(s => s
+                        .SetProperty(x => x.IsArchived, true)
+                        .SetProperty(x => x.ArchivedOn, now)
+                        .SetProperty(x => x.ArchivedBy, userId));
+
+                await _context.MaintenanceRequests
+                    .Where(x => x.PropertyId == id && !x.IsDeleted && !x.IsArchived)
+                    .ExecuteUpdateAsync(s => s
+                        .SetProperty(x => x.IsArchived, true)
+                        .SetProperty(x => x.ArchivedOn, now)
+                        .SetProperty(x => x.ArchivedBy, userId));
+
+                await _context.Documents
+                    .Where(x => x.PropertyId == id && !x.IsDeleted && !x.IsArchived)
+                    .ExecuteUpdateAsync(s => s
+                        .SetProperty(x => x.IsArchived, true)
+                        .SetProperty(x => x.ArchivedOn, now)
+                        .SetProperty(x => x.ArchivedBy, userId));
+
+                await _context.Repairs
+                    .Where(x => x.PropertyId == id && !x.IsDeleted && !x.IsArchived)
+                    .ExecuteUpdateAsync(s => s
+                        .SetProperty(x => x.IsArchived, true)
+                        .SetProperty(x => x.ArchivedOn, now)
+                        .SetProperty(x => x.ArchivedBy, userId));
+
+                await _context.PropertyExpenses
+                    .Where(x => x.PropertyId == id && !x.IsDeleted && !x.IsArchived)
+                    .ExecuteUpdateAsync(s => s
+                        .SetProperty(x => x.IsArchived, true)
+                        .SetProperty(x => x.ArchivedOn, now)
+                        .SetProperty(x => x.ArchivedBy, userId));
+
+                // ExpenseDue/ExpensePayment are PropertyExpense's own children.
+                // Reached directly here (rather than relying on
+                // PropertyExpenseService.ArchiveAsync's cascade) so the full
+                // expense chain goes offline together when the property itself
+                // is archived, per "Archive Property -> everything follows".
+                await _context.Set<ExpenseDue>()
+                    .Where(x => x.PropertyId == id && !x.IsDeleted && !x.IsArchived)
+                    .ExecuteUpdateAsync(s => s
+                        .SetProperty(x => x.IsArchived, true)
+                        .SetProperty(x => x.ArchivedOn, now)
+                        .SetProperty(x => x.ArchivedBy, userId));
+
+                await _context.Set<ExpensePayment>()
+                    .Where(x => !x.IsDeleted && !x.IsArchived && x.ExpenseDue!.PropertyId == id)
+                    .ExecuteUpdateAsync(s => s
+                        .SetProperty(x => x.IsArchived, true)
+                        .SetProperty(x => x.ArchivedOn, now)
+                        .SetProperty(x => x.ArchivedBy, userId));
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Restores the property to view (removes archive flag only).
+        /// IsActive and Status are NOT changed — the property remains inactive and off market.
+        /// The user must explicitly reactivate a property to avoid breaching the active property limit.
+        /// </summary>
+        public override async Task<bool> RestoreAsync(Guid id)
+        {
+            return await base.RestoreAsync(id);
+        }
+
+        /// <summary>
+        /// Unarchives the property. When <paramref name="restoreRelated"/> is true, also unarchives
+        /// all archived related records (leases, inspections, maintenance requests, documents).
+        /// IsActive and Status are NOT changed — the user must explicitly reactivate the property.
+        /// </summary>
+        public async Task<bool> RestorePropertyAsync(Guid id, bool restoreRelated)
+        {
+            var result = await base.RestoreAsync(id);
+
+            if (result && restoreRelated)
+            {
+                await _context.Leases
+                    .Where(x => x.PropertyId == id && !x.IsDeleted && x.IsArchived)
+                    .ExecuteUpdateAsync(s => s
+                        .SetProperty(x => x.IsArchived, false)
+                        .SetProperty(x => x.ArchivedOn, x => (DateTime?)null)
+                        .SetProperty(x => x.ArchivedBy, x => (string?)null));
+
+                await _context.Inspections
+                    .Where(x => x.PropertyId == id && !x.IsDeleted && x.IsArchived)
+                    .ExecuteUpdateAsync(s => s
+                        .SetProperty(x => x.IsArchived, false)
+                        .SetProperty(x => x.ArchivedOn, x => (DateTime?)null)
+                        .SetProperty(x => x.ArchivedBy, x => (string?)null));
+
+                await _context.MaintenanceRequests
+                    .Where(x => x.PropertyId == id && !x.IsDeleted && x.IsArchived)
+                    .ExecuteUpdateAsync(s => s
+                        .SetProperty(x => x.IsArchived, false)
+                        .SetProperty(x => x.ArchivedOn, x => (DateTime?)null)
+                        .SetProperty(x => x.ArchivedBy, x => (string?)null));
+
+                await _context.Documents
+                    .Where(x => x.PropertyId == id && !x.IsDeleted && x.IsArchived)
+                    .ExecuteUpdateAsync(s => s
+                        .SetProperty(x => x.IsArchived, false)
+                        .SetProperty(x => x.ArchivedOn, x => (DateTime?)null)
+                        .SetProperty(x => x.ArchivedBy, x => (string?)null));
+
+                await _context.Repairs
+                    .Where(x => x.PropertyId == id && !x.IsDeleted && x.IsArchived)
+                    .ExecuteUpdateAsync(s => s
+                        .SetProperty(x => x.IsArchived, false)
+                        .SetProperty(x => x.ArchivedOn, x => (DateTime?)null)
+                        .SetProperty(x => x.ArchivedBy, x => (string?)null));
+
+                await _context.PropertyExpenses
+                    .Where(x => x.PropertyId == id && !x.IsDeleted && x.IsArchived)
+                    .ExecuteUpdateAsync(s => s
+                        .SetProperty(x => x.IsArchived, false)
+                        .SetProperty(x => x.ArchivedOn, x => (DateTime?)null)
+                        .SetProperty(x => x.ArchivedBy, x => (string?)null));
+
+                await _context.Set<ExpenseDue>()
+                    .Where(x => x.PropertyId == id && !x.IsDeleted && x.IsArchived)
+                    .ExecuteUpdateAsync(s => s
+                        .SetProperty(x => x.IsArchived, false)
+                        .SetProperty(x => x.ArchivedOn, x => (DateTime?)null)
+                        .SetProperty(x => x.ArchivedBy, x => (string?)null));
+
+                await _context.Set<ExpensePayment>()
+                    .Where(x => !x.IsDeleted && x.IsArchived && x.ExpenseDue!.PropertyId == id)
+                    .ExecuteUpdateAsync(s => s
+                        .SetProperty(x => x.IsArchived, false)
+                        .SetProperty(x => x.ArchivedOn, x => (DateTime?)null)
+                        .SetProperty(x => x.ArchivedBy, x => (string?)null));
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Returns a count of currently-archived related records for this property.
+        /// Used to populate the unarchive confirmation prompt.
+        /// </summary>
+        public async Task<CascadeSummary> GetRestoreCascadeSummaryAsync(Guid id)
+        {
+            var counts = new Dictionary<string, int>
+            {
+                ["Leases"] = await _context.Leases.CountAsync(x => x.PropertyId == id && !x.IsDeleted && x.IsArchived),
+                ["Inspections"] = await _context.Inspections.CountAsync(x => x.PropertyId == id && !x.IsDeleted && x.IsArchived),
+                ["Maintenance Requests"] = await _context.MaintenanceRequests.CountAsync(x => x.PropertyId == id && !x.IsDeleted && x.IsArchived),
+                ["Documents"] = await _context.Documents.CountAsync(x => x.PropertyId == id && !x.IsDeleted && x.IsArchived),
+                ["Repairs"] = await _context.Repairs.CountAsync(x => x.PropertyId == id && !x.IsDeleted && x.IsArchived),
+                ["Property Expenses"] = await _context.PropertyExpenses.CountAsync(x => x.PropertyId == id && !x.IsDeleted && x.IsArchived),
+            };
+            return new CascadeSummary { EntityName = "Property", Counts = counts };
+        }
+
+        #endregion
+
+        #region Delete Override
+
+        /// <summary>
+        /// Deletes a property and all related records (cascade delete).
+        /// Removes leases (with invoices, payments, security deposits), maintenance requests
+        /// (with repairs), inspections, documents, calendar events, tours, and rental applications.
+        /// </summary>
+        public override async Task<bool> DeleteAsync(Guid id)
+        {
+            await using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+            // Delete invoice payments and invoices for all leases on this property
+            var leaseIds = await _context.Leases
+                .Where(l => l.PropertyId == id)
+                .Select(l => l.Id)
+                .ToListAsync();
+
+            foreach (var leaseId in leaseIds)
+            {
+                var invoiceIds = await _context.Invoices
+                    .Where(i => i.LeaseId == leaseId)
+                    .Select(i => i.Id)
+                    .ToListAsync();
+
+                foreach (var invoiceId in invoiceIds)
+                {
+                    var invoicePayments = await _context.Payments
+                        .Where(p => p.InvoiceId == invoiceId)
+                        .ToListAsync();
+                    _context.Payments.RemoveRange(invoicePayments);
+                }
+
+                var invoices = await _context.Invoices.Where(i => i.LeaseId == leaseId).ToListAsync();
+                _context.Invoices.RemoveRange(invoices);
+
+                var securityDeposits = await _context.SecurityDeposits.Where(s => s.LeaseId == leaseId).ToListAsync();
+                _context.SecurityDeposits.RemoveRange(securityDeposits);
+            }
+
+            var leases = await _context.Leases.Where(l => l.PropertyId == id).ToListAsync();
+
+            _context.Leases.RemoveRange(leases);
+
+            // Null out Repair.MaintenanceRequestId before deleting maintenance requests
+            var maintenanceIds = await _context.MaintenanceRequests
+                .Where(m => m.PropertyId == id)
+                .Select(m => m.Id)
+                .ToListAsync();
+
+            var repairs = await _context.Repairs
+                .Where(r => r.PropertyId == id)
+                .ToListAsync();
+            _context.Repairs.RemoveRange(repairs);
+
+            var expenses = await _context.PropertyExpenses
+                .Where(e => e.PropertyId == id)
+                .ToListAsync();
+            _context.PropertyExpenses.RemoveRange(expenses);
+
+            var maintenanceRequests = await _context.MaintenanceRequests.Where(m => m.PropertyId == id).ToListAsync();
+            _context.MaintenanceRequests.RemoveRange(maintenanceRequests);
+
+            // Delete calendar events linked to inspections, then delete inspections
+            var inspectionIds = await _context.Inspections
+                .Where(i => i.PropertyId == id)
+                .Select(i => new { i.Id, i.CalendarEventId })
+                .ToListAsync();
+
+            foreach (var inspection in inspectionIds.Where(i => i.CalendarEventId.HasValue))
+            {
+                var inspectionEvent = await _context.CalendarEvents.FindAsync(inspection.CalendarEventId!.Value);
+                if (inspectionEvent != null) _context.CalendarEvents.Remove(inspectionEvent);
+            }
+
+            var inspections = await _context.Inspections.Where(i => i.PropertyId == id).ToListAsync();
+            _context.Inspections.RemoveRange(inspections);
+
+            // Delete documents, calendar events, tours, rental applications
+            var documents = await _context.Documents.Where(d => d.PropertyId == id).ToListAsync();
+            _context.Documents.RemoveRange(documents);
+
+            var calendarEvents = await _context.CalendarEvents.Where(c => c.PropertyId == id).ToListAsync();
+            _context.CalendarEvents.RemoveRange(calendarEvents);
+
+            var tours = await _context.Tours.Where(t => t.PropertyId == id).ToListAsync();
+            _context.Tours.RemoveRange(tours);
+
+            var applicationIds = await _context.RentalApplications
+                .Where(a => a.PropertyId == id)
+                .Select(a => a.Id)
+                .ToListAsync();
+
+            var screenings = await _context.ApplicationScreenings
+                .Where(s => applicationIds.Contains(s.RentalApplicationId))
+                .ToListAsync();
+            _context.ApplicationScreenings.RemoveRange(screenings);
+
+            var applications = await _context.RentalApplications.Where(a => a.PropertyId == id).ToListAsync();
+            _context.RentalApplications.RemoveRange(applications);
+
+            await _context.SaveChangesAsync();
+
+            bool result = await base.DeleteAsync(id);
+            await transaction.CommitAsync();
+            return result;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+        }
+
+        #endregion
+
+        #region Cascade Summary
+
+        /// <summary>
+        /// Returns a count of related records that would be permanently deleted with this property.
+        /// </summary>
+        public override async Task<CascadeSummary> GetDeleteCascadeSummaryAsync(Guid id)
+        {
+            var counts = new Dictionary<string, int>
+            {
+                ["Leases"] = await _context.Leases.CountAsync(x => x.PropertyId == id && !x.IsDeleted),
+                ["Inspections"] = await _context.Inspections.CountAsync(x => x.PropertyId == id && !x.IsDeleted),
+                ["Maintenance Requests"] = await _context.MaintenanceRequests.CountAsync(x => x.PropertyId == id && !x.IsDeleted),
+                ["Documents"] = await _context.Documents.CountAsync(x => x.PropertyId == id && !x.IsDeleted),
+                ["Calendar Events"] = await _context.CalendarEvents.CountAsync(x => x.PropertyId == id && !x.IsDeleted),
+                ["Tours"] = await _context.Tours.CountAsync(x => x.PropertyId == id && !x.IsDeleted),
+                ["Rental Applications"] = await _context.RentalApplications.CountAsync(x => x.PropertyId == id && !x.IsDeleted),
+                ["Property Expenses"] = await _context.PropertyExpenses.CountAsync(x => x.PropertyId == id && !x.IsDeleted),
+            };
+            return new CascadeSummary { EntityName = "Property", Counts = counts };
+        }
+
+        /// <summary>
+        /// Returns a count of related records that would be archived with this property.
+        /// </summary>
+        public override async Task<CascadeSummary> GetArchiveCascadeSummaryAsync(Guid id)
+        {
+            var counts = new Dictionary<string, int>
+            {
+                ["Leases"] = await _context.Leases.CountAsync(x => x.PropertyId == id && !x.IsDeleted && !x.IsArchived),
+                ["Inspections"] = await _context.Inspections.CountAsync(x => x.PropertyId == id && !x.IsDeleted && !x.IsArchived),
+                ["Maintenance Requests"] = await _context.MaintenanceRequests.CountAsync(x => x.PropertyId == id && !x.IsDeleted && !x.IsArchived),
+                ["Documents"] = await _context.Documents.CountAsync(x => x.PropertyId == id && !x.IsDeleted && !x.IsArchived),
+                ["Repairs"] = await _context.Repairs.CountAsync(x => x.PropertyId == id && !x.IsDeleted && !x.IsArchived),
+                ["Property Expenses"] = await _context.PropertyExpenses.CountAsync(x => x.PropertyId == id && !x.IsDeleted && !x.IsArchived),
+            };
+            return new CascadeSummary { EntityName = "Property", Counts = counts };
+        }
 
         #endregion
     }

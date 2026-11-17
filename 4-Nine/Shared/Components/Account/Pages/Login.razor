@@ -3,9 +3,12 @@
 @using System.ComponentModel.DataAnnotations
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Identity
+@using Microsoft.EntityFrameworkCore
+@using Nine.Core.Constants
 @using ElectronNET.API
 
 @inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
 @inject ILogger<Login> Logger
 @inject NavigationManager NavigationManager
 @inject IdentityRedirectManager RedirectManager
@@ -67,9 +70,12 @@
                     <p>
                         <a href="Account/ForgotPassword">Forgot your password?</a>
                     </p>
-                    <p>
-                        <a href="@(NavigationManager.GetUriWithQueryParameters("Account/Register", new Dictionary<string, object?> { ["ReturnUrl"] = ReturnUrl }))">Register as a new user</a>
-                    </p>
+                    @if (_showRegistrationLink)
+                    {
+                        <p>
+                            <a href="@(NavigationManager.GetUriWithQueryParameters("Account/Register", new Dictionary<string, object?> { ["ReturnUrl"] = ReturnUrl }))">Register as a new user</a>
+                        </p>
+                    }
                     @* <p>
                         <a href="Account/ResendEmailConfirmation">Resend email confirmation</a>
                     </p> *@
@@ -89,6 +95,7 @@
 @code {
     private string? errorMessage;
     private bool isSubmitting = false;
+    private bool _showRegistrationLink = false;
 
     [CascadingParameter]
     private HttpContext HttpContext { get; set; } = default!;
@@ -102,6 +109,11 @@
     protected override async Task OnInitializedAsync()
     {
         Input ??= new InputModel();
+
+        // Show registration link only when no non-system user exists yet
+        var hasUsers = await UserManager.Users
+            .AnyAsync(u => u.Id != ApplicationConstants.SystemUser.Id);
+        _showRegistrationLink = !hasUsers;
 
         // For Electron, default Remember Me to true (trusted device)
         if (HybridSupport.IsElectronActive)

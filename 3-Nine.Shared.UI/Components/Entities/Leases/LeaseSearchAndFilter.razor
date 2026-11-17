@@ -1,5 +1,6 @@
 
 @namespace Nine.Shared.UI.Components.Entities.Leases
+@using Nine.Core.Constants
 
 <div class="row mb-3">
     <div class="col-md-3">
@@ -13,10 +14,10 @@
     <div class="col-md-3">
         <select class="form-select" value="@StatusFilter" @onchange="HandleStatusFilterChanged">
             <option value="">All Lease Statuses</option>
-            <option value="Active">Active</option>
-            <option value="Expired">Expired</option>
-            <option value="Terminated">Terminated</option>
-            <option value="Pending">Pending</option>
+            @foreach (var status in ApplicationConstants.LeaseStatuses.AllLeaseStatuses)
+            {
+                <option value="@status">@status</option>
+            }
         </select>
     </div>
     <div class="col-md-3">

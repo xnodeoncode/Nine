@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using Nine.Application.Models;
 using Nine.Core.Constants;
 using Nine.Core.Entities;
 using Nine.Core.Interfaces.Services;
@@ -99,7 +100,7 @@ namespace Nine.Application.Services
 
                 var organizationId = await _userContext.GetActiveOrganizationIdAsync();
 
-                IQueryable<TEntity> query = _dbSet.Where(e => !e.IsDeleted);
+                IQueryable<TEntity> query = _dbSet.Where(e => !e.IsDeleted && !e.IsArchived);
 
                 // Apply organization filter if entity has OrganizationId property
                 if (typeof(TEntity).GetProperty("OrganizationId") != null)
@@ -279,20 +280,9 @@ namespace Nine.Application.Services
                     }
                 }
 
-                // Soft delete or hard delete based on settings
-                if (_settings.SoftDeleteEnabled)
-                {
-                    entity.IsDeleted = true;
-                    SetAuditFieldsForUpdate(entity, userId);
-                    await _context.SaveChangesAsync();
-                    _logger.LogInformation($"{typeof(TEntity).Name} soft deleted: {id} by user {userId}");
-                }
-                else
-                {
-                    _dbSet.Remove(entity);
-                    await _context.SaveChangesAsync();
-                    _logger.LogInformation($"{typeof(TEntity).Name} hard deleted: {id} by user {userId}");
-                }
+                _dbSet.Remove(entity);
+                await _context.SaveChangesAsync();
+                _logger.LogInformation($"{typeof(TEntity).Name} hard deleted: {id} by user {userId}");
 
                 return true;
             }
@@ -301,6 +291,159 @@ namespace Nine.Application.Services
                 await HandleExceptionAsync(ex, $"Delete{typeof(TEntity).Name}");
                 throw;
             }
+        }
+
+        /// <summary>
+        /// Retrieves all archived (non-deleted) entities for the current organization.
+        /// </summary>
+        public virtual async Task<List<TEntity>> GetArchivedAsync()
+        {
+            try
+            {
+                var userId = await _userContext.GetUserIdAsync();
+                if (string.IsNullOrEmpty(userId))
+                {
+                    throw new UnauthorizedAccessException("User is not authenticated.");
+                }
+
+                var organizationId = await _userContext.GetActiveOrganizationIdAsync();
+
+                IQueryable<TEntity> query = _dbSet.Where(e => !e.IsDeleted && e.IsArchived);
+
+                if (typeof(TEntity).GetProperty("OrganizationId") != null)
+                {
+                    var parameter = Expression.Parameter(typeof(TEntity), "e");
+                    var property = Expression.Property(parameter, "OrganizationId");
+                    var constant = Expression.Constant(organizationId);
+                    var condition = Expression.Equal(property, constant);
+                    var lambda = Expression.Lambda<Func<TEntity, bool>>(condition, parameter);
+
+                    query = query.Where(lambda);
+                }
+
+                return await query.ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                await HandleExceptionAsync(ex, $"GetArchived{typeof(TEntity).Name}");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Archives an entity, preserving it for historical reference.
+        /// </summary>
+        public virtual async Task<bool> ArchiveAsync(Guid id)
+        {
+            try
+            {
+                var userId = await _userContext.GetUserIdAsync();
+                if (string.IsNullOrEmpty(userId))
+                {
+                    throw new UnauthorizedAccessException("User is not authenticated.");
+                }
+
+                var organizationId = await _userContext.GetActiveOrganizationIdAsync();
+
+                var entity = await _dbSet.FirstOrDefaultAsync(e => e.Id == id && !e.IsDeleted && !e.IsArchived);
+
+                if (entity == null)
+                {
+                    _logger.LogWarning($"{typeof(TEntity).Name} not found for archiving: {id}");
+                    return false;
+                }
+
+                if (HasOrganizationIdProperty(entity) && organizationId.HasValue)
+                {
+                    if (GetOrganizationId(entity) != organizationId)
+                    {
+                        throw new UnauthorizedAccessException(
+                            $"Cannot archive {typeof(TEntity).Name} {id} - belongs to different organization.");
+                    }
+                }
+
+                entity.IsArchived = true;
+                entity.ArchivedOn = DateTime.UtcNow;
+                entity.ArchivedBy = userId;
+                SetAuditFieldsForUpdate(entity, userId);
+
+                await _context.SaveChangesAsync();
+                _logger.LogInformation($"{typeof(TEntity).Name} archived: {id} by user {userId}");
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                await HandleExceptionAsync(ex, $"Archive{typeof(TEntity).Name}");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Restores an archived entity back to active status.
+        /// </summary>
+        public virtual async Task<bool> RestoreAsync(Guid id)
+        {
+            try
+            {
+                var userId = await _userContext.GetUserIdAsync();
+                if (string.IsNullOrEmpty(userId))
+                {
+                    throw new UnauthorizedAccessException("User is not authenticated.");
+                }
+
+                var organizationId = await _userContext.GetActiveOrganizationIdAsync();
+
+                var entity = await _dbSet.FirstOrDefaultAsync(e => e.Id == id && !e.IsDeleted && e.IsArchived);
+
+                if (entity == null)
+                {
+                    _logger.LogWarning($"{typeof(TEntity).Name} not found for unarchiving: {id}");
+                    return false;
+                }
+
+                if (HasOrganizationIdProperty(entity) && organizationId.HasValue)
+                {
+                    if (GetOrganizationId(entity) != organizationId)
+                    {
+                        throw new UnauthorizedAccessException(
+                            $"Cannot unarchive {typeof(TEntity).Name} {id} - belongs to different organization.");
+                    }
+                }
+
+                entity.IsArchived = false;
+                entity.ArchivedOn = null;
+                entity.ArchivedBy = null;
+                SetAuditFieldsForUpdate(entity, userId);
+
+                await _context.SaveChangesAsync();
+                _logger.LogInformation($"{typeof(TEntity).Name} unarchived: {id} by user {userId}");
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                await HandleExceptionAsync(ex, $"Unarchive{typeof(TEntity).Name}");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Returns a summary of related records that would be permanently deleted with this entity.
+        /// Override in entity services to provide accurate cascade counts.
+        /// </summary>
+        public virtual Task<CascadeSummary> GetDeleteCascadeSummaryAsync(Guid id)
+        {
+            return Task.FromResult(new CascadeSummary { EntityName = typeof(TEntity).Name });
+        }
+
+        /// <summary>
+        /// Returns a summary of related records that would be archived with this entity.
+        /// Override in entity services to provide accurate cascade counts.
+        /// </summary>
+        public virtual Task<CascadeSummary> GetArchiveCascadeSummaryAsync(Guid id)
+        {
+            return Task.FromResult(new CascadeSummary { EntityName = typeof(TEntity).Name });
         }
 
         #endregion

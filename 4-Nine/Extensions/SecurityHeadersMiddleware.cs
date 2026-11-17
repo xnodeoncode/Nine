@@ -45,11 +45,11 @@ public class SecurityHeadersMiddleware
             // Scripts: Allow self, inline scripts (Blazor requirement), and eval (Blazor SignalR requirement)
             "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
             
-            // Styles: Allow self, inline styles (Bootstrap/Blazor requirement), and Bootstrap CDN
-            "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net",
+            // Styles: Allow self and inline styles (Bootstrap/Blazor requirement)
+            "style-src 'self' 'unsafe-inline'",
             
-            // Fonts: Allow self, Bootstrap Icons CDN, and data URIs
-            "font-src 'self' https://cdn.jsdelivr.net data:",
+            // Fonts: Allow self and data URIs (Bootstrap Icons are served locally)
+            "font-src 'self' data:",
             
             // Images: Allow self, data URIs (for inline images), and blob URIs (for PDF viewer)
             "img-src 'self' data: blob:",

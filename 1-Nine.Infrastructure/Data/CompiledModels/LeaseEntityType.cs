@@ -2,10 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using Nine.Core.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Nine.Core.Entities;
 
 #pragma warning disable 219, 612, 618
 #nullable disable
@@ -21,9 +21,9 @@ namespace Nine.Infrastructure.Data.CompiledModels
                 "Nine.Core.Entities.Lease",
                 typeof(Lease),
                 baseEntityType,
-                propertyCount: 37,
-                navigationCount: 5,
-                foreignKeyCount: 4,
+                propertyCount: 41,
+                navigationCount: 4,
+                foreignKeyCount: 3,
                 unnamedIndexCount: 4,
                 keyCount: 1);
 
@@ -40,6 +40,21 @@ namespace Nine.Infrastructure.Data.CompiledModels
                 typeof(DateTime?),
                 propertyInfo: typeof(Lease).GetProperty("ActualMoveOutDate", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Lease).GetField("<ActualMoveOutDate>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                nullable: true);
+
+            var archivedBy = runtimeEntityType.AddProperty(
+                "ArchivedBy",
+                typeof(string),
+                propertyInfo: typeof(BaseModel).GetProperty("ArchivedBy", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(BaseModel).GetField("<ArchivedBy>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                nullable: true,
+                maxLength: 100);
+
+            var archivedOn = runtimeEntityType.AddProperty(
+                "ArchivedOn",
+                typeof(DateTime?),
+                propertyInfo: typeof(BaseModel).GetProperty("ArchivedOn", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(BaseModel).GetField("<ArchivedOn>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
 
             var createdBy = runtimeEntityType.AddProperty(
@@ -63,13 +78,6 @@ namespace Nine.Infrastructure.Data.CompiledModels
                 fieldInfo: typeof(Lease).GetField("<DeclinedOn>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
 
-            var documentId = runtimeEntityType.AddProperty(
-                "DocumentId",
-                typeof(Guid?),
-                propertyInfo: typeof(Lease).GetProperty("DocumentId", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(Lease).GetField("<DocumentId>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                nullable: true);
-
             var endDate = runtimeEntityType.AddProperty(
                 "EndDate",
                 typeof(DateTime),
@@ -90,6 +98,20 @@ namespace Nine.Infrastructure.Data.CompiledModels
                 propertyInfo: typeof(Lease).GetProperty("ExpiresOn", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Lease).GetField("<ExpiresOn>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
+
+            var isActive = runtimeEntityType.AddProperty(
+                "IsActive",
+                typeof(bool),
+                propertyInfo: typeof(Lease).GetProperty("IsActive", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(Lease).GetField("<IsActive>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                sentinel: false);
+
+            var isArchived = runtimeEntityType.AddProperty(
+                "IsArchived",
+                typeof(bool),
+                propertyInfo: typeof(BaseModel).GetProperty("IsArchived", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(BaseModel).GetField("<IsArchived>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                sentinel: false);
 
             var isDeleted = runtimeEntityType.AddProperty(
                 "IsDeleted",
@@ -126,6 +148,13 @@ namespace Nine.Infrastructure.Data.CompiledModels
                 propertyInfo: typeof(Lease).GetProperty("LeaseOfferId", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Lease).GetField("<LeaseOfferId>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
+
+            var leaseType = runtimeEntityType.AddProperty(
+                "LeaseType",
+                typeof(string),
+                propertyInfo: typeof(Lease).GetProperty("LeaseType", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(Lease).GetField("<LeaseType>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                maxLength: 50);
 
             var monthlyRent = runtimeEntityType.AddProperty(
                 "MonthlyRent",
@@ -303,7 +332,7 @@ namespace Nine.Infrastructure.Data.CompiledModels
             runtimeEntityType.SetPrimaryKey(key);
 
             var index = runtimeEntityType.AddIndex(
-                new[] { documentId });
+                new[] { isActive });
 
             var index0 = runtimeEntityType.AddIndex(
                 new[] { organizationId });
@@ -318,23 +347,6 @@ namespace Nine.Infrastructure.Data.CompiledModels
         }
 
         public static RuntimeForeignKey CreateForeignKey1(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
-        {
-            var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("DocumentId") },
-                principalEntityType.FindKey(new[] { principalEntityType.FindProperty("Id") }),
-                principalEntityType,
-                deleteBehavior: DeleteBehavior.SetNull);
-
-            var document = declaringEntityType.AddNavigation("Document",
-                runtimeForeignKey,
-                onDependent: true,
-                typeof(Document),
-                propertyInfo: typeof(Lease).GetProperty("Document", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(Lease).GetField("<Document>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
-
-            return runtimeForeignKey;
-        }
-
-        public static RuntimeForeignKey CreateForeignKey2(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
         {
             var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("OrganizationId") },
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("Id") }),
@@ -352,7 +364,7 @@ namespace Nine.Infrastructure.Data.CompiledModels
             return runtimeForeignKey;
         }
 
-        public static RuntimeForeignKey CreateForeignKey3(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
+        public static RuntimeForeignKey CreateForeignKey2(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
         {
             var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("PropertyId") },
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("Id") }),
@@ -377,7 +389,7 @@ namespace Nine.Infrastructure.Data.CompiledModels
             return runtimeForeignKey;
         }
 
-        public static RuntimeForeignKey CreateForeignKey4(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
+        public static RuntimeForeignKey CreateForeignKey3(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
         {
             var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("TenantId") },
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("Id") }),

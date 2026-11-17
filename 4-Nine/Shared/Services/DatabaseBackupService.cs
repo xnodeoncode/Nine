@@ -249,15 +249,15 @@ namespace Nine.Shared.Services
                 }
 
                 var backupFiles = Directory.GetFiles(backupDir, "*.db")
-                    .OrderByDescending(f => File.GetCreationTime(f))
                     .Select(f => new BackupInfo
                     {
                         FilePath = f,
                         FileName = Path.GetFileName(f),
-                        CreatedDate = File.GetCreationTime(f),
+                        CreatedDate = ResolveBackupDate(f),
                         SizeBytes = new FileInfo(f).Length,
                         SizeFormatted = FormatFileSize(new FileInfo(f).Length)
                     })
+                    .OrderByDescending(b => b.CreatedDate)
                     .ToList();
 
                 return backupFiles;
@@ -267,6 +267,24 @@ namespace Nine.Shared.Services
                 _logger.LogError(ex, "Failed to list backup files");
                 return new List<BackupInfo>();
             }
+        }
+
+        /// <summary>
+        /// Gets a backup's date from the yyyyMMdd_HHmmss timestamp in its file name, falling back
+        /// to the file's last write time (file creation time is unreliable on some Linux filesystems).
+        /// </summary>
+        public static DateTime ResolveBackupDate(string filePath)
+        {
+            var match = System.Text.RegularExpressions.Regex.Match(
+                Path.GetFileName(filePath), @"(\d{8}_\d{6})\.db$", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+
+            if (match.Success && DateTime.TryParseExact(match.Groups[1].Value, "yyyyMMdd_HHmmss",
+                    System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out var parsed))
+            {
+                return parsed;
+            }
+
+            return File.GetLastWriteTime(filePath);
         }
 
         /// <summary>

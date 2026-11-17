@@ -78,22 +78,31 @@ else
                     <hr />
 
                     <div class="row">
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <div class="mb-3">
                                 <label class="text-muted small">Invoice Amount</label>
                                 <div class="fw-bold fs-4">@invoice.Amount.ToString("C")</div>
                             </div>
                         </div>
-                        <div class="col-md-4">
+                        @if (invoice.LateFeeApplied == true && invoice.LateFeeAmount.HasValue)
+                        {
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label class="text-muted small">Late Fee</label>
+                                    <div class="fw-bold fs-4 text-warning">@invoice.LateFeeAmount.Value.ToString("C")</div>
+                                </div>
+                            </div>
+                        }
+                        <div class="col-md-3">
                             <div class="mb-3">
                                 <label class="text-muted small">Paid Amount</label>
                                 <div class="fw-bold fs-4 text-success">@invoice.AmountPaid.ToString("C")</div>
                             </div>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <div class="mb-3">
                                 <label class="text-muted small">Balance Due</label>
-                                <div class="fw-bold fs-4 @(invoice.BalanceDue > 0 ? "text-danger" : "text-success")">
+                                <div class="fw-bold fs-4 @(invoice.BalanceDue > 0 ? "text-danger" : invoice.BalanceDue == 0 ? "text-success" : "text-warning")">
                                     @invoice.BalanceDue.ToString("C")
                                 </div>
                             </div>

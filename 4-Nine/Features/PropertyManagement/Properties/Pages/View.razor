@@ -6,13 +6,20 @@
 @using Nine.Shared.UI.Components.Entities.Documents
 @using Nine.Shared.UI.Components.Entities.Inspections
 @using Nine.Shared.UI.Components.Entities.Repairs
+@using Nine.Shared.UI.Components.Entities.PropertyExpenses
 @using Nine.Shared.UI.Features.PropertyManagement.Properties
 @using Nine.Shared.UI.Features.PropertyManagement.Leases
+@using Microsoft.Extensions.Options
 
 @inject PropertyService PropertyService
 @inject InspectionService InspectionService
 @inject LeaseService LeaseService
 @inject RepairService RepairService
+@inject PropertyExpenseService PropertyExpenseService
+@inject ExpenseDueService ExpenseDueService
+@inject ExpensePaymentService ExpensePaymentService
+@inject ToastService ToastService
+@inject IOptions<ApplicationSettings> AppSettings
 @inject NavigationManager Navigation
 @inject IJSRuntime JSRuntime
 
@@ -59,16 +66,16 @@
                             <button class="btn btn-outline-primary" @onclick="EditProperty">
                                 <i class="bi bi-pencil"></i> Edit Property
                             </button>
-                            @if (property.IsActive)
+                            @if (hasCurrentLease)
                             {
-                                <button class="btn btn-outline-success" @onclick="CreateLease">
-                                    <i class="bi bi-file-plus"></i> New Lease
+                                <button class="btn btn-outline-info" @onclick="ViewLease">
+                                    <i class="bi bi-file-text"></i> View Lease
                                 </button>
                             }
                             else
                             {
-                                <button class="btn btn-outline-info" @onclick="ViewLease">
-                                    <i class="bi bi-file-text"></i> View Lease
+                                <button class="btn btn-outline-success" @onclick="CreateLease">
+                                    <i class="bi bi-file-plus"></i> New Lease
                                 </button>
                             }
                             <button class="btn btn-outline-warning" @onclick="CompleteInspection">
@@ -77,6 +84,12 @@
                             <button class="btn btn-outline-secondary" @onclick="ViewDocuments">
                                 <i class="bi bi-folder"></i> View Documents
                             </button>
+                            @if (_hasArchivedRelated)
+                            {
+                                <button class="btn btn-outline-warning" @onclick="ShowArchivedRecordsModal">
+                                    <i class="bi bi-archive"></i> This property has archived records
+                                </button>
+                            }
                         </div>
                     </div>
                 </div>
@@ -89,8 +102,35 @@
                 ShowViewButton = "@showInspectionViewButton"
                 NextInspectionDate="@property.NextRoutineInspectionDueDate" />
             </div>
+            <div class="mt-4">
+                <PropertyExpenseList
+                    Expenses="@propertyExpenses"
+                    ShowAddButton="true"
+                    ShowEditButton="true"
+                    OnAddExpense="ShowAddExpenseModal"
+                    OnEditExpense="ShowEditExpenseModal" />
+            </div>
         </div>
     </div>
+
+<!-- Expense Modals -->
+<PropertyExpenseModal
+    IsVisible="@showAddExpenseModal"
+    IsSaving="@isSavingExpense"
+    ErrorMessage="@expenseErrorMessage"
+    OnSave="AddExpense"
+    OnCancel="CloseAddExpenseModal" />
+
+<PropertyExpenseEditModal
+    IsVisible="@showEditExpenseModal"
+    Expense="@selectedExpense"
+    CurrentDue="@selectedExpenseCurrentDue"
+    SoftDeleteEnabled="@AppSettings.Value.SoftDeleteEnabled"
+    OnCancelExpense="HandleCancelExpense"
+    OnVoidExpense="HandleVoidExpense"
+    OnMarkPaid="HandleMarkPaid"
+    OnWaiveExpenseDue="HandleWaiveExpenseDue"
+    OnDismiss="CloseEditExpenseModal" />
 
 <!-- Modals -->
 <Modal IsVisible="@showLeaseModal" 
@@ -211,20 +251,138 @@
     </FooterContent>
 </Modal>
 
+<Modal IsVisible="@_showArchivedRecordsModal"
+       Title="Archived Records"
+       OnClose="@CloseArchivedRecordsModal">
+    <ChildContent>
+        <p>The following records are currently archived for this property:</p>
+        @if (_archivedSummary != null)
+        {
+            <ul class="mb-2">
+                @foreach (var (label, count) in _archivedSummary.Counts.Where(c => c.Value > 0))
+                {
+                    <li>@count @label</li>
+                }
+            </ul>
+        }
+        <p class="text-muted small mb-0">Use the <strong>Show Archived</strong> toggle on each list page to view individual archived records. To restore all records, archive and then restore this property and choose <em>Restore All</em>.</p>
+    </ChildContent>
+    <FooterContent>
+        <button class="btn btn-secondary" @onclick="@CloseArchivedRecordsModal">Close</button>
+    </FooterContent>
+</Modal>
+
 @code {
     [Parameter]
     public Guid PropertyId { get; set; }
 
     private Property property = new Property();
     private Inspection lastInspection = new Inspection();
+    private List<PropertyExpense> propertyExpenses = new();
 
     // Modal state
     private bool showLeaseModal = false;
     private bool showRepairModal = false;
     private bool showInspectionModal = false;
+    private bool _showArchivedRecordsModal = false;
+    private CascadeSummary? _archivedSummary;
+    private bool _hasArchivedRelated => _archivedSummary is { HasRelatedRecords: true };
     private bool showInspectionViewButton => lastInspection != null && lastInspection.Id != Guid.Empty && property.LastRoutineInspectionDate.HasValue;
+    private bool hasCurrentLease => property.Leases.Any(l => !l.IsDeleted &&
+        l.Status != ApplicationConstants.LeaseStatuses.Expired &&
+        l.Status != ApplicationConstants.LeaseStatuses.Terminated &&
+        l.Status != ApplicationConstants.LeaseStatuses.Declined);
 
-    // Selected entities for modals
+    // Expense modal state
+    private bool showAddExpenseModal = false;
+    private bool showEditExpenseModal = false;
+    private bool isSavingExpense = false;
+    private string expenseErrorMessage = string.Empty;
+    private PropertyExpense? selectedExpense;
+    private ExpenseDue? selectedExpenseCurrentDue;
+
+    private void ShowAddExpenseModal() { expenseErrorMessage = string.Empty; showAddExpenseModal = true; }
+    private void CloseAddExpenseModal() => showAddExpenseModal = false;
+
+    private async Task ShowEditExpenseModal(PropertyExpense expense)
+    {
+        selectedExpense = expense;
+        selectedExpenseCurrentDue = await ExpenseDueService.GetCurrentCycleForPropertyExpenseAsync(expense.Id);
+        showEditExpenseModal = true;
+    }
+
+    private void CloseEditExpenseModal()
+    {
+        showEditExpenseModal = false;
+        selectedExpense = null;
+        selectedExpenseCurrentDue = null;
+    }
+
+    private async Task AddExpense(PropertyExpenseFormModel model)
+    {
+        try
+        {
+            isSavingExpense = true;
+            expenseErrorMessage = string.Empty;
+            var result = await PropertyExpenseService.CreateExpenseAsync(new PropertyExpense
+            {
+                PropertyId = PropertyId,
+                ExpenseType = model.ExpenseType,
+                Description = model.Description ?? string.Empty,
+                Amount = model.Amount,
+                EffectiveDate = model.DueDate,
+                RecurrencePattern = new RecurrencePattern { Frequency = model.Frequency },
+            }, model.DueDate);
+            propertyExpenses = await PropertyExpenseService.GetExpensesByPropertyAsync(PropertyId);
+            showAddExpenseModal = false;
+
+            if (result.WasBackfillClamped)
+            {
+                ToastService.ShowInfo(
+                    $"'{result.Expense.ExpenseType}' was added. Cycles from January 1, {DateTime.Today.Year} forward were generated automatically; " +
+                    "any earlier occurrences must be entered manually.",
+                    "Backdated Expense");
+            }
+        }
+        catch (Exception ex) { expenseErrorMessage = $"Error adding expense: {ex.Message}"; }
+        finally { isSavingExpense = false; }
+    }
+
+    private async Task HandleCancelExpense(string? reason)
+    {
+        if (selectedExpense == null) return;
+        await PropertyExpenseService.CancelExpenseAsync(selectedExpense.Id, reason);
+        CloseEditExpenseModal();
+        propertyExpenses = await PropertyExpenseService.GetExpensesByPropertyAsync(PropertyId);
+    }
+
+    private async Task HandleVoidExpense()
+    {
+        if (selectedExpense == null) return;
+        await PropertyExpenseService.VoidExpenseAsync(selectedExpense.Id);
+        CloseEditExpenseModal();
+        propertyExpenses = await PropertyExpenseService.GetExpensesByPropertyAsync(PropertyId);
+    }
+
+    private async Task HandleMarkPaid(ExpensePaymentRequest request)
+    {
+        await ExpensePaymentService.RecordPaymentAsync(request.ExpenseDueId, request.AmountPaid, request.PaidOn, request.Notes);
+        if (selectedExpense != null)
+        {
+            selectedExpenseCurrentDue = await ExpenseDueService.GetCurrentCycleForPropertyExpenseAsync(selectedExpense.Id);
+        }
+    }
+
+    private async Task HandleWaiveExpenseDue(string reason)
+    {
+        if (selectedExpenseCurrentDue == null) return;
+        await ExpenseDueService.WaiveExpenseDueAsync(selectedExpenseCurrentDue.Id, reason);
+        if (selectedExpense != null)
+        {
+            selectedExpenseCurrentDue = await ExpenseDueService.GetCurrentCycleForPropertyExpenseAsync(selectedExpense.Id);
+        }
+    }
+
     private Lease? selectedLease;
     private Repair? selectedRepair;
     private Inspection? selectedInspection;
@@ -233,6 +391,8 @@
     {
         property = await PropertyService.GetPropertyWithRelationsAsync(PropertyId) ?? new Property();
         lastInspection = await InspectionService.GetLastRoutineInspectionAsync(PropertyId) ?? new Inspection();
+        _archivedSummary = await PropertyService.GetRestoreCascadeSummaryAsync(PropertyId);
+        propertyExpenses = await PropertyExpenseService.GetExpensesByPropertyAsync(PropertyId);
     }
 
     private void EditProperty()
@@ -280,7 +440,10 @@
 
     private async Task ViewLease()
     {
-        var lease = property.Leases.FirstOrDefault(l => l.IsActive);
+        var lease = property.Leases
+            .Where(l => !l.IsDeleted)
+            .OrderByDescending(l => l.StartDate)
+            .FirstOrDefault();
         if (lease != null)
         {
             selectedLease = await LeaseService.GetLeaseWithRelationsAsync(lease.Id);
@@ -327,6 +490,16 @@
     {
         showInspectionModal = false;
         selectedInspection = null;
+    }
+
+    private void ShowArchivedRecordsModal()
+    {
+        _showArchivedRecordsModal = true;
+    }
+
+    private void CloseArchivedRecordsModal()
+    {
+        _showArchivedRecordsModal = false;
     }
 
     // View Full Page methods

@@ -8,9 +8,16 @@
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1><span class="bi bi-receipt" aria-hidden="true"></span> Invoices</h1>
-    <button class="btn btn-primary" @onclick="CreateInvoice">
-        <i class="bi bi-plus-lg"></i> Create Invoice
-    </button>
+    <div class="d-flex align-items-center gap-3">
+        <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="showArchivedInvoices"
+                   @bind="_showArchived" @bind:after="RefreshView" />
+            <label class="form-check-label text-muted" for="showArchivedInvoices">Show Archived</label>
+        </div>
+        <button class="btn btn-primary" @onclick="CreateInvoice">
+            <i class="bi bi-plus-lg"></i> Create Invoice
+        </button>
+    </div>
 </div>
 
 @if (invoices == null)
@@ -179,10 +186,22 @@ else
                                                         <button class="btn btn-sm btn-outline-primary" @onclick="() => ViewInvoice(invoice.Id)" title="View">
                                                             <i class="bi bi-eye"></i>
                                                         </button>
-                                                        <button class="btn btn-sm btn-outline-secondary" @onclick="() => EditInvoice(invoice.Id)" title="Edit">
-                                                            <i class="bi bi-pencil"></i>
-                                                        </button>
-                                                        <button class="btn btn-sm btn-outline-danger" @onclick="() => DeleteInvoice(invoice)" title="Delete">
+                                                        @if (!_showArchived)
+                                                        {
+                                                            <button class="btn btn-sm btn-outline-secondary" @onclick="() => EditInvoice(invoice.Id)" title="Edit">
+                                                                <i class="bi bi-pencil"></i>
+                                                            </button>
+                                                            <button class="btn btn-sm btn-outline-warning" @onclick="() => ShowArchiveModal(invoice.Id)" title="Archive">
+                                                                <i class="bi bi-archive"></i>
+                                                            </button>
+                                                        }
+                                                        @if (_showArchived)
+                                                        {
+                                                            <button class="btn btn-sm btn-outline-success" @onclick="() => UnarchiveInvoice(invoice.Id)" title="Unarchive">
+                                                                <i class="bi bi-arrow-counterclockwise"></i>
+                                                            </button>
+                                                        }
+                                                        <button class="btn btn-sm btn-outline-danger" @onclick="() => ShowDeleteModal(invoice.Id)" title="Delete">
                                                             <i class="bi bi-trash"></i>
                                                         </button>
                                                     </div>
@@ -295,10 +314,22 @@ else
                                         <button class="btn btn-sm btn-outline-primary" @onclick="() => ViewInvoice(invoice.Id)" title="View">
                                             <i class="bi bi-eye"></i>
                                         </button>
-                                        <button class="btn btn-sm btn-outline-secondary" @onclick="() => EditInvoice(invoice.Id)" title="Edit">
-                                            <i class="bi bi-pencil"></i>
-                                        </button>
-                                        <button class="btn btn-sm btn-outline-danger" @onclick="() => DeleteInvoice(invoice)" title="Delete">
+                                        @if (!_showArchived)
+                                        {
+                                            <button class="btn btn-sm btn-outline-secondary" @onclick="() => EditInvoice(invoice.Id)" title="Edit">
+                                                <i class="bi bi-pencil"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-warning" @onclick="() => ShowArchiveModal(invoice.Id)" title="Archive">
+                                                <i class="bi bi-archive"></i>
+                                            </button>
+                                        }
+                                        @if (_showArchived)
+                                        {
+                                            <button class="btn btn-sm btn-outline-success" @onclick="() => UnarchiveInvoice(invoice.Id)" title="Unarchive">
+                                                <i class="bi bi-arrow-counterclockwise"></i>
+                                            </button>
+                                        }
+                                        <button class="btn btn-sm btn-outline-danger" @onclick="() => ShowDeleteModal(invoice.Id)" title="Delete">
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </div>
@@ -361,6 +392,16 @@ else
     </div>
 }
 
+<ActionConfirmModal IsVisible="@_showArchiveModal" Variant="warning"
+    Title="Archive Invoice" ConfirmText="Archive"
+    Cascade="@_cascade" IsProcessing="@_isProcessing"
+    OnConfirm="ConfirmArchive" OnCancel="CloseModals" />
+
+<ActionConfirmModal IsVisible="@_showDeleteModal" Variant="danger"
+    Title="Delete Invoice" ConfirmText="Delete Permanently"
+    Cascade="@_cascade" IsProcessing="@_isProcessing"
+    OnConfirm="ConfirmDelete" OnCancel="CloseModals" />
+
 @code {
     private List<Invoice>? invoices;
     private List<Invoice> filteredInvoices = new();
@@ -385,6 +426,12 @@ else
     private int pageSize = 20;
     private int totalPages = 1;
     private int totalRecords = 0;
+    private Guid _pendingId;
+    private CascadeSummary? _cascade;
+    private bool _showArchiveModal;
+    private bool _showDeleteModal;
+    private bool _isProcessing;
+    private bool _showArchived;
 
     [CascadingParameter]
     private Task<AuthenticationState> AuthenticationStateTask { get; set; } = default!;
@@ -405,7 +452,9 @@ else
 
         if (!string.IsNullOrEmpty(userId))
         {
-            invoices = await InvoiceService.GetAllAsync();
+            invoices = _showArchived
+                ? await InvoiceService.GetArchivedAsync()
+                : await InvoiceService.GetAllAsync();
             if (LeaseId.HasValue)
             {
                 invoices = invoices.Where(i => i.LeaseId == LeaseId.Value).ToList();
@@ -413,6 +462,11 @@ else
             FilterInvoices();
             UpdateStatistics();
         }
+    }
+
+    private async Task RefreshView()
+    {
+        await LoadInvoices();
     }
 
     private void FilterInvoices()
@@ -574,12 +628,48 @@ else
         Navigation.NavigateTo($"/propertymanagement/invoices/{id}/edit");
     }
 
-    private async Task DeleteInvoice(Invoice invoice)
+    private async Task ShowArchiveModal(Guid id)
     {
-        if (await JSRuntime.InvokeAsync<bool>("confirm", $"Are you sure you want to delete invoice {invoice.InvoiceNumber}?"))
-        {
-            await InvoiceService.DeleteAsync(invoice.Id);
-            await LoadInvoices();
-        }
+        _pendingId = id;
+        _cascade = await InvoiceService.GetArchiveCascadeSummaryAsync(id);
+        _showArchiveModal = true;
+    }
+
+    private async Task ShowDeleteModal(Guid id)
+    {
+        _pendingId = id;
+        _cascade = await InvoiceService.GetDeleteCascadeSummaryAsync(id);
+        _showDeleteModal = true;
+    }
+
+    private async Task ConfirmArchive()
+    {
+        _isProcessing = true;
+        await InvoiceService.ArchiveAsync(_pendingId);
+        _isProcessing = false;
+        CloseModals();
+        await LoadInvoices();
+    }
+
+    private async Task ConfirmDelete()
+    {
+        _isProcessing = true;
+        await InvoiceService.DeleteAsync(_pendingId);
+        _isProcessing = false;
+        CloseModals();
+        await LoadInvoices();
+    }
+
+    private async Task UnarchiveInvoice(Guid id)
+    {
+        await InvoiceService.RestoreAsync(id);
+        await LoadInvoices();
+    }
+
+    private void CloseModals()
+    {
+        _showArchiveModal = false;
+        _showDeleteModal = false;
+        _cascade = null;
     }
 }

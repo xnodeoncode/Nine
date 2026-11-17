@@ -1,27 +1,50 @@
+@using Nine.Core.Constants
+@using Nine.Core.Entities
 
 <div>
-@* Lease Lifecycle Management Card *@
-@if (Lease.Status == "Active" || Lease.Status == "MonthToMonth" || Lease.Status == "NoticeGiven")
+@* Lease Lifecycle Management Card — shown for any actionable lease state *@
+@{
+    var isActive  = Lease.Status == ApplicationConstants.LeaseStatuses.Active;
+    var isNotice  = Lease.Status == ApplicationConstants.LeaseStatuses.NoticeGiven;
+    var isExpired = Lease.Status == ApplicationConstants.LeaseStatuses.Expired;
+    var isTerm    = Lease.LeaseType == ApplicationConstants.LeaseTypes.Term;
+    var isMTM     = Lease.LeaseType == ApplicationConstants.LeaseTypes.MonthToMonth;
+}
+@if (isActive || isNotice || isExpired)
 {
-    <div class="card mt-3 border-warning">
-        <div class="card-header bg-warning text-dark">
-            <h5 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Lease Management</h5>
+    <div class="card mt-3 @(isExpired ? "border-danger" : "border-warning")">
+        <div class="card-header @(isExpired ? "bg-danger text-white" : "bg-warning text-dark")">
+            <h5 class="mb-0">
+                <i class="bi bi-exclamation-triangle"></i> Lease Management
+                <span class="badge bg-light text-dark ms-2 small">@Lease.LeaseType</span>
+            </h5>
         </div>
         <div class="card-body">
             <div class="d-grid gap-2">
-                @if (Lease.Status == "Active" || Lease.Status == "MonthToMonth")
+                @if (isActive)
                 {
+                    @* Renewal only applies to Term leases — MTM continues automatically *@
+                    @if (isTerm)
+                    {
+                        <button class="btn btn-outline-success" @onclick="() => OnShowRenewLeaseModal.InvokeAsync(null)">
+                            <i class="bi bi-arrow-clockwise"></i> Renew Lease
+                        </button>
+                    }
                     <button class="btn btn-outline-warning" @onclick="() => OnShowTerminationNoticeModal.InvokeAsync(null)">
                         <i class="bi bi-calendar-x"></i> Record Termination Notice
                     </button>
                     <button class="btn btn-outline-danger" @onclick="() => OnShowEarlyTerminationModal.InvokeAsync(null)">
                         <i class="bi bi-x-octagon"></i> Early Termination
                     </button>
-                    <button class="btn btn-outline-secondary" @onclick="() => OnShowConvertMTMModal.InvokeAsync(null)">
-                        <i class="bi bi-arrow-repeat"></i> Convert to Month-to-Month
-                    </button>
+                    @* Convert to MTM only makes sense for Term leases *@
+                    @if (isTerm)
+                    {
+                        <button class="btn btn-outline-secondary" @onclick="() => OnShowConvertMTMModal.InvokeAsync(null)">
+                            <i class="bi bi-arrow-repeat"></i> Convert to Month-to-Month
+                        </button>
+                    }
                 }
-                @if (Lease.Status == "NoticeGiven")
+                @if (isNotice)
                 {
                     <div class="alert alert-info mb-2">
                         <small>
@@ -36,6 +59,22 @@
                         <i class="bi bi-x-octagon"></i> Early Termination
                     </button>
                 }
+                @if (isExpired)
+                {
+                    <div class="alert alert-danger mb-2">
+                        <small>
+                            <strong>Lease Expired:</strong> @Lease.EndDate.ToString("MMM dd, yyyy")<br/>
+                            The tenant remains in occupancy without a current lease agreement.
+                            Convert to month-to-month or create a new lease.
+                        </small>
+                    </div>
+                    <button class="btn btn-outline-secondary" @onclick="() => OnShowConvertMTMModal.InvokeAsync(null)">
+                        <i class="bi bi-arrow-repeat"></i> Convert to Month-to-Month
+                    </button>
+                    <button class="btn btn-outline-danger" @onclick="() => OnShowEarlyTerminationModal.InvokeAsync(null)">
+                        <i class="bi bi-x-octagon"></i> Terminate
+                    </button>
+                }
             </div>
         </div>
     </div>
@@ -43,15 +82,10 @@
 </div>
 
 @code {
-    [Parameter]
-    public Lease Lease { get; set; } = new Lease();
-
-    [Parameter]
-    public EventCallback OnShowTerminationNoticeModal { get; set; }
-    [Parameter]
-    public EventCallback OnShowEarlyTerminationModal { get; set; }
-    [Parameter]
-    public EventCallback OnShowConvertMTMModal { get; set; }
-    [Parameter]
-    public EventCallback OnShowMoveOutModal { get; set; }
+    [Parameter] public Lease Lease { get; set; } = new Lease();
+    [Parameter] public EventCallback OnShowRenewLeaseModal { get; set; }
+    [Parameter] public EventCallback OnShowTerminationNoticeModal { get; set; }
+    [Parameter] public EventCallback OnShowEarlyTerminationModal { get; set; }
+    [Parameter] public EventCallback OnShowConvertMTMModal { get; set; }
+    [Parameter] public EventCallback OnShowMoveOutModal { get; set; }
 }

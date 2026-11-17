@@ -1,6 +1,8 @@
 using System.Runtime.Versioning;
 using System.Security.Cryptography;
 using System.Text;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Nine.Infrastructure.Interfaces;
 
 namespace Nine.Infrastructure.Services;
@@ -15,13 +17,16 @@ namespace Nine.Infrastructure.Services;
 public class WindowsKeychainService : IKeychainService
 {
     private readonly string _keyFilePath;
+    private readonly ILogger _logger;
 
     /// <summary>
     /// Initialize the Windows DPAPI keychain service.
     /// </summary>
     /// <param name="appName">App-specific identifier to prevent key conflicts (e.g. "Nine-Electron")</param>
-    public WindowsKeychainService(string appName = "Nine-Electron")
+    /// <param name="logger">Optional logger for routine diagnostics (written at Debug level). Omit during startup, before DI is available.</param>
+    public WindowsKeychainService(string appName = "Nine-Electron", ILogger? logger = null)
     {
+        _logger = logger ?? NullLogger.Instance;
         var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
         var nineDir = Path.Combine(appDataPath, "Nine");
         Directory.CreateDirectory(nineDir);
@@ -30,7 +35,7 @@ public class WindowsKeychainService : IKeychainService
         var safeAppName = new string(appName.Where(c => char.IsLetterOrDigit(c) || c == '-' || c == '_').ToArray());
         _keyFilePath = Path.Combine(nineDir, $"aquiis_{safeAppName}.key");
 
-        Console.WriteLine($"[WindowsKeychainService] Initialized with key file: {_keyFilePath}");
+        _logger.LogDebug("Keychain initialized with key file {KeyFilePath}", _keyFilePath);
     }
 
     /// <summary>
@@ -41,11 +46,11 @@ public class WindowsKeychainService : IKeychainService
     {
         try
         {
-            Console.WriteLine("[WindowsKeychainService] Storing password using DPAPI");
+            _logger.LogDebug("Storing password using DPAPI");
             var plainBytes = Encoding.UTF8.GetBytes(password);
             var encryptedBytes = ProtectedData.Protect(plainBytes, null, DataProtectionScope.CurrentUser);
             File.WriteAllBytes(_keyFilePath, encryptedBytes);
-            Console.WriteLine("[WindowsKeychainService] Password stored successfully using DPAPI");
+            _logger.LogDebug("Password stored successfully using DPAPI");
             return true;
         }
         catch (Exception ex)
@@ -69,11 +74,11 @@ public class WindowsKeychainService : IKeychainService
 
         try
         {
-            Console.WriteLine("[WindowsKeychainService] Retrieving password using DPAPI");
+            _logger.LogDebug("Retrieving password using DPAPI");
             var encryptedBytes = File.ReadAllBytes(_keyFilePath);
             var plainBytes = ProtectedData.Unprotect(encryptedBytes, null, DataProtectionScope.CurrentUser);
             var password = Encoding.UTF8.GetString(plainBytes);
-            Console.WriteLine($"[WindowsKeychainService] Password retrieved successfully using DPAPI. Password status: {(string.IsNullOrEmpty(password) ? "empty" : "received")}");
+            _logger.LogDebug("Password retrieved using DPAPI. Password status: {Status}", string.IsNullOrEmpty(password) ? "empty" : "received");
             return password;
         }
         catch (CryptographicException ex)
@@ -99,7 +104,7 @@ public class WindowsKeychainService : IKeychainService
             if (File.Exists(_keyFilePath))
             {
                 File.Delete(_keyFilePath);
-                Console.WriteLine("[WindowsKeychainService] Key file deleted successfully");
+                _logger.LogDebug("Key file deleted successfully");
             }
             return true;
         }

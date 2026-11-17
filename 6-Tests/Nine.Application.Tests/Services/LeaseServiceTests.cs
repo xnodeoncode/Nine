@@ -281,7 +281,7 @@ namespace Nine.Application.Tests
         #region Property Availability Tests
 
         [Fact]
-        public async Task CreateAsync_ActiveLease_MarksPropertyUnavailable()
+        public async Task CreateAsync_ActiveLease_MarksPropertyOccupied()
         {
             // Arrange
             var lease = new Lease
@@ -300,9 +300,11 @@ namespace Nine.Application.Tests
             // Act
             await _service.CreateAsync(lease);
 
-            // Assert
+            // Assert - Property.Status reflects occupancy; Property.IsActive tracks
+            // market status (on/off market) and is unaffected by occupancy.
             var property = await _context.Properties.FindAsync(_testPropertyId);
-            Assert.False(property!.IsActive);
+            Assert.Equal(ApplicationConstants.PropertyStatuses.Occupied, property!.Status);
+            Assert.True(property.IsActive);
         }
 
         [Fact]
@@ -429,8 +431,11 @@ namespace Nine.Application.Tests
         [Fact]
         public async Task GetActiveLeasesAsync_ReturnsOnlyActiveLeases()
         {
-            // Arrange - Create leases with different statuses
-            var pendingLease = new Lease
+            // Arrange - Create leases with different statuses.
+            // Note: ApplicationConstants.LeaseStatuses.ActiveStatuses treats "Pending" as
+            // active (lease record still relevant/not archived), so use "Declined" here
+            // to represent a genuinely inactive lease.
+            var declinedLease = new Lease
             {
                 OrganizationId = _testOrgId,
                 PropertyId = _testPropertyId,
@@ -438,11 +443,11 @@ namespace Nine.Application.Tests
                 StartDate = DateTime.Today.AddMonths(1),
                 EndDate = DateTime.Today.AddMonths(13),
                 MonthlyRent = 1400,
-                Status = ApplicationConstants.LeaseStatuses.Pending,
+                Status = ApplicationConstants.LeaseStatuses.Declined,
                 CreatedBy = _testUserId,
                 CreatedOn = DateTime.UtcNow
             };
-            await _service.CreateAsync(pendingLease);
+            await _service.CreateAsync(declinedLease);
 
             // Create a second property and tenant for active lease
             var property2 = new Property
@@ -687,7 +692,7 @@ namespace Nine.Application.Tests
         }
 
         [Fact]
-        public async Task UpdateLeaseStatusAsync_UpdatesStatusAndPropertyAvailability()
+        public async Task UpdateLeaseStatusAsync_UpdatesStatusAndPropertyOccupancy()
         {
             // Arrange - Create pending lease
             var lease = new Lease
@@ -707,10 +712,12 @@ namespace Nine.Application.Tests
             // Act - Change to Active
             var updated = await _service.UpdateLeaseStatusAsync(created.Id, ApplicationConstants.LeaseStatuses.Active);
 
-            // Assert
+            // Assert - Property.Status reflects occupancy; Property.IsActive tracks
+            // market status (on/off market) and is unaffected by occupancy.
             Assert.Equal(ApplicationConstants.LeaseStatuses.Active, updated.Status);
             var property = await _context.Properties.FindAsync(_testPropertyId);
-            Assert.False(property!.IsActive);
+            Assert.Equal(ApplicationConstants.PropertyStatuses.Occupied, property!.Status);
+            Assert.True(property.IsActive);
         }
 
         [Fact]

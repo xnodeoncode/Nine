@@ -1,6 +1,5 @@
 using Nine.Shared.UI.Components.Layout;
 using Bunit;
-using FluentAssertions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -15,7 +14,7 @@ namespace Nine.Shared.UI.Tests.Components.Layout;
 /// Tests for SharedMainLayout component.
 /// Note: SharedMainLayout uses AuthorizeView, so these tests add test authorization context.
 /// </summary>
-public class SharedMainLayoutTests : TestContext
+public class SharedMainLayoutTests : BunitContext
 {
     public SharedMainLayoutTests()
     {
@@ -70,8 +69,8 @@ public class SharedMainLayoutTests : TestContext
         );
 
         // Assert
-        cut.Markup.Should().Contain("Main content");
-        cut.Markup.Should().Contain("content px-4");
+        Assert.Contains("Main content", cut.Markup);
+        Assert.Contains("content px-4", cut.Markup);
     }
 
     [Fact]
@@ -83,8 +82,8 @@ public class SharedMainLayoutTests : TestContext
         );
 
         // Assert
-        cut.Markup.Should().Contain("Sidebar content");
-        cut.Markup.Should().Contain("sidebar");
+        Assert.Contains("Sidebar content", cut.Markup);
+        Assert.Contains("sidebar", cut.Markup);
     }
 
     [Fact]
@@ -96,7 +95,7 @@ public class SharedMainLayoutTests : TestContext
         );
 
         // Assert
-        cut.Markup.Should().Contain("top-row px-4");
+        Assert.Contains("top-row px-4", cut.Markup);
     }
 
     [Fact]
@@ -108,7 +107,7 @@ public class SharedMainLayoutTests : TestContext
         );
 
         // Assert
-        cut.Markup.Should().Contain("top-row px-4");
+        Assert.Contains("top-row px-4", cut.Markup);
     }
 
     [Fact]
@@ -120,7 +119,7 @@ public class SharedMainLayoutTests : TestContext
         );
 
         // Assert
-        cut.Markup.Should().Contain("Footer content");
+        Assert.Contains("Footer content", cut.Markup);
     }
 
     [Fact]
@@ -132,7 +131,7 @@ public class SharedMainLayoutTests : TestContext
         );
 
         // Assert
-        cut.Markup.Should().Contain("data-bs-theme=\"dark\"");
+        Assert.Contains("data-bs-theme=\"dark\"", cut.Markup);
     }
 
     [Fact]
@@ -144,8 +143,8 @@ public class SharedMainLayoutTests : TestContext
         );
 
         // Assert
-        cut.Markup.Should().Contain("blazor-error-ui");
-        cut.Markup.Should().Contain("An unhandled error has occurred.");
+        Assert.Contains("blazor-error-ui", cut.Markup);
+        Assert.Contains("An unhandled error has occurred.", cut.Markup);
     }
 
     [Fact]
@@ -157,7 +156,7 @@ public class SharedMainLayoutTests : TestContext
         );
 
         // Assert
-        cut.Markup.Should().Contain("Minimal");
-        cut.Markup.Should().Contain("page");
+        Assert.Contains("Minimal", cut.Markup);
+        Assert.Contains("page", cut.Markup);
     }
 }

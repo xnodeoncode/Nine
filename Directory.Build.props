@@ -1,0 +1,13 @@
+<Project>
+  <PropertyGroup>
+    <!--
+      SQLitePCLRaw.lib.e_sqlite3 2.1.11 is flagged by GHSA-2m69-gcr7-jv3q.
+      This is a transitive dependency of SQLitePCLRaw.bundle_e_sqlcipher.
+      The lib.e_sqlite3 native library is never loaded at runtime — SQLCipher
+      replaces it. No patched version exists (2.1.11 is the latest 2.x release
+      and v3.x removed free encryption support). Suppressing the advisory.
+    -->
+    <NuGetAuditSuppressUrls>https://github.com/advisories/GHSA-2m69-gcr7-jv3q</NuGetAuditSuppressUrls>
+    <NoWarn>$(NoWarn);NU1903</NoWarn>
+  </PropertyGroup>
+</Project>

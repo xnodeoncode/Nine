@@ -2,10 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using Nine.Core.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Nine.Core.Entities;
 
 #pragma warning disable 219, 612, 618
 #nullable disable
@@ -21,7 +21,7 @@ namespace Nine.Infrastructure.Data.CompiledModels
                 "Nine.Core.Entities.ChecklistItem",
                 typeof(ChecklistItem),
                 baseEntityType,
-                propertyCount: 18,
+                propertyCount: 21,
                 navigationCount: 1,
                 foreignKeyCount: 1,
                 unnamedIndexCount: 1,
@@ -34,6 +34,21 @@ namespace Nine.Infrastructure.Data.CompiledModels
                 fieldInfo: typeof(BaseModel).GetField("<Id>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 afterSaveBehavior: PropertySaveBehavior.Throw,
                 sentinel: new Guid("00000000-0000-0000-0000-000000000000"));
+
+            var archivedBy = runtimeEntityType.AddProperty(
+                "ArchivedBy",
+                typeof(string),
+                propertyInfo: typeof(BaseModel).GetProperty("ArchivedBy", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(BaseModel).GetField("<ArchivedBy>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                nullable: true,
+                maxLength: 100);
+
+            var archivedOn = runtimeEntityType.AddProperty(
+                "ArchivedOn",
+                typeof(DateTime?),
+                propertyInfo: typeof(BaseModel).GetProperty("ArchivedOn", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(BaseModel).GetField("<ArchivedOn>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                nullable: true);
 
             var categorySection = runtimeEntityType.AddProperty(
                 "CategorySection",
@@ -63,6 +78,13 @@ namespace Nine.Infrastructure.Data.CompiledModels
                 propertyInfo: typeof(BaseModel).GetProperty("CreatedOn", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(BaseModel).GetField("<CreatedOn>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
+
+            var isArchived = runtimeEntityType.AddProperty(
+                "IsArchived",
+                typeof(bool),
+                propertyInfo: typeof(BaseModel).GetProperty("IsArchived", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(BaseModel).GetField("<IsArchived>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                sentinel: false);
 
             var isChecked = runtimeEntityType.AddProperty(
                 "IsChecked",

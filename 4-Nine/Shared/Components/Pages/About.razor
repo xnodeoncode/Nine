@@ -1,21 +1,116 @@
 @page "/about"
+@inject ThemeService ThemeService
+@inject ApplicationService ApplicationService
+@attribute [AllowAnonymous]
+@rendermode InteractiveServer
+@implements IDisposable
 
 <div class="text-center py-5">
     <div class="container">
-        <h1 class="display-4">Property Management System</h1>
-        <p class="lead">Manage your rental properties, tenants, leases, and payments with ease.</p>
-        <hr class="my-4">
-        <AuthorizeView>
-        <Authorized>
-            <p>Welcome back! Access your <a href="/">dashboard</a> to manage your properties.</p>
-        </Authorized>
-        <NotAuthorized>
-        <p>Sign in to access your dashboard and manage your properties.</p>
-        <div class="btn-group">
-            <a class="btn btn-primary btn-lg" href="/Account/Login" role="button">Sign In</a>
-            <a class="btn btn-outline-primary btn-lg" href="/Account/Register" role="button">Create Account</a>
+        <div class="text-start">
+            <h1 class="display-4"><img src="@LogoSrc" width="90" alt="Nine." /></h1>
         </div>
-        </NotAuthorized>
-        </AuthorizeView>
+        <div class="d-flex flex-wrap gap-2 my-3 align-items-center">
+            <a href="@ReleaseNotesUrl" target="_blank" class="text-decoration-none"
+               title="Release notes (opens in your default browser)">
+                <span class="badge text-bg-primary">version @ApplicationService.ApplicationSettings.Version</span>
+            </a>
+            <a href="licenses/Nine-LICENSE.txt" target="_blank" class="text-decoration-none" title="Nine license">
+                <span class="badge text-bg-success">license MIT</span>
+            </a>
+            <span class="badge text-bg-secondary">.NET @Environment.Version.Major.@Environment.Version.Minor</span>
+            <span class="badge text-bg-light border">platform Linux | Windows</span>
+            <a href="@ApplicationService.ApplicationSettings.Website" target="_blank" class="text-decoration-none"
+               title="Opens in your default browser">
+                <span class="badge text-bg-info">website nineapp.co</span>
+            </a>
+        </div>
+
+        <hr class="my-4">
+        <div class="text-start">
+            <h5 class="mb-3">What is Nine?</h5>
+            <p class="lead">
+                <strong>Nine</strong> is a free, open-source desktop application designed to help real estate investors, property managers, and landlords manage up to nine residential rental properties with ease.
+            </p>
+        </div>
+        <div class="text-start">
+            <h5 class="mt-4 mb-3">Nine is perfect for:</h5>
+            <ul class="list leading-relaxed">
+                <li>Independent property managers and landlords</li>
+                <li>Property owners who self-manage their rentals</li>
+                <li>New real estate investors building their portfolio</li>
+                <li>Anyone seeking focused, no-subscription property management software</li>
+            </ul>
+        </div>
+        <hr class="my-4">
+        <div class="text-start" id="third-party-licenses">
+            <h5 class="mb-3">Third-Party Licenses</h5>
+            <p>
+                Nine is released under the MIT License (<a href="licenses/Nine-LICENSE.txt" target="_blank">view</a>).
+                It includes third-party software that is licensed separately, including QuestPDF, SQLCipher,
+                Electron and Bootstrap.
+                The complete list, with the license text for each component, is on the
+                <a href="licenses">third-party licenses</a> page
+                (stored with the application; no internet connection is needed).
+            </p>
+            <h6>PDF generation (QuestPDF)</h6>
+            <p>
+                Nine uses QuestPDF to generate its documents. QuestPDF is free for organizations and individuals with
+                annual gross revenue under USD 1,000,000, for charitable and qualifying academic organizations, and for
+                open-source projects. Government and public-sector organizations and publicly traded companies require a
+                paid QuestPDF license.
+                <a href="licenses/questpdf/QuestPDF-PackageLicense.txt" target="_blank">QuestPDF license text</a>.
+                Current terms: <a href="https://www.questpdf.com/license/community.html">questpdf.com/license/community.html</a>
+                (opens in your default browser).
+            </p>
+            <p>
+                <strong>You are responsible for confirming that you are eligible to use QuestPDF.</strong>
+                This notice is informational and is not legal advice.
+            </p>
+        </div>
+
+        <hr class="my-4">
+
+        <div class="d-flex flex-wrap justify-content-center gap-2 mt-3">
+            <a class="btn btn-outline-success" href="https://github.com/xnodeoncode/Nine/releases" target="_blank">
+                Download Latest Release
+            </a>
+        </div>
     </div>
 </div>
+
+@code {
+    // Release notes for the installed version (tag vX.Y.Z); opens in the default browser.
+    private string ReleaseNotesUrl
+    {
+        get
+        {
+            var repo = string.IsNullOrWhiteSpace(ApplicationService.ApplicationSettings.Repository)
+                ? "https://github.com/xnodeoncode/Nine"
+                : ApplicationService.ApplicationSettings.Repository.TrimEnd('/');
+            return $"{repo}/releases/tag/v{ApplicationService.ApplicationSettings.Version}";
+        }
+    }
+
+    // Obsidian always uses the inverted logo. Bootstrap and Teal use inverted in dark mode only.
+    private string LogoSrc => (ThemeService.CurrentTheme == "dark")
+        ? "/assets/nine-logo-inverted.svg"
+        : "/assets/nine-logo.svg";
+
+    protected override void OnInitialized()
+    {
+        ThemeService.OnThemeChanged += OnThemeChanged;
+        ThemeService.OnBrandThemeChanged += OnThemeChanged;
+    }
+
+    private void OnThemeChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        ThemeService.OnThemeChanged -= OnThemeChanged;
+        ThemeService.OnBrandThemeChanged -= OnThemeChanged;
+    }
+}

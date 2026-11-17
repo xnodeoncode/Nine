@@ -1,0 +1,71 @@
+@using Nine.Core.Entities
+@namespace Nine.Shared.UI.Components.Entities.PropertyExpenses
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Property Expenses</h5>
+        @if (ShowAddButton)
+        {
+            <button type="button" class="btn btn-sm btn-outline-primary" @onclick="() => OnAddExpense.InvokeAsync()">
+                <i class="bi bi-plus-lg"></i> Add Property Expense
+            </button>
+        }
+    </div>
+    <div class="card-body">
+        @if (Expenses == null || !Expenses.Any())
+        {
+            <p class="text-muted mb-0">No fixed expenses have been added for this property yet.</p>
+        }
+        else
+        {
+            <ul class="list-group list-group-flush mb-3">
+                @foreach (var expense in Expenses)
+                {
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                        <div>
+                            <div class="fw-semibold">@expense.ExpenseType</div>
+                            @if (!string.IsNullOrWhiteSpace(expense.Description))
+                            {
+                                <div class="text-muted small">@expense.Description</div>
+                            }
+                            <div class="text-muted small">@expense.RecurrencePattern.Frequency</div>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="fw-semibold">@expense.MonthlyAmount.ToString("C")/mo</span>
+                            @if (ShowEditButton)
+                            {
+                                <button type="button" class="btn btn-sm btn-outline-secondary" title="Edit"
+                                        @onclick="() => OnEditExpense.InvokeAsync(expense)">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                            }
+                        </div>
+                    </li>
+                }
+            </ul>
+            <div class="d-flex justify-content-between align-items-center border-top pt-2">
+                <span class="fw-bold">Total</span>
+                <span class="fw-bold">@TotalMonthlyAmount.ToString("C")/mo</span>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public List<PropertyExpense>? Expenses { get; set; }
+
+    [Parameter]
+    public bool ShowAddButton { get; set; } = true;
+
+    [Parameter]
+    public bool ShowEditButton { get; set; } = false;
+
+    [Parameter]
+    public EventCallback OnAddExpense { get; set; }
+
+    [Parameter]
+    public EventCallback<PropertyExpense> OnEditExpense { get; set; }
+
+    private decimal TotalMonthlyAmount => Expenses?.Sum(e => e.MonthlyAmount) ?? 0m;
+}

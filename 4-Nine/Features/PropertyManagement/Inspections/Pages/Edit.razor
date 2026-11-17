@@ -1,1 +1,567 @@
-@page "/propertymanagement/inspections/{InspectionId:guid}/edit"
+@page "/propertymanagement/inspections/edit/{InspectionId:guid}"
+
+@using Nine.Core.Entities
+@using Nine.Core.Validation
+@using Nine.Features.PropertyManagement
+@using Nine.Application.Services
+@using Nine.Shared.Services
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Forms
+@using System.ComponentModel.DataAnnotations
+
+@inject InspectionService InspectionService
+@inject PropertyService PropertyService
+@inject UserContextService UserContext
+@inject NavigationManager NavigationManager
+@attribute [OrganizationAuthorize("Owner", "Administrator", "PropertyManager")]
+@rendermode InteractiveServer
+
+<PageTitle>Edit Inspection</PageTitle>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="bi bi-clipboard-check"></i> Edit Inspection</h1>
+    <button class="btn btn-outline-secondary" @onclick="Cancel">
+        <i class="bi bi-x-circle"></i> Cancel
+    </button>
+</div>
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @errorMessage
+        <button type="button" class="btn-close" @onclick="() => errorMessage = null"></button>
+    </div>
+}
+
+@if (property == null || model == null)
+{
+    <div class="text-center">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+}
+else
+{
+    @if (!string.IsNullOrEmpty(successMessage))
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill"></i> @successMessage
+            <button type="button" class="btn-close" @onclick="@(() => successMessage = null)"></button>
+        </div>
+    }
+
+    <div class="row">
+        <div class="col-md-8">
+            <EditForm Model="model" OnValidSubmit="SaveInspection" FormName="editInspection">
+                <DataAnnotationsValidator />
+                <ValidationSummary class="text-danger" />
+
+                <!-- Property Information Card -->
+                <div class="card mb-3">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="bi bi-building"></i> Property Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-1"><strong>@property.Address</strong></p>
+                        <p class="text-muted mb-0">@property.City, @property.State @property.ZipCode</p>
+                    </div>
+                </div>
+
+                <!-- Inspection Details Card -->
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-info-circle"></i> Inspection Details</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Inspection Date *</label>
+                                <InputDate @bind-Value="model.CompletedOn" class="form-control" />
+                                <ValidationMessage For="() => model.CompletedOn" />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Inspection Type *</label>
+                                <InputSelect @bind-Value="model.InspectionType" class="form-select">
+                                    <option value="Routine">Routine</option>
+                                    <option value="Move-In">Move-In</option>
+                                    <option value="Move-Out">Move-Out</option>
+                                    <option value="Maintenance">Maintenance</option>
+                                </InputSelect>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Inspected By</label>
+                            <InputText @bind-Value="model.InspectedBy" class="form-control" placeholder="Inspector name" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Exterior Inspection Card -->
+                <div class="card mb-3">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="bi bi-house"></i> Exterior Inspection</h5>
+                        <button type="button" class="btn btn-sm btn-outline-success" @onclick="MarkAllExteriorGood">
+                            <i class="bi bi-check-all"></i> Mark All as Good
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <InspectionChecklistItem Label="Roof" @bind-IsGood="model.ExteriorRoofGood" @bind-Notes="model.ExteriorRoofNotes" />
+                        <InspectionChecklistItem Label="Gutters & Downspouts" @bind-IsGood="model.ExteriorGuttersGood" @bind-Notes="model.ExteriorGuttersNotes" />
+                        <InspectionChecklistItem Label="Siding/Paint" @bind-IsGood="model.ExteriorSidingGood" @bind-Notes="model.ExteriorSidingNotes" />
+                        <InspectionChecklistItem Label="Windows" @bind-IsGood="model.ExteriorWindowsGood" @bind-Notes="model.ExteriorWindowsNotes" />
+                        <InspectionChecklistItem Label="Doors" @bind-IsGood="model.ExteriorDoorsGood" @bind-Notes="model.ExteriorDoorsNotes" />
+                        <InspectionChecklistItem Label="Foundation" @bind-IsGood="model.ExteriorFoundationGood" @bind-Notes="model.ExteriorFoundationNotes" />
+                        <InspectionChecklistItem Label="Landscaping & Drainage" @bind-IsGood="model.LandscapingGood" @bind-Notes="model.LandscapingNotes" />
+                    </div>
+                </div>
+
+                <!-- Interior Inspection Card -->
+                <div class="card mb-3">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="bi bi-door-open"></i> Interior Inspection</h5>
+                        <button type="button" class="btn btn-sm btn-outline-success" @onclick="MarkAllInteriorGood">
+                            <i class="bi bi-check-all"></i> Mark All as Good
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <InspectionChecklistItem Label="Walls" @bind-IsGood="model.InteriorWallsGood" @bind-Notes="model.InteriorWallsNotes" />
+                        <InspectionChecklistItem Label="Ceilings" @bind-IsGood="model.InteriorCeilingsGood" @bind-Notes="model.InteriorCeilingsNotes" />
+                        <InspectionChecklistItem Label="Floors" @bind-IsGood="model.InteriorFloorsGood" @bind-Notes="model.InteriorFloorsNotes" />
+                        <InspectionChecklistItem Label="Doors" @bind-IsGood="model.InteriorDoorsGood" @bind-Notes="model.InteriorDoorsNotes" />
+                        <InspectionChecklistItem Label="Windows" @bind-IsGood="model.InteriorWindowsGood" @bind-Notes="model.InteriorWindowsNotes" />
+                    </div>
+                </div>
+
+                <!-- Kitchen Inspection Card -->
+                <div class="card mb-3">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="bi bi-cup-hot"></i> Kitchen</h5>
+                        <button type="button" class="btn btn-sm btn-outline-success" @onclick="MarkAllKitchenGood">
+                            <i class="bi bi-check-all"></i> Mark All as Good
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <InspectionChecklistItem Label="Appliances" @bind-IsGood="model.KitchenAppliancesGood" @bind-Notes="model.KitchenAppliancesNotes" />
+                        <InspectionChecklistItem Label="Cabinets & Drawers" @bind-IsGood="model.KitchenCabinetsGood" @bind-Notes="model.KitchenCabinetsNotes" />
+                        <InspectionChecklistItem Label="Countertops" @bind-IsGood="model.KitchenCountersGood" @bind-Notes="model.KitchenCountersNotes" />
+                        <InspectionChecklistItem Label="Sink & Plumbing" @bind-IsGood="model.KitchenSinkPlumbingGood" @bind-Notes="model.KitchenSinkPlumbingNotes" />
+                    </div>
+                </div>
+
+                <!-- Bathroom Inspection Card -->
+                <div class="card mb-3">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="bi bi-droplet"></i> Bathroom</h5>
+                        <button type="button" class="btn btn-sm btn-outline-success" @onclick="MarkAllBathroomGood">
+                            <i class="bi bi-check-all"></i> Mark All as Good
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <InspectionChecklistItem Label="Toilet" @bind-IsGood="model.BathroomToiletGood" @bind-Notes="model.BathroomToiletNotes" />
+                        <InspectionChecklistItem Label="Sink & Vanity" @bind-IsGood="model.BathroomSinkGood" @bind-Notes="model.BathroomSinkNotes" />
+                        <InspectionChecklistItem Label="Tub/Shower" @bind-IsGood="model.BathroomTubShowerGood" @bind-Notes="model.BathroomTubShowerNotes" />
+                        <InspectionChecklistItem Label="Ventilation/Exhaust Fan" @bind-IsGood="model.BathroomVentilationGood" @bind-Notes="model.BathroomVentilationNotes" />
+                    </div>
+                </div>
+
+                <!-- Systems Inspection Card -->
+                <div class="card mb-3">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="bi bi-gear"></i> Systems & Safety</h5>
+                        <button type="button" class="btn btn-sm btn-outline-success" @onclick="MarkAllSystemsGood">
+                            <i class="bi bi-check-all"></i> Mark All as Good
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <InspectionChecklistItem Label="HVAC System" @bind-IsGood="model.HvacSystemGood" @bind-Notes="model.HvacSystemNotes" />
+                        <InspectionChecklistItem Label="Electrical System" @bind-IsGood="model.ElectricalSystemGood" @bind-Notes="model.ElectricalSystemNotes" />
+                        <InspectionChecklistItem Label="Plumbing System" @bind-IsGood="model.PlumbingSystemGood" @bind-Notes="model.PlumbingSystemNotes" />
+                        <InspectionChecklistItem Label="Smoke Detectors" @bind-IsGood="model.SmokeDetectorsGood" @bind-Notes="model.SmokeDetectorsNotes" />
+                        <InspectionChecklistItem Label="Carbon Monoxide Detectors" @bind-IsGood="model.CarbonMonoxideDetectorsGood" @bind-Notes="model.CarbonMonoxideDetectorsNotes" />
+                    </div>
+                </div>
+
+                <!-- Overall Assessment Card -->
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-clipboard-data"></i> Overall Assessment</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label">Overall Condition *</label>
+                            <InputSelect @bind-Value="model.OverallCondition" class="form-select">
+                                <option value="Excellent">Excellent</option>
+                                <option value="Good">Good</option>
+                                <option value="Fair">Fair</option>
+                                <option value="Poor">Poor</option>
+                            </InputSelect>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">General Notes</label>
+                            <InputTextArea @bind-Value="model.GeneralNotes" class="form-control" rows="4" placeholder="Additional observations or comments..." />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Action Items Required</label>
+                            <InputTextArea @bind-Value="model.ActionItemsRequired" class="form-control" rows="4" placeholder="List any repairs or follow-up actions needed..." />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Buttons -->
+                <div class="d-flex gap-2 mb-4">
+                    <button type="submit" class="btn btn-primary" disabled="@isSaving">
+                        @if (isSaving)
+                        {
+                            <span class="spinner-border spinner-border-sm me-2"></span>
+                        }
+                        <i class="bi bi-check-circle"></i> Save Changes
+                    </button>
+                    <button type="button" class="btn btn-secondary" @onclick="Cancel">
+                        <i class="bi bi-x-circle"></i> Cancel
+                    </button>
+                </div>
+            </EditForm>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-md-4">
+            <div class="card sticky-top" style="top: 20px;">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="bi bi-info-circle"></i> Inspection Tips</h6>
+                </div>
+                <div class="card-body">
+                    <ul class="small mb-0">
+                        <li>Take photos of any issues found</li>
+                        <li>Check all appliances for proper operation</li>
+                        <li>Test all outlets and switches</li>
+                        <li>Run water in all sinks/tubs</li>
+                        <li>Check for signs of moisture/leaks</li>
+                        <li>Note any safety concerns immediately</li>
+                        <li>Document any tenant-caused damage</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public Guid InspectionId { get; set; }
+
+    private Inspection? inspection;
+    private Property? property;
+    private InspectionModel? model;
+    private string? errorMessage;
+    private string? successMessage;
+    private bool isSaving = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        inspection = await InspectionService.GetByIdAsync(InspectionId);
+
+        if (inspection == null)
+        {
+            errorMessage = "Inspection not found.";
+            return;
+        }
+
+        property = await PropertyService.GetByIdAsync(inspection.PropertyId);
+
+        if (property == null)
+        {
+            errorMessage = "Property not found.";
+            return;
+        }
+
+        model = new InspectionModel
+        {
+            PropertyId = inspection.PropertyId,
+            LeaseId = inspection.LeaseId,
+            CompletedOn = inspection.CompletedOn,
+            InspectionType = inspection.InspectionType,
+            InspectedBy = inspection.InspectedBy,
+            ExteriorRoofGood = inspection.ExteriorRoofGood,
+            ExteriorRoofNotes = inspection.ExteriorRoofNotes,
+            ExteriorGuttersGood = inspection.ExteriorGuttersGood,
+            ExteriorGuttersNotes = inspection.ExteriorGuttersNotes,
+            ExteriorSidingGood = inspection.ExteriorSidingGood,
+            ExteriorSidingNotes = inspection.ExteriorSidingNotes,
+            ExteriorWindowsGood = inspection.ExteriorWindowsGood,
+            ExteriorWindowsNotes = inspection.ExteriorWindowsNotes,
+            ExteriorDoorsGood = inspection.ExteriorDoorsGood,
+            ExteriorDoorsNotes = inspection.ExteriorDoorsNotes,
+            ExteriorFoundationGood = inspection.ExteriorFoundationGood,
+            ExteriorFoundationNotes = inspection.ExteriorFoundationNotes,
+            LandscapingGood = inspection.LandscapingGood,
+            LandscapingNotes = inspection.LandscapingNotes,
+            InteriorWallsGood = inspection.InteriorWallsGood,
+            InteriorWallsNotes = inspection.InteriorWallsNotes,
+            InteriorCeilingsGood = inspection.InteriorCeilingsGood,
+            InteriorCeilingsNotes = inspection.InteriorCeilingsNotes,
+            InteriorFloorsGood = inspection.InteriorFloorsGood,
+            InteriorFloorsNotes = inspection.InteriorFloorsNotes,
+            InteriorDoorsGood = inspection.InteriorDoorsGood,
+            InteriorDoorsNotes = inspection.InteriorDoorsNotes,
+            InteriorWindowsGood = inspection.InteriorWindowsGood,
+            InteriorWindowsNotes = inspection.InteriorWindowsNotes,
+            KitchenAppliancesGood = inspection.KitchenAppliancesGood,
+            KitchenAppliancesNotes = inspection.KitchenAppliancesNotes,
+            KitchenCabinetsGood = inspection.KitchenCabinetsGood,
+            KitchenCabinetsNotes = inspection.KitchenCabinetsNotes,
+            KitchenCountersGood = inspection.KitchenCountersGood,
+            KitchenCountersNotes = inspection.KitchenCountersNotes,
+            KitchenSinkPlumbingGood = inspection.KitchenSinkPlumbingGood,
+            KitchenSinkPlumbingNotes = inspection.KitchenSinkPlumbingNotes,
+            BathroomToiletGood = inspection.BathroomToiletGood,
+            BathroomToiletNotes = inspection.BathroomToiletNotes,
+            BathroomSinkGood = inspection.BathroomSinkGood,
+            BathroomSinkNotes = inspection.BathroomSinkNotes,
+            BathroomTubShowerGood = inspection.BathroomTubShowerGood,
+            BathroomTubShowerNotes = inspection.BathroomTubShowerNotes,
+            BathroomVentilationGood = inspection.BathroomVentilationGood,
+            BathroomVentilationNotes = inspection.BathroomVentilationNotes,
+            HvacSystemGood = inspection.HvacSystemGood,
+            HvacSystemNotes = inspection.HvacSystemNotes,
+            ElectricalSystemGood = inspection.ElectricalSystemGood,
+            ElectricalSystemNotes = inspection.ElectricalSystemNotes,
+            PlumbingSystemGood = inspection.PlumbingSystemGood,
+            PlumbingSystemNotes = inspection.PlumbingSystemNotes,
+            SmokeDetectorsGood = inspection.SmokeDetectorsGood,
+            SmokeDetectorsNotes = inspection.SmokeDetectorsNotes,
+            CarbonMonoxideDetectorsGood = inspection.CarbonMonoxideDetectorsGood,
+            CarbonMonoxideDetectorsNotes = inspection.CarbonMonoxideDetectorsNotes,
+            OverallCondition = inspection.OverallCondition,
+            GeneralNotes = inspection.GeneralNotes,
+            ActionItemsRequired = inspection.ActionItemsRequired,
+        };
+    }
+
+    private async Task SaveInspection()
+    {
+        if (inspection == null || model == null) return;
+
+        try
+        {
+            isSaving = true;
+            errorMessage = null;
+            successMessage = null;
+
+            // Apply model changes onto the tracked entity; service sets tracking fields.
+            inspection.CompletedOn = model.CompletedOn;
+            inspection.InspectionType = model.InspectionType;
+            inspection.InspectedBy = model.InspectedBy;
+            inspection.ExteriorRoofGood = model.ExteriorRoofGood;
+            inspection.ExteriorRoofNotes = model.ExteriorRoofNotes;
+            inspection.ExteriorGuttersGood = model.ExteriorGuttersGood;
+            inspection.ExteriorGuttersNotes = model.ExteriorGuttersNotes;
+            inspection.ExteriorSidingGood = model.ExteriorSidingGood;
+            inspection.ExteriorSidingNotes = model.ExteriorSidingNotes;
+            inspection.ExteriorWindowsGood = model.ExteriorWindowsGood;
+            inspection.ExteriorWindowsNotes = model.ExteriorWindowsNotes;
+            inspection.ExteriorDoorsGood = model.ExteriorDoorsGood;
+            inspection.ExteriorDoorsNotes = model.ExteriorDoorsNotes;
+            inspection.ExteriorFoundationGood = model.ExteriorFoundationGood;
+            inspection.ExteriorFoundationNotes = model.ExteriorFoundationNotes;
+            inspection.LandscapingGood = model.LandscapingGood;
+            inspection.LandscapingNotes = model.LandscapingNotes;
+            inspection.InteriorWallsGood = model.InteriorWallsGood;
+            inspection.InteriorWallsNotes = model.InteriorWallsNotes;
+            inspection.InteriorCeilingsGood = model.InteriorCeilingsGood;
+            inspection.InteriorCeilingsNotes = model.InteriorCeilingsNotes;
+            inspection.InteriorFloorsGood = model.InteriorFloorsGood;
+            inspection.InteriorFloorsNotes = model.InteriorFloorsNotes;
+            inspection.InteriorDoorsGood = model.InteriorDoorsGood;
+            inspection.InteriorDoorsNotes = model.InteriorDoorsNotes;
+            inspection.InteriorWindowsGood = model.InteriorWindowsGood;
+            inspection.InteriorWindowsNotes = model.InteriorWindowsNotes;
+            inspection.KitchenAppliancesGood = model.KitchenAppliancesGood;
+            inspection.KitchenAppliancesNotes = model.KitchenAppliancesNotes;
+            inspection.KitchenCabinetsGood = model.KitchenCabinetsGood;
+            inspection.KitchenCabinetsNotes = model.KitchenCabinetsNotes;
+            inspection.KitchenCountersGood = model.KitchenCountersGood;
+            inspection.KitchenCountersNotes = model.KitchenCountersNotes;
+            inspection.KitchenSinkPlumbingGood = model.KitchenSinkPlumbingGood;
+            inspection.KitchenSinkPlumbingNotes = model.KitchenSinkPlumbingNotes;
+            inspection.BathroomToiletGood = model.BathroomToiletGood;
+            inspection.BathroomToiletNotes = model.BathroomToiletNotes;
+            inspection.BathroomSinkGood = model.BathroomSinkGood;
+            inspection.BathroomSinkNotes = model.BathroomSinkNotes;
+            inspection.BathroomTubShowerGood = model.BathroomTubShowerGood;
+            inspection.BathroomTubShowerNotes = model.BathroomTubShowerNotes;
+            inspection.BathroomVentilationGood = model.BathroomVentilationGood;
+            inspection.BathroomVentilationNotes = model.BathroomVentilationNotes;
+            inspection.HvacSystemGood = model.HvacSystemGood;
+            inspection.HvacSystemNotes = model.HvacSystemNotes;
+            inspection.ElectricalSystemGood = model.ElectricalSystemGood;
+            inspection.ElectricalSystemNotes = model.ElectricalSystemNotes;
+            inspection.PlumbingSystemGood = model.PlumbingSystemGood;
+            inspection.PlumbingSystemNotes = model.PlumbingSystemNotes;
+            inspection.SmokeDetectorsGood = model.SmokeDetectorsGood;
+            inspection.SmokeDetectorsNotes = model.SmokeDetectorsNotes;
+            inspection.CarbonMonoxideDetectorsGood = model.CarbonMonoxideDetectorsGood;
+            inspection.CarbonMonoxideDetectorsNotes = model.CarbonMonoxideDetectorsNotes;
+            inspection.OverallCondition = model.OverallCondition;
+            inspection.GeneralNotes = model.GeneralNotes;
+            inspection.ActionItemsRequired = model.ActionItemsRequired;
+
+            await InspectionService.UpdateAsync(inspection);
+
+            successMessage = "Inspection updated successfully!";
+
+            // Navigate to view inspection page after short delay
+            await Task.Delay(500);
+            NavigationManager.NavigateTo($"/propertymanagement/inspections/{inspection.Id}");
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error saving inspection: {ex.Message}";
+        }
+        finally
+        {
+            isSaving = false;
+        }
+    }
+
+    private void Cancel()
+    {
+        NavigationManager.NavigateTo($"/propertymanagement/inspections/{InspectionId}");
+    }
+
+    private void MarkAllExteriorGood()
+    {
+        if (model == null) return;
+        model.ExteriorRoofGood = true;
+        model.ExteriorGuttersGood = true;
+        model.ExteriorSidingGood = true;
+        model.ExteriorWindowsGood = true;
+        model.ExteriorDoorsGood = true;
+        model.ExteriorFoundationGood = true;
+        model.LandscapingGood = true;
+    }
+
+    private void MarkAllInteriorGood()
+    {
+        if (model == null) return;
+        model.InteriorWallsGood = true;
+        model.InteriorCeilingsGood = true;
+        model.InteriorFloorsGood = true;
+        model.InteriorDoorsGood = true;
+        model.InteriorWindowsGood = true;
+    }
+
+    private void MarkAllKitchenGood()
+    {
+        if (model == null) return;
+        model.KitchenAppliancesGood = true;
+        model.KitchenCabinetsGood = true;
+        model.KitchenCountersGood = true;
+        model.KitchenSinkPlumbingGood = true;
+    }
+
+    private void MarkAllBathroomGood()
+    {
+        if (model == null) return;
+        model.BathroomToiletGood = true;
+        model.BathroomSinkGood = true;
+        model.BathroomTubShowerGood = true;
+        model.BathroomVentilationGood = true;
+    }
+
+    private void MarkAllSystemsGood()
+    {
+        if (model == null) return;
+        model.HvacSystemGood = true;
+        model.ElectricalSystemGood = true;
+        model.PlumbingSystemGood = true;
+        model.SmokeDetectorsGood = true;
+        model.CarbonMonoxideDetectorsGood = true;
+    }
+
+    public class InspectionModel
+    {
+        [RequiredGuid]
+        public Guid PropertyId { get; set; }
+
+        [OptionalGuid]
+        public Guid? LeaseId { get; set; }
+
+        [Required]
+        public DateTime CompletedOn { get; set; } = DateTime.Today;
+
+        [Required]
+        [StringLength(50)]
+        public string InspectionType { get; set; } = "Routine";
+
+        [StringLength(100)]
+        public string? InspectedBy { get; set; }
+
+        // Exterior
+        public bool ExteriorRoofGood { get; set; }
+        public string? ExteriorRoofNotes { get; set; }
+        public bool ExteriorGuttersGood { get; set; }
+        public string? ExteriorGuttersNotes { get; set; }
+        public bool ExteriorSidingGood { get; set; }
+        public string? ExteriorSidingNotes { get; set; }
+        public bool ExteriorWindowsGood { get; set; }
+        public string? ExteriorWindowsNotes { get; set; }
+        public bool ExteriorDoorsGood { get; set; }
+        public string? ExteriorDoorsNotes { get; set; }
+        public bool ExteriorFoundationGood { get; set; }
+        public string? ExteriorFoundationNotes { get; set; }
+        public bool LandscapingGood { get; set; }
+        public string? LandscapingNotes { get; set; }
+
+        // Interior
+        public bool InteriorWallsGood { get; set; }
+        public string? InteriorWallsNotes { get; set; }
+        public bool InteriorCeilingsGood { get; set; }
+        public string? InteriorCeilingsNotes { get; set; }
+        public bool InteriorFloorsGood { get; set; }
+        public string? InteriorFloorsNotes { get; set; }
+        public bool InteriorDoorsGood { get; set; }
+        public string? InteriorDoorsNotes { get; set; }
+        public bool InteriorWindowsGood { get; set; }
+        public string? InteriorWindowsNotes { get; set; }
+
+        // Kitchen
+        public bool KitchenAppliancesGood { get; set; }
+        public string? KitchenAppliancesNotes { get; set; }
+        public bool KitchenCabinetsGood { get; set; }
+        public string? KitchenCabinetsNotes { get; set; }
+        public bool KitchenCountersGood { get; set; }
+        public string? KitchenCountersNotes { get; set; }
+        public bool KitchenSinkPlumbingGood { get; set; }
+        public string? KitchenSinkPlumbingNotes { get; set; }
+
+        // Bathroom
+        public bool BathroomToiletGood { get; set; }
+        public string? BathroomToiletNotes { get; set; }
+        public bool BathroomSinkGood { get; set; }
+        public string? BathroomSinkNotes { get; set; }
+        public bool BathroomTubShowerGood { get; set; }
+        public string? BathroomTubShowerNotes { get; set; }
+        public bool BathroomVentilationGood { get; set; }
+        public string? BathroomVentilationNotes { get; set; }
+
+        // Systems
+        public bool HvacSystemGood { get; set; }
+        public string? HvacSystemNotes { get; set; }
+        public bool ElectricalSystemGood { get; set; }
+        public string? ElectricalSystemNotes { get; set; }
+        public bool PlumbingSystemGood { get; set; }
+        public string? PlumbingSystemNotes { get; set; }
+        public bool SmokeDetectorsGood { get; set; }
+        public string? SmokeDetectorsNotes { get; set; }
+        public bool CarbonMonoxideDetectorsGood { get; set; }
+        public string? CarbonMonoxideDetectorsNotes { get; set; }
+
+        // Overall
+        [Required]
+        [StringLength(50)]
+        public string OverallCondition { get; set; } = "Good";
+        public string? GeneralNotes { get; set; }
+        public string? ActionItemsRequired { get; set; }
+    }
+}

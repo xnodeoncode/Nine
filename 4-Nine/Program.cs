@@ -25,14 +25,22 @@ SQLitePCL.raw.sqlite3_initialize();
 WebApplication app = null!;
 var builder = WebApplication.CreateBuilder(args);
 
+// Declared before UseElectron so ElectronAppReady() can capture it.
+int electronPort = 0;
+
 // Configure Electron startup callback — called when Electron's socket bridge is ready.
 builder.WebHost.UseElectron(args, ElectronAppReady);
 
 // CRITICAL: Handle .restore_pending BEFORE any DbContext registration.
 HandlePendingRestore(builder.Configuration);
 
-// Electron-only: always bind to the fixed port Electron expects
-builder.WebHost.UseUrls("http://localhost:8888");
+// Electron-only: pick a free port at startup to avoid port conflicts.
+if (HybridSupport.IsElectronActive)
+{
+    electronPort = GetFreePort();
+    builder.WebHost.UseUrls($"http://localhost:{electronPort}");
+    NetworkLockdown.RestrictHostsToLoopback(builder.Configuration);
+}
 
 
 
@@ -117,7 +125,6 @@ builder.Services.ConfigureApplicationCookie(options =>
     };
 });
 
-builder.Services.AddScoped<PropertyManagementService>();
 builder.Services.AddScoped<PropertyService>(); // New refactored service
 builder.Services.AddScoped<TenantService>(); // New refactored service
 builder.Services.AddScoped<LeaseService>(); // New refactored service
@@ -143,14 +150,7 @@ builder.Services.AddScoped<NoteService>();
 // Add to service registration section
 builder.Services.AddScoped<NotificationService>();
 
-// Phase 2.4: Notification Infrastructure
-builder.Services.AddScoped<IEmailService, EmailService>();
-builder.Services.AddScoped<ISMSService, SMSService>();
-
-// Phase 2.5: Email/SMS Integration
-builder.Services.AddScoped<EmailSettingsService>();
-builder.Services.AddScoped<SMSSettingsService>();
-// SendGridEmailService and TwilioSMSService registered in extension methods
+// Email/SMS not used in desktop app (available in Professional product via Infrastructure layer)
 
 // Workflow services
 builder.Services.AddScoped<ApplicationWorkflowService>();
@@ -164,6 +164,7 @@ builder.Services.AddScoped<NineFinancialReportService>(); // Nine uses Repairs f
 builder.Services.AddScoped<FinancialReportPdfGenerator>();
 builder.Services.AddScoped<ChecklistPdfGenerator>();
 builder.Services.AddScoped<DatabaseBackupService>();
+builder.Services.AddScoped<DatabaseHealthService>();
 builder.Services.AddScoped<SchemaValidationService>();
 builder.Services.AddScoped<LeaseWorkflowService>();
 
@@ -172,9 +173,10 @@ builder.Services.AddScoped<PasswordDerivationService>();
 builder.Services.AddScoped<IKeychainService>(sp =>
 {
     var appName = "Nine-Electron";
+    var loggerFactory = sp.GetRequiredService<ILoggerFactory>();
     if (OperatingSystem.IsWindows())
-        return new WindowsKeychainService(appName);
-    return new LinuxKeychainService(appName);
+        return new WindowsKeychainService(appName, loggerFactory.CreateLogger<WindowsKeychainService>());
+    return new LinuxKeychainService(appName, loggerFactory.CreateLogger<LinuxKeychainService>());
 });
 builder.Services.AddScoped<DatabaseEncryptionService>();
 builder.Services.AddScoped<DatabasePasswordService>();
@@ -695,6 +697,8 @@ app.MapPost("/api/session/refresh", async (HttpContext context) =>
     return Results.Ok(new { success = true, timestamp = DateTime.UtcNow });
 }).RequireAuthorization();
 
+NetworkLockdown.MapExternalLinkEndpoint(app);
+
 // Create system service account for background jobs
 // Skip if database is locked
 using (var scope = app.Services.CreateScope())
@@ -754,8 +758,12 @@ async Task ElectronAppReady()
     // app is captured from the enclosing scope — guaranteed non-null by the time
     // this fires, since Electron's ready event arrives after StartAsync completes.
 
-    // Verify backend is responding before showing window
-    var backendUrl = "http://localhost:8888";
+    // Resolve the URL Kestrel actually bound to — app.Urls is populated after
+    // StartAsync completes, so it's always accurate regardless of how the port
+    // was chosen (GetFreePort, launchSettings, ASPNETCORE_URLS, etc.).
+    var backendUrl = app.Urls.FirstOrDefault(u => u.StartsWith("http://localhost"))
+        ?? app.Urls.First();
+    app.Logger.LogInformation("Electron backend URL resolved to: {Url}", backendUrl);
     var isBackendReady = false;
 
     try
@@ -770,13 +778,19 @@ async Task ElectronAppReady()
         app.Logger.LogWarning(ex, "Backend health check failed, will show offline page");
     }
 
+    // Packaged builds get their icon from electron-builder; in development the window would show
+    // Electron's default icon, so point it at the app icon copied next to the binaries.
+    var iconPath = Path.Combine(AppContext.BaseDirectory, "Assets",
+        OperatingSystem.IsWindows() ? "icon.ico" : "icon.png");
+
     var window = await Electron.WindowManager.CreateWindowAsync(new ElectronNET.API.Entities.BrowserWindowOptions
     {
-        Width = 1400,
-        Height = 900,
+        Width = 1600,
+        Height = 1000,
         MinWidth = 800,
         MinHeight = 600,
         Show = false,
+        Icon = File.Exists(iconPath) ? iconPath : null,
     });
 
     if (OperatingSystem.IsLinux() || OperatingSystem.IsWindows())
@@ -787,17 +801,19 @@ async Task ElectronAppReady()
     window.OnReadyToShow += () => window.Show();
     window.SetTitle("Nine Property Management");
 
+    await NetworkLockdown.ApplyAsync(window, backendUrl, app.Logger);
+
     if (!isBackendReady)
     {
         app.Logger.LogWarning("Loading offline page due to backend unavailability");
         window.LoadURL($"{backendUrl}/offline.html");
     }
 
-    if (app.Environment.IsDevelopment())
-    {
-        window.WebContents.OpenDevTools();
-        app.Logger.LogInformation("DevTools opened for debugging");
-    }
+    // if (app.Environment.IsDevelopment())
+    // {
+    //     window.WebContents.OpenDevTools();
+    //     app.Logger.LogInformation("DevTools opened for debugging");
+    // }
 
     // Re-register DevTools shortcut because RemoveMenu() strips default accelerators
     Electron.GlobalShortcut.Register("CmdOrCtrl+Shift+I", () =>
@@ -811,6 +827,17 @@ async Task ElectronAppReady()
         app.Logger.LogInformation("Electron window closed, shutting down application");
         Electron.App.Quit();
     };
+}
+
+// Picks a free local port by binding a TcpListener to port 0 (OS-assigned),
+// reading the assigned port, then releasing the socket before Kestrel binds.
+static int GetFreePort()
+{
+    var listener = new System.Net.Sockets.TcpListener(System.Net.IPAddress.Loopback, 0);
+    listener.Start();
+    int port = ((System.Net.IPEndPoint)listener.LocalEndpoint).Port;
+    listener.Stop();
+    return port;
 }
 
 // Local function to handle .restore_pending before service registration

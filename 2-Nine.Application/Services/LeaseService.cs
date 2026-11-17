@@ -1,3 +1,4 @@
+using Nine.Application.Models;
 using Nine.Core.Interfaces.Services;
 using Nine.Core.Constants;
 using Nine.Core.Entities;
@@ -73,8 +74,7 @@ namespace Nine.Application.Services
                     && l.Id != entity.Id
                     && !l.IsDeleted
                     && l.Property.OrganizationId == organizationId
-                    && (l.Status == ApplicationConstants.LeaseStatuses.Active 
-                        || l.Status == ApplicationConstants.LeaseStatuses.Pending))
+                    && l.IsActive)
                 .Where(l =>
                     // New lease starts during existing lease
                     (entity.StartDate >= l.StartDate && entity.StartDate <= l.EndDate) ||
@@ -102,16 +102,19 @@ namespace Nine.Application.Services
         /// </summary>
         public override async Task<Lease> CreateAsync(Lease entity)
         {
+            // Keep IsActive in sync with the lease's initial status so queries like
+            // GetActiveLeasesAsync() correctly exclude leases created as Pending, etc.
+            entity.IsActive = ApplicationConstants.LeaseStatuses.ActiveStatuses.Contains(entity.Status);
+
             var lease = await base.CreateAsync(entity);
 
             // If lease is active, mark property as unavailable
-            if (entity.Status == ApplicationConstants.LeaseStatuses.Active)
+            if (entity.IsActive)
             {
                 var property = await _context.Properties.FindAsync(entity.PropertyId);
                 if (property != null)
                 {
                     property.Status = ApplicationConstants.PropertyStatuses.Occupied;
-                    property.IsActive = false;
                     property.LastModifiedOn = DateTime.UtcNow;
                     property.LastModifiedBy = await _userContext.GetUserIdAsync();
                     _context.Properties.Update(property);
@@ -133,20 +136,39 @@ namespace Nine.Application.Services
 
             var lease = await base.UpdateAsync(entity);
 
-            // Handle property status when lease becomes active
-            if (existingLease != null && 
-                existingLease.Status != ApplicationConstants.LeaseStatuses.Active &&
-                entity.Status == ApplicationConstants.LeaseStatuses.Active)
+            // Handle property status when lease IsActive changes
+            if (existingLease != null)
             {
                 var property = await _context.Properties.FindAsync(entity.PropertyId);
                 if (property != null)
                 {
-                    property.Status = ApplicationConstants.PropertyStatuses.Occupied;
-                    property.IsActive = false;
-                    property.LastModifiedOn = DateTime.UtcNow;
-                    property.LastModifiedBy = await _userContext.GetUserIdAsync();
-                    _context.Properties.Update(property);
-                    await _context.SaveChangesAsync();
+                    if (!existingLease.IsActive && entity.IsActive)
+                    {
+                        // Lease became active - mark property Occupied
+                        property.Status = ApplicationConstants.PropertyStatuses.Occupied;
+                        property.LastModifiedOn = DateTime.UtcNow;
+                        property.LastModifiedBy = await _userContext.GetUserIdAsync();
+                        _context.Properties.Update(property);
+                        await _context.SaveChangesAsync();
+                    }
+                    else if (existingLease.IsActive && !entity.IsActive)
+                    {
+                        // Lease became inactive - mark property Available if no other active leases
+                        var hasOtherActiveLeases = await _context.Leases
+                            .AnyAsync(l => l.PropertyId == entity.PropertyId
+                                && l.Id != entity.Id
+                                && !l.IsDeleted
+                                && l.IsActive);
+
+                        if (!hasOtherActiveLeases)
+                        {
+                            property.Status = ApplicationConstants.PropertyStatuses.Available;
+                            property.LastModifiedOn = DateTime.UtcNow;
+                            property.LastModifiedBy = await _userContext.GetUserIdAsync();
+                            _context.Properties.Update(property);
+                            await _context.SaveChangesAsync();
+                        }
+                    }
                 }
             }
 
@@ -154,32 +176,58 @@ namespace Nine.Application.Services
         }
 
         /// <summary>
-        /// Deletes (soft deletes) a lease and updates property availability if needed.
+        /// Deletes a lease and all related child records (invoices with payments, security deposits,
+        /// documents), then updates property availability if the lease was active.
         /// </summary>
         public override async Task<bool> DeleteAsync(Guid id)
         {
             var lease = await GetByIdAsync(id);
             if (lease == null) return false;
 
+            await using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+            // Cascade delete: payments → invoices → security deposits → documents
+            var invoiceIds = await _context.Invoices
+                .Where(i => i.LeaseId == id)
+                .Select(i => i.Id)
+                .ToListAsync();
+
+            foreach (var invoiceId in invoiceIds)
+            {
+                var payments = await _context.Payments.Where(p => p.InvoiceId == invoiceId).ToListAsync();
+                _context.Payments.RemoveRange(payments);
+            }
+
+            var invoices = await _context.Invoices.Where(i => i.LeaseId == id).ToListAsync();
+            _context.Invoices.RemoveRange(invoices);
+
+            var securityDeposits = await _context.SecurityDeposits.Where(s => s.LeaseId == id).ToListAsync();
+            _context.SecurityDeposits.RemoveRange(securityDeposits);
+
+            var documents = await _context.Documents.Where(d => d.LeaseId == id).ToListAsync();
+            _context.Documents.RemoveRange(documents);
+
+            await _context.SaveChangesAsync();
+
             var result = await base.DeleteAsync(id);
 
             // If lease was active, check if property should be marked available
-            if (result && lease.Status == ApplicationConstants.LeaseStatuses.Active)
+            if (result && lease.IsActive)
             {
                 var property = await _context.Properties.FindAsync(lease.PropertyId);
                 if (property != null)
                 {
-                    // Check if there are any other active/pending leases for this property
+                    // Check if there are any other active leases for this property
                     var hasOtherActiveLeases = await _context.Leases
                         .AnyAsync(l => l.PropertyId == lease.PropertyId
                             && l.Id != lease.Id
                             && !l.IsDeleted
-                            && (l.Status == ApplicationConstants.LeaseStatuses.Active 
-                                || l.Status == ApplicationConstants.LeaseStatuses.Pending));
+                            && l.IsActive);
 
                     if (!hasOtherActiveLeases)
                     {
-                        property.IsActive = true;
+                        property.Status = ApplicationConstants.PropertyStatuses.Available;
                         property.LastModifiedOn = DateTime.UtcNow;
                         property.LastModifiedBy = await _userContext.GetUserIdAsync();
                         _context.Properties.Update(property);
@@ -188,7 +236,14 @@ namespace Nine.Application.Services
                 }
             }
 
+            await transaction.CommitAsync();
             return result;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
         }
 
         #endregion
@@ -207,7 +262,6 @@ namespace Nine.Application.Services
                 var lease = await _context.Leases
                     .Include(l => l.Property)
                     .Include(l => l.Tenant)
-                    .Include(l => l.Document)
                     .Include(l => l.Documents)
                     .Include(l => l.Invoices)
                         .ThenInclude(i => i.Payments)
@@ -237,13 +291,36 @@ namespace Nine.Application.Services
                 return await _context.Leases
                     .Include(l => l.Property)
                     .Include(l => l.Tenant)
-                    .Where(l => !l.IsDeleted && l.Property.OrganizationId == organizationId)
+                    .Where(l => !l.IsDeleted && !l.IsArchived && l.Property.OrganizationId == organizationId)
                     .OrderByDescending(l => l.StartDate)
                     .ToListAsync();
             }
             catch (Exception ex)
             {
                 await HandleExceptionAsync(ex, "GetLeasesWithRelations");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Gets all archived leases with Property and Tenant relations.
+        /// </summary>
+        public async Task<List<Lease>> GetArchivedLeasesWithRelationsAsync()
+        {
+            try
+            {
+                var organizationId = await _userContext.GetActiveOrganizationIdAsync();
+
+                return await _context.Leases
+                    .Include(l => l.Property)
+                    .Include(l => l.Tenant)
+                    .Where(l => !l.IsDeleted && l.IsArchived && l.Property.OrganizationId == organizationId)
+                    .OrderByDescending(l => l.StartDate)
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                await HandleExceptionAsync(ex, "GetArchivedLeasesWithRelations");
                 throw;
             }
         }
@@ -317,9 +394,7 @@ namespace Nine.Application.Services
                     .Include(l => l.Tenant)
                     .Where(l => !l.IsDeleted
                         && l.Property.OrganizationId == organizationId
-                        && l.Status == ApplicationConstants.LeaseStatuses.Active
-                        && l.StartDate <= today
-                        && l.EndDate >= today)
+                        && l.IsActive)
                     .OrderBy(l => l.Property.Address)
                     .ToListAsync();
             }
@@ -346,7 +421,7 @@ namespace Nine.Application.Services
                     .Include(l => l.Tenant)
                     .Where(l => !l.IsDeleted
                         && l.Property.OrganizationId == organizationId
-                        && l.Status == ApplicationConstants.LeaseStatuses.Active
+                        && l.IsActive
                         && l.EndDate >= today
                         && l.EndDate <= expirationDate)
                     .OrderBy(l => l.EndDate)
@@ -399,8 +474,7 @@ namespace Nine.Application.Services
                     .Where(l => l.PropertyId == propertyId
                         && !l.IsDeleted
                         && l.Property.OrganizationId == organizationId
-                        && (l.Status == ApplicationConstants.LeaseStatuses.Active
-                            || l.Status == ApplicationConstants.LeaseStatuses.Pending))
+                        && l.IsActive)
                     .OrderBy(l => l.StartDate)
                     .ToListAsync();
             }
@@ -419,7 +493,6 @@ namespace Nine.Application.Services
             try
             {
                 var organizationId = await _userContext.GetActiveOrganizationIdAsync();
-                var today = DateTime.Today;
 
                 return await _context.Leases
                     .Include(l => l.Property)
@@ -427,9 +500,7 @@ namespace Nine.Application.Services
                     .Where(l => l.PropertyId == propertyId
                         && !l.IsDeleted
                         && l.Property.OrganizationId == organizationId
-                        && l.Status == ApplicationConstants.LeaseStatuses.Active
-                        && l.StartDate <= today
-                        && l.EndDate >= today)
+                        && l.IsActive)
                     .ToListAsync();
             }
             catch (Exception ex)
@@ -479,38 +550,9 @@ namespace Nine.Application.Services
                 }
 
                 lease.Status = newStatus;
+                lease.IsActive = ApplicationConstants.LeaseStatuses.ActiveStatuses.Contains(newStatus);
 
-                // Update property availability based on status
-                var property = await _context.Properties.FindAsync(lease.PropertyId);
-                if (property != null)
-                {
-                    if (newStatus == ApplicationConstants.LeaseStatuses.Active)
-                    {
-                        property.IsActive = false;
-                    }
-                    else if (newStatus == ApplicationConstants.LeaseStatuses.Terminated 
-                        || newStatus == ApplicationConstants.LeaseStatuses.Expired)
-                    {
-                        // Only mark available if no other active leases exist
-                        var hasOtherActiveLeases = await _context.Leases
-                            .AnyAsync(l => l.PropertyId == lease.PropertyId
-                                && l.Id != lease.Id
-                                && !l.IsDeleted
-                                && (l.Status == ApplicationConstants.LeaseStatuses.Active 
-                                    || l.Status == ApplicationConstants.LeaseStatuses.Pending));
-
-                        if (!hasOtherActiveLeases)
-                        {
-                            property.IsActive = true;
-                            property.Status = ApplicationConstants.PropertyStatuses.Available;
-                        }
-                    }
-
-                    property.LastModifiedOn = DateTime.UtcNow;
-                    property.LastModifiedBy = await _userContext.GetUserIdAsync();
-                    _context.Properties.Update(property);
-                }
-
+                // Property status management delegated to UpdateAsync
                 return await UpdateAsync(lease);
             }
             catch (Exception ex)
@@ -518,6 +560,89 @@ namespace Nine.Application.Services
                 await HandleExceptionAsync(ex, "UpdateLeaseStatus");
                 throw;
             }
+        }
+
+        #endregion
+
+        #region Cascade Summary
+
+        /// <summary>
+        /// Returns a count of related records that would be permanently deleted with this lease.
+        /// </summary>
+        public override async Task<CascadeSummary> GetDeleteCascadeSummaryAsync(Guid id)
+        {
+            var counts = new Dictionary<string, int>
+            {
+                ["Invoices"] = await _context.Invoices.CountAsync(x => x.LeaseId == id && !x.IsDeleted),
+                ["Security Deposits"] = await _context.SecurityDeposits.CountAsync(x => x.LeaseId == id && !x.IsDeleted),
+                ["Documents"] = await _context.Documents.CountAsync(x => x.LeaseId == id && !x.IsDeleted),
+            };
+            return new CascadeSummary { EntityName = "Lease", Counts = counts };
+        }
+
+        /// <summary>
+        /// Returns a count of related records that would be archived with this lease.
+        /// </summary>
+        public override async Task<CascadeSummary> GetArchiveCascadeSummaryAsync(Guid id)
+        {
+            var counts = new Dictionary<string, int>
+            {
+                ["Invoices"] = await _context.Invoices.CountAsync(x => x.LeaseId == id && !x.IsDeleted && !x.IsArchived),
+                ["Documents"] = await _context.Documents.CountAsync(x => x.LeaseId == id && !x.IsDeleted && !x.IsArchived),
+            };
+            return new CascadeSummary { EntityName = "Lease", Counts = counts };
+        }
+
+        #endregion
+
+        #region Archive/Restore Override
+
+        /// <summary>
+        /// Archives a lease using a direct SQL update to avoid EF change tracking issues,
+        /// and cascade-archives all related invoices and documents.
+        /// </summary>
+        public override async Task<bool> ArchiveAsync(Guid id)
+        {
+            var userId = await _userContext.GetUserIdAsync();
+            var now = DateTime.UtcNow;
+
+            int rows = await _context.Leases
+                .Where(l => l.Id == id && !l.IsDeleted && !l.IsArchived)
+                .ExecuteUpdateAsync(setters => setters
+                    .SetProperty(l => l.IsArchived, true)
+                    .SetProperty(l => l.ArchivedOn, now)
+                    .SetProperty(l => l.ArchivedBy, userId));
+
+            if (rows > 0)
+            {
+                await _context.Invoices
+                    .Where(x => x.LeaseId == id && !x.IsDeleted && !x.IsArchived)
+                    .ExecuteUpdateAsync(s => s
+                        .SetProperty(x => x.IsArchived, true)
+                        .SetProperty(x => x.ArchivedOn, now)
+                        .SetProperty(x => x.ArchivedBy, userId));
+
+                await _context.Documents
+                    .Where(x => x.LeaseId == id && !x.IsDeleted && !x.IsArchived)
+                    .ExecuteUpdateAsync(s => s
+                        .SetProperty(x => x.IsArchived, true)
+                        .SetProperty(x => x.ArchivedOn, now)
+                        .SetProperty(x => x.ArchivedBy, userId));
+            }
+
+            return rows > 0;
+        }
+
+        /// <summary>
+        /// Restores an archived lease using a direct SQL update to avoid EF change tracking issues.
+        /// </summary>
+        public override async Task<bool> RestoreAsync(Guid id)
+        {
+            int rows = await _context.Leases
+                .Where(l => l.Id == id && l.IsArchived)
+                .ExecuteUpdateAsync(setters => setters.SetProperty(l => l.IsArchived, false));
+
+            return rows > 0;
         }
 
         #endregion

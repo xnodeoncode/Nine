@@ -17,7 +17,7 @@
             <button class="btn btn-outline-secondary" @onclick="() => OnViewDocuments.InvokeAsync(Lease.Id)">
                 <i class="bi bi-folder"></i> View Documents
             </button>
-            @if (Lease.DocumentId == null)
+            @if (!HasLeaseDocument)
             {
                 <button class="btn btn-outline-warning" @onclick="() => OnGenerateLeaseDocument.InvokeAsync(Lease.Id)" disabled="@IsGenerating">
                     @if (IsGenerating)
@@ -71,4 +71,7 @@
     public EventCallback<Guid> OnDownloadDocument { get; set; }
     [Parameter]
     public bool IsGenerating { get; set; } = false;
+
+    [Parameter]
+    public bool HasLeaseDocument { get; set; } = false;
 }

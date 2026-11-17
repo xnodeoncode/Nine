@@ -88,6 +88,9 @@ public class FinancialReportPdfGenerator
                             table.Cell().PaddingLeft(15).Text("Management Fees");
                             table.Cell().AlignRight().Text(statement.ManagementFees.ToString("C"));
 
+                            table.Cell().PaddingLeft(15).Text("Mortgage");
+                            table.Cell().AlignRight().Text(statement.MortgageExpenses.ToString("C"));
+
                             table.Cell().PaddingLeft(15).Text("Other Expenses");
                             table.Cell().AlignRight().Text(statement.OtherExpenses.ToString("C"));
 
@@ -369,8 +372,8 @@ public class FinancialReportPdfGenerator
                                     table.Cell().PaddingLeft(10).Text("12. Management fees");
                                     table.Cell().AlignRight().Text(report.Management.ToString("C"));
 
-                                    table.Cell().PaddingLeft(10).Text("13. Mortgage interest");
-                                    table.Cell().AlignRight().Text(report.MortgageInterest.ToString("C"));
+                                    table.Cell().PaddingLeft(10).Text("13. Mortgage Expense (see Form 1098, Box 1 for the tax-deductible interest portion)");
+                                    table.Cell().AlignRight().Text(report.MortgageExpense.ToString("C"));
 
                                     table.Cell().PaddingLeft(10).Text("14. Repairs");
                                     table.Cell().AlignRight().Text(report.Repairs.ToString("C"));

@@ -1,11 +1,20 @@
 @inject MaintenanceService MaintenanceService
 @inject NavigationManager NavigationManager
+@using Nine.Application.Services
+@using Nine.Application.Models
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1><i class="bi bi-tools"></i> Maintenance Requests</h1>
-    <button class="btn btn-primary" @onclick="CreateNew">
-        <i class="bi bi-plus-circle"></i> New Request
-    </button>
+    <div class="d-flex align-items-center gap-3">
+        <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="showArchivedMaintenance"
+                   @bind="_showArchived" @bind:after="RefreshView" />
+            <label class="form-check-label text-muted" for="showArchivedMaintenance">Show Archived</label>
+        </div>
+        <button class="btn btn-primary" @onclick="CreateNew" disabled="@_showArchived">
+            <i class="bi bi-plus-circle"></i> New Request
+        </button>
+    </div>
 </div>
 
 @if (isLoading)
@@ -137,9 +146,17 @@ else
                                     <td><small>@request.ScheduledOn?.ToString("MMM dd")</small></td>
                                     <td><span class="badge bg-danger">@request.DaysOpen days</span></td>
                                     <td>
-                                        <button class="btn btn-sm btn-outline-primary" @onclick="() => ViewRequest(request.Id)">
-                                            <i class="bi bi-eye"></i>
-                                        </button>
+                                        <div class="btn-group btn-group-sm">
+                                            <button class="btn btn-sm btn-outline-primary" @onclick="() => ViewRequest(request.Id)">
+                                                <i class="bi bi-eye"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-warning" @onclick="() => ShowArchiveModal(request.Id)" title="Archive">
+                                                <i class="bi bi-archive"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger" @onclick="() => ShowDeleteModal(request.Id)" title="Delete">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             }
@@ -212,6 +229,21 @@ else
                                             <button class="btn btn-outline-secondary" @onclick="() => ViewProperty(request.PropertyId)" title="View Property">
                                                 <i class="bi bi-house"></i>
                                             </button>
+                                            @if (!_showArchived)
+                                            {
+                                                <button class="btn btn-outline-warning" @onclick="() => ShowArchiveModal(request.Id)" title="Archive">
+                                                    <i class="bi bi-archive"></i>
+                                                </button>
+                                            }
+                                            @if (_showArchived)
+                                            {
+                                                <button class="btn btn-outline-secondary" @onclick="() => UnarchiveRequest(request.Id)" title="Unarchive">
+                                                    <i class="bi bi-arrow-counterclockwise"></i>
+                                                </button>
+                                            }
+                                            <button class="btn btn-outline-danger" @onclick="() => ShowDeleteModal(request.Id)" title="Delete">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>
@@ -231,6 +263,16 @@ else
     </div>
 }
 
+<ActionConfirmModal IsVisible="@_showArchiveModal" Variant="warning"
+    Title="Archive Maintenance Request" ConfirmText="Archive"
+    Cascade="@_cascade" IsProcessing="@_isProcessing"
+    OnConfirm="ConfirmArchive" OnCancel="CloseModals" />
+
+<ActionConfirmModal IsVisible="@_showDeleteModal" Variant="danger"
+    Title="Delete Maintenance Request" ConfirmText="Delete Permanently"
+    Cascade="@_cascade" IsProcessing="@_isProcessing"
+    OnConfirm="ConfirmDelete" OnCancel="CloseModals" />
+
 @code {
     private List<MaintenanceRequest> allRequests = new();
     private List<MaintenanceRequest> filteredRequests = new();
@@ -245,6 +287,12 @@ else
     private string currentTypeFilter = "";
     
     private bool isLoading = true;
+    private bool _showArchived;
+    private Guid _pendingId;
+    private CascadeSummary? _cascade;
+    private bool _showArchiveModal;
+    private bool _showDeleteModal;
+    private bool _isProcessing;
 
     [Parameter]
     [SupplyParameterFromQuery]
@@ -260,7 +308,9 @@ else
         isLoading = true;
         try
         {
-            allRequests = await MaintenanceService.GetAllAsync();
+            allRequests = _showArchived
+                ? await MaintenanceService.GetArchivedAsync()
+                : await MaintenanceService.GetAllAsync();
             
             if (PropertyId.HasValue)
             {
@@ -326,6 +376,53 @@ else
         currentPriorityFilter = "";
         currentTypeFilter = "";
         ApplyFilters();
+    }
+
+    private async Task RefreshView() { await LoadData(); }
+
+    private async Task ShowArchiveModal(Guid id)
+    {
+        _pendingId = id;
+        _cascade = await MaintenanceService.GetArchiveCascadeSummaryAsync(id);
+        _showArchiveModal = true;
+    }
+
+    private async Task ShowDeleteModal(Guid id)
+    {
+        _pendingId = id;
+        _cascade = await MaintenanceService.GetDeleteCascadeSummaryAsync(id);
+        _showDeleteModal = true;
+    }
+
+    private async Task ConfirmArchive()
+    {
+        _isProcessing = true;
+        await MaintenanceService.ArchiveAsync(_pendingId);
+        _isProcessing = false;
+        CloseModals();
+        await LoadData();
+    }
+
+    private async Task ConfirmDelete()
+    {
+        _isProcessing = true;
+        await MaintenanceService.DeleteAsync(_pendingId);
+        _isProcessing = false;
+        CloseModals();
+        await LoadData();
+    }
+
+    private async Task UnarchiveRequest(Guid id)
+    {
+        await MaintenanceService.RestoreAsync(id);
+        await LoadData();
+    }
+
+    private void CloseModals()
+    {
+        _showArchiveModal = false;
+        _showDeleteModal = false;
+        _cascade = null;
     }
 
     private void CreateNew()

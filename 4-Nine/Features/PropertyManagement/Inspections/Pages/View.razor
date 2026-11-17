@@ -7,12 +7,14 @@
 @using Nine.Application.Services.PdfGenerators
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components
+@using Nine.Application.Models
 
 @inject InspectionService InspectionService
 @inject Application.Services.DocumentService DocumentService
 @inject UserContextService UserContext
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
+@inject ToastService ToastService
 @attribute [OrganizationAuthorize("Owner", "Administrator", "PropertyManager")]
 @rendermode InteractiveServer
 
@@ -50,6 +52,21 @@ else
                     <i class="bi bi-download"></i> Download PDF
                 </button>
             }
+            @if (!inspection.IsArchived)
+            {
+                <button class="btn btn-outline-warning" @onclick="ArchiveInspection" title="Archive Inspection">
+                    <i class="bi bi-archive"></i> Archive
+                </button>
+            }
+            else
+            {
+                <button class="btn btn-outline-success" @onclick="RestoreInspection" title="Restore Inspection">
+                    <i class="bi bi-arrow-counterclockwise"></i> Restore
+                </button>
+            }
+            <button class="btn btn-outline-danger" @onclick="() => ShowDeleteModal(inspection.Id)" title="Delete Inspection">
+                <i class="bi bi-trash"></i> Delete
+            </button>
             <button class="btn btn-outline-secondary" @onclick="BackToProperty">
                 <i class="bi bi-arrow-left"></i> Back to Property
             </button>
@@ -221,6 +238,11 @@ else
     </div>
 }
 
+<ActionConfirmModal IsVisible="@_showDeleteModal" Variant="danger"
+    Title="Delete Inspection" ConfirmText="Delete Permanently"
+    Cascade="@_cascade" IsProcessing="@_isProcessing"
+    OnConfirm="ConfirmDelete" OnCancel="CloseDeleteModal" />
+
 @code {
     [Parameter]
     public Guid InspectionId { get; set; }
@@ -230,6 +252,9 @@ else
     private string? errorMessage;
     private bool isGenerating = false;
     private Document? document = null;
+    private bool _showDeleteModal = false;
+    private CascadeSummary? _cascade;
+    private bool _isProcessing = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -421,6 +446,55 @@ else
         else
         {
             NavigationManager.NavigateTo("/propertymanagement/properties");
+        }
+    }
+
+    private async Task ShowDeleteModal(Guid id)
+    {
+        _cascade = await InspectionService.GetDeleteCascadeSummaryAsync(id);
+        _showDeleteModal = true;
+    }
+
+    private async Task ConfirmDelete()
+    {
+        _isProcessing = true;
+        await InspectionService.DeleteAsync(InspectionId);
+        _isProcessing = false;
+        CloseDeleteModal();
+        BackToProperty();
+    }
+
+    private void CloseDeleteModal()
+    {
+        _showDeleteModal = false;
+        _cascade = null;
+    }
+
+    private async Task ArchiveInspection()
+    {
+        try
+        {
+            await InspectionService.ArchiveAsync(InspectionId);
+            ToastService.ShowSuccess("Inspection archived successfully.");
+            inspection = await InspectionService.GetByIdAsync(InspectionId);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error archiving inspection: {ex.Message}";
+        }
+    }
+
+    private async Task RestoreInspection()
+    {
+        try
+        {
+            await InspectionService.RestoreAsync(InspectionId);
+            ToastService.ShowSuccess("Inspection restored successfully.");
+            inspection = await InspectionService.GetByIdAsync(InspectionId);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error restoring inspection: {ex.Message}";
         }
     }
 }

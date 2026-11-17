@@ -1,17 +1,17 @@
 @using Nine.Shared.UI.Components.Common
 <div class="row">
-     @if(ShowTotalProperties){
-    <MetricsCard Title="Total Properties" 
-                 IconCssClass="bi bi-house-fill" 
-                 ColorClass="bg-primary"
-                 Count="@TotalPropertiesCount.ToString()" />
-    }
     @if(ShowAvailableProperties){
     <MetricsCard Title="Available Properties" 
                  IconCssClass="bi bi-check-circle" 
                  ColorClass="bg-success"
                  Count="@AvailableCount.ToString()" />
     
+    }
+     @if(ShowTotalProperties){
+    <MetricsCard Title="Total Properties" 
+                 IconCssClass="bi bi-house-fill" 
+                 ColorClass="bg-primary"
+                 Count="@TotalPropertiesCount.ToString()" />
     }
     @if(ShowOccupiedProperties){
     <MetricsCard Title="Occupied Properties" 

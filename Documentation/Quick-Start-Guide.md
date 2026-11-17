@@ -1,765 +1,564 @@
 # Nine. - Quick Start Guide
 
-**Version:** 1.0.0  
-**Last Updated:** March 1, 2026  
+**Version:** 1.2.0  
+**Last Updated:** November 12, 2026  
 **Estimated Time:** 15 minutes
 
 ---
 
-## 📖 Welcome!
+## Welcome
 
-This guide will help you get started with Nine in just 15 minutes. By the end, you'll have:
+This guide gets you from a fresh install to your first invoice and payment. By the end you will have:
 
-- ✅ Installed the application
-- ✅ Created your organization
-- ✅ Added your first property
-- ✅ Added a tenant
-- ✅ Created a lease
-- ✅ Generated an invoice
-- ✅ Recorded a payment
-- ✅ Scheduled an inspection
+- [Installing the application](#step-1-installation-5-minutes)
+- [Create an account and organization](#step-2-create-your-account-and-organization-2-minutes)
+- [Add a property](#step-3-add-your-first-property-3-minutes)
+- [Add a tenant](#step-4-add-a-tenant-2-minutes)
+- [Create a lease](#step-5-create-a-lease-2-minutes)
+- [Create an invoice](#step-6-create-an-invoice-1-minute)
+- [Record a payment](#step-7-record-a-payment-1-minute)
+- [Record a property inspection](#step-8-record-an-inspection-3-minutes)
+- [Uninstalling Nine](#uninstalling-nine)
 
-Let's get started!
+Let's get started.
 
 ---
 
-## 📋 Prerequisites
+## Prerequisites
 
 Before you begin, ensure you have:
 
 - **Operating System:**
-  - Linux (Ubuntu 20.04+, Debian 11+, Fedora 35+), OR
+  - Linux, 64-bit (x86_64). Tested on Red Hat Enterprise Linux 10 with GNOME; see [AppImage Requirements](#appimage-requirements), OR
   - Windows 10/11 (64-bit)
 - **Hardware:**
-  - 2 GB RAM minimum (4 GB recommended)
-  - 500 MB disk space
-- **Downloaded:** Nine v1.0.0 installer for your platform
+  - 8 GB RAM minimum (16 GB recommended)
+  - 2 GB disk space
+- **Download:** [Nine v1.2.0](https://github.com/xnodeoncode/Nine/releases/tag/v1.2.0) for your platform
 
-### Universal Linux Support:
+### AppImage Requirements
 
-Nine. is distributed as an AppImage, which runs on all major Linux distributions—including Ubuntu, Debian, Fedora, RedHat, Arch, openSUSE, and more. No installation required: just download, make executable, and run.
+**Nine as an AppImage.** The Nine AppImage has been tested on Red Hat Enterprise Linux 10 with the GNOME desktop. No installation is required: download, make executable (using `chmod +x Nine-1.2.0-x86_64.AppImage`), and run.
 
-### Windows Portable Version:
+The AppImage format is designed to run on most Linux distributions. The AppImage bundles Nine and its runtime, but it still requires the following on your system:
 
-Nine. is available as a portable Windows executable (.exe). No installation required—just download, extract, and run. All application data is stored locally in the same folder, making it easy to use Nine from a USB drive or move between systems.
+- **A 64-bit (x86_64) Linux system with a recent C library (glibc).**
+- **FUSE,** which AppImages use to start. Some distributions do not install it by default. If the AppImage will not start, install your distribution's FUSE package, or run it with `./Nine-1.2.0-x86_64.AppImage --appimage-extract-and-run`.
+- **A graphical desktop with the common GTK and graphics libraries** that Electron applications use. Most desktop distributions already include them.
+- **A Secret Service provider (for example, GNOME Keyring or KWallet)** to store the database password securely.
 
----
+**Desktop integration script.** The optional `nine-tool.sh` script has been tested on RHEL 10 with GNOME, so not guaranteed to work on all distros. It writes to the standard locations (`~/.local/share/applications` and `~/.local/share/icons`). If it does not work for you, run the AppImage directly.
 
-## 🚀 Step 1: Installation (5 minutes)
+### Windows Portable
 
-### Linux Installation
+**Nine as a portable Windows executable (.exe).** The Nine portable exe file has been tested to run on Windows 11. No installation is required. Download the portable exe file, store it in a location of choice on your Windows 11 computer, and double-click the file to run.
 
-**Option A: AppImage (Recommended for most users)**
+### Windows Installer
+
+**Using Windows Installer.** Nine can be installed using the Windows installer. This adds the application to the Windows Add/Remove programs list of programs and the Windows Start Menu. Optional desktop and task bar shortcuts can be created for ease of access.
+
+## Step 1: Installation (5 minutes)
+
+### Linux Installation Steps
+
+**Option A: Manual AppImage copy**
 
 ```bash
 # 1. Download the file
-# File: Nine-1.0.0-x86_64.AppImage
+# File: Nine-1.2.0-x86_64.AppImage
 
 # 2. Make it executable
-chmod +x Nine-1.0.0-x86_64.AppImage
+chmod +x Nine-1.2.0-x86_64.AppImage
 
 # 3. Run the application
-./Nine-1.0.0-x86_64.AppImage
+./Nine-1.2.0-x86_64.AppImage
 ```
 
-**Option B: Debian Package (Ubuntu/Debian users)**
+The application start-up displaying the start-up log in the terminal.
+
+**Option B: Desktop Integration Option**
+
+Nine can be integrated into your GNOME desktop environment.
+
+1. Download the file: currently Nine-1.2.0-x86_64.AppImage
+2. Download the installer script, `install-desktop-integration.sh`, and put it in the same folder as the AppImage. The release also has a `Utilities` folder with the other scripts (`nine-tool.sh`, `nine-removal.sh` and more). If you keep them in the same folder as the installer, it copies them to `~/Applications/Nine/Utilities` so you can use them later to uninstall Nine.
+3. Make the files executable
 
 ```bash
-# 1. Install the package
-sudo dpkg -i Nine-1.0.0-amd64.deb
-
-# 2. Run the application
-nine
+chmod +x Nine-1.2.0-x86_64.AppImage
+chmod +x install-desktop-integration.sh
 ```
 
-### Windows Installation
+4. Execute the script
 
-**Option A: NSIS Installer (Recommended)**
+```bash
+./install-desktop-integration.sh Nine-1.2.0-x86_64.AppImage
+```
 
-1. **Download** `Nine-1.0.0-x64-Setup.exe`
-2. **Double-click** the installer
-3. **Follow the wizard:**
-   - Click "Next" to begin
-   - Accept license agreement
-   - Choose installation directory (default: `C:\Program Files\Nine\`)
-   - Create desktop shortcut (recommended)
-   - Click "Install"
-4. **Launch** from Start Menu or Desktop shortcut
+The install script is expected to:
 
-**Option B: Portable Executable (No installation)**
+1. Copy the AppImage to the `~/Applications/Nine` directory (it creates the directory if it doesn't exist). The original file is left where it was.
+2. Copy every script it finds in its own folder (the installer itself, the removal script, `nine-tool.sh` and the others) to `~/Applications/Nine/Utilities` and make the `.sh` files executable. If the removal script or `nine-tool.sh` is not found next to the installer, it shows a warning and continues.
+3. Create a desktop entry file which adds Nine to the Launch Menu.
 
-1. **Download** `Nine-1.0.0-x64-Portable.exe`
-2. **Place** in your desired folder (e.g., `C:\Nine\`)
-3. **Double-click** to run
+### Windows Installation Steps
 
-**✅ Checkpoint:** Application window should open showing the New Setup Wizard.
+**Option A: Installer (recommended)**
 
----
+1. Download `Nine-1.2.0-x64-Setup.exe`
+2. Double-click the installer
+3. Follow the wizard (accept the license, choose the installation folder, create a desktop shortcut)
+4. Launch Nine from the Start Menu or desktop shortcut
 
-## 🏢 Step 2: Create Your Organization (2 minutes)
+**Option B: Portable executable (no installation)**
 
-When you first launch Nine, the **New Setup Wizard** guides you through initial setup.
+1. Download `Nine-1.2.0-x64-Portable.exe`
+2. Place it in the folder you want to run it from (for example `C:\Nine\`)
+3. Double-click to run
 
-### Organization Setup
+**Checkpoint:** The Nine window opens and shows the **Register** page.
 
-**On the "Create Organization" screen:**
-
-1. **Organization Name:** Enter your business name
-   - Example: "ABC Property Management" or "John Smith Rentals"
-2. **Contact Information:**
-   - **Phone:** Your business phone number
-   - **Email:** Your business email address
-   - **Website:** (Optional) Your website URL
-
-3. **Address:**
-   - Street address
-   - City, State, ZIP code
-   - Country
-
-4. **Click** "Create Organization"
-
-**✅ Checkpoint:** You should see "Organization created successfully!" message.
+<!-- VERIFY: first launch on a clean profile. Confirm the first screen is Register, and that no database password prompt appears before it. -->
 
 ---
 
-## 👤 Step 3: Register Your User Account (2 minutes)
+## Step 2: Create an Account and Organization (2 minutes)
 
-**On the "Register User" screen:**
+The first time Nine starts, there are no accounts, so the **Register** page shows a single form that creates both your organization and your account. Registration is only available for this first account.
 
-1. **Personal Information:**
-   - **First Name:** Your first name
-   - **Last Name:** Your last name
+1. Fill in **Organization Name** (for example "ABC Property Management" or "John Smith Rentals").
+2. Choose your **State**.
+3. Enter your **Email** (this is your login), **First Name** and **Last Name**.
+4. Enter and confirm a **Password**. It must be at least **12 characters** and include an uppercase letter, a lowercase letter, a number and a special character.
+5. Click **Register**.
 
-2. **Login Credentials:**
-   - **Email:** Your email address (becomes your username)
-   - **Password:** Choose a strong password
-     - Minimum 8 characters
-     - Must contain: uppercase, lowercase, number, special character
-   - **Confirm Password:** Re-enter your password
+You are the organization's owner with full administrative privileges. The account is confirmed automatically; there is no email verification step.
 
-3. **Role:** Administrator (automatically selected for first user)
+**Checkpoint:** You are signed in and see the **Property Management Dashboard**. If not, click Log-In in the left navigation or Sign-In in the center of the page and log in to the application.
 
-4. **Click** "Register"
+### The Dashboard
 
-**✅ Checkpoint:** You should be logged in and see the Dashboard.
+The left navigation menu contains **Dashboard, Calendar, Properties, Tenants, Leases, Inspections, Repairs, Documents** and **Reports**. Owners and Administrators also see **Application** and **Organization** as two top-most navigation links.
 
-### First-Time Dashboard
+The dashboard shows property metrics, **Outstanding Invoices**, **Outstanding Repairs**, **Upcoming Lease Renewals** and **Available Properties**.
 
-After registration, you'll see the main dashboard with:
-
-- **Navigation menu** on the left
-- **Dashboard widgets** showing 0 properties, tenants, leases
-- **Welcome message** with quick actions
-
-**Note:** Your account is automatically confirmed in Nine (no email verification step).
+<!-- VERIFY: first-run message wording and whether the dashboard shows a sample-data option on a new database. NO SAMPLE DATA IS EXPLICITLY ADDED VIA ORGANIZATION SETTINGS-->
 
 ---
 
-## 🏠 Step 4: Add Your First Property (3 minutes)
+## Step 3: Add Your First Property (3 minutes)
 
-Let's add a rental property to your portfolio.
+1. Click **Properties** in the left menu.
+2. Click **Add Property**.
+3. Fill in the form:
+   - **Address** (street address) and optional **Unit Number**
+   - **City**, **State** and **Postal Code**
+   - **Property Type:** House, Apartment, Condo, Townhouse, Duplex, Commercial or Other
+   - **Monthly Rent**
+   - **Status:** choose **Available** for a property that is ready to rent
+   - Optional: **Bedrooms**, **Bathrooms**, **Square Feet** and **Description**
+4. Click **Create Property**.
 
-### Navigate to Properties
+**Checkpoint:** The property appears in the property list.
 
-1. Click **"Property Management"** in the left navigation menu
-2. Click **"Properties"**
-3. Click **"Add Property"** button (top-right)
-
-### Enter Property Details
-
-**Basic Information:**
-
-- **Property Name:** Give it a friendly name
-  - Example: "123 Main Street House"
-- **Address:**
-  - **Street Address:** 123 Main Street
-  - **City:** Anytown
-  - **State/Province:** CA
-  - **ZIP/Postal Code:** 12345
-  - **Country:** USA
-
-- **Property Type:** Select from dropdown
-  - Options: Single Family, Multi-Family, Apartment, Condo, Townhouse
-  - Choose: **Single Family**
-
-- **Number of Units:** 1 (for single-family home)
-
-**Financial Information:**
-
-- **Monthly Rent:** $1,500.00
-- **Security Deposit:** $1,500.00 (typically equal to one month's rent)
-
-**Property Status:**
-
-- Select: **Available** (ready to rent)
-
-**Description (Optional):**
-
-- Enter a brief description of the property
-- Example: "Beautiful 3-bedroom, 2-bathroom single-family home with large backyard. Recently renovated kitchen with modern appliances."
-
-### Save Property
-
-1. Click **"Save"** button at the bottom
-2. You'll be redirected to the property list
-
-**✅ Checkpoint:** You should see your property in the list with status "Available".
-
-### Add Property Photo (Optional)
-
-1. Click on your property name to view details
-2. Click **"Upload Photo"** button
-3. Select an image file (max 10MB)
-4. Photo appears in property profile
+You can record expenses for a property from the panel beside the form (or later from the property page).
 
 ---
 
-## 👥 Step 5: Add a Tenant (2 minutes)
+## Step 4: Add a Tenant (2 minutes)
 
-Now let's add a tenant who will rent this property.
+1. Click **Tenants** in the left menu.
+2. Click **Add Tenant**.
+3. Fill in the form:
+   - **First Name**, **Last Name** and **Email** (required)
+   - Optional: **Phone Number**, **Date of Birth**, **Identification Number**
+   - Optional: **Emergency Contact Name** and **Emergency Contact Phone**
+   - Optional: **Notes**
+4. Click **Create Tenant**.
 
-### Navigate to Tenants
-
-1. Click **"Tenant Management"** in left navigation
-2. Click **"Tenants"**
-3. Click **"Add Tenant"** button
-
-### Enter Tenant Details
-
-**Personal Information:**
-
-- **First Name:** Jane
-- **Last Name:** Doe
-- **Email:** jane.doe@example.com
-- **Phone:** (555) 123-4567
-
-**Current Address (Optional but Recommended):**
-
-- Street Address: 456 Oak Avenue
-- City: Anytown
-- State: CA
-- ZIP: 12345
-
-**Emergency Contact (Optional):**
-
-- Name: John Doe (Spouse)
-- Relationship: Spouse
-- Phone: (555) 123-4568
-
-### Save Tenant
-
-1. Click **"Save"** button
-2. You'll be redirected to the tenant list
-
-**✅ Checkpoint:** You should see Jane Doe in the tenant list.
-
-**Note:** In a real-world scenario, you'd go through the full prospect-to-tenant journey (application, screening, approval). For this Quick Start, we're creating the tenant directly.
+**Checkpoint:** The tenant appears in the tenant list.
 
 ---
 
-## 📄 Step 6: Create a Lease (2 minutes)
+## Step 5: Create a Lease (2 minutes)
 
-Let's create a lease agreement between your property and tenant.
+1. Click **Leases** in the left menu.
+2. Click **Add Lease**.
+3. Fill in the form:
+   - **Property** and **Tenant** (select from the dropdowns)
+   - **Start Date** and **End Date** (defaulted to current date and 12 months later respectively.)
+   - **Monthly Rent** and **Security Deposit**
+   - **Lease Type:** Term, Month-to-Month
+   - **Status:** new leases default to **Pending**; choose **Active** if the lease is ready to start.
+   - Optional: **Lease Terms** and **Notes** (add the terms of the lease and any additional notes. Lease term regulations can differ from region to region so enter the text relevant for your state, county, region, etc.)
+4. Click **Create Lease**.
 
-### Navigate to Leases
+You are taken to the property page. Open the lease from **Leases** to see its details.
 
-1. Click **"Lease Management"** in left navigation
-2. Click **"Leases"**
-3. Click **"Create Lease"** button
+**Checkpoint:** The lease appears in the lease list.
 
-### Enter Lease Details
+<!-- VERIFY: when a lease becomes Active, does the property change to Occupied? (LeaseWorkflowService.ActivateLeaseAsync sets it, but no button was found that calls it, and the create form sets the status directly.) Update this step and the "Status" bullet to match. -->
 
-**Lease Information:**
+### Generate the Lease PDF (optional)
 
-- **Property:** Select "123 Main Street House" from dropdown
-- **Tenant:** Select "Jane Doe" from dropdown
+1. Open the lease from the lease list.
+2. Click **Generate PDF**.
+3. Use **View PDF** or **Download PDF**.
 
-**Lease Terms:**
+### Lease actions
 
-- **Start Date:** Choose today's date (or desired move-in date)
-  - Example: February 1, 2026
-- **End Date:** Choose one year from start date
-  - Example: January 31, 2027
-- **Monthly Rent:** $1,500.00 (pre-filled from property)
-- **Security Deposit:** $1,500.00 (pre-filled from property)
-- **Due Day:** 1 (rent due on 1st of each month)
-
-**Payment Terms:**
-
-- **Late Fee Grace Period:** 5 days (rent due 1st, late fee applied on 6th)
-- **Late Fee Amount:** $50.00 or 5% of rent
-- **Payment Methods Accepted:** Check all that apply
-  - ☑ Cash
-  - ☑ Check
-  - ☑ Credit Card
-  - ☑ ACH
-  - ☑ Online Portal
-
-### Generate Lease
-
-1. Click **"Generate Lease"** button
-2. System creates the lease with status: **Active**
-3. Property status automatically changes to: **Occupied**
-
-**✅ Checkpoint:** You should see the new lease in the lease list with status "Active".
-
-### View Lease PDF (Optional)
-
-1. Click on the lease to view details
-2. Click **"Download Lease PDF"** button
-3. PDF opens showing complete lease agreement with all terms
+The lease page also lets you **Edit Lease**, **Create Invoice**, **View Invoices** and **View Documents**, and provides actions for renewals, termination notices, early termination, move-out and converting to month-to-month.
 
 ---
 
-## 💰 Step 7: Generate a Rent Invoice (1 minute)
+## Step 6: Create an Invoice (1 minute)
 
-Let's create the first month's rent invoice.
+Invoices and payments do not appear in the left menu. Start from the lease:
 
-### Navigate to Invoices
+1. Open the lease.
+2. Click **Create Invoice** (this opens the invoice form with the lease selected and fields populated by default using lease details).
+3. Fill in the form:
+   - **Invoice Number** and **Invoice Date** (Invoice number is autogenerated and should not be modified. Invoice date defaults to current date, but can be modified as needed.)
+   - **Due Date** (keep the default, five days from current date or enter a new due date)
+   - **Lease** (already selected)
+   - **Description** (for example "First month's rent" or keep the default)
+   - **Amount** (enter amount or keep the default which is based on the lease agreement)
+   - **Status:** Pending (A new invoice is pending by default. When a payment is recorded, the invoice's payment status is updated)
+   - Optional: **Notes**
+4. Click **Create Invoice**.
 
-1. Click **"Financial Management"** in left navigation
-2. Click **"Invoices"**
-3. Click **"Create Invoice"** button
+You can find all invoices later from the lease's **View Invoices** button, from **Outstanding Invoices** on the dashboard, or from the **Documents** page.
 
-### Enter Invoice Details
+**Checkpoint:** The invoice shows status **Pending** with your due date.
 
-**Invoice Information:**
-
-- **Lease:** Select "Jane Doe - 123 Main Street House" from dropdown
-- **Invoice Type:** Rent (from dropdown)
-- **Description:** "February 2026 Rent"
-
-**Financial Details:**
-
-- **Amount:** $1,500.00 (pre-filled from lease monthly rent)
-- **Due Date:** February 1, 2026
-- **Issue Date:** Today's date (auto-filled)
-
-**Status:**
-
-- **Invoice Status:** Pending (default)
-
-### Save Invoice
-
-1. Click **"Save"** button
-2. Invoice is created and added to the list
-
-**✅ Checkpoint:** You should see the invoice with status "Pending" and due date of February 1, 2026.
-
-**Note:** In production, rent invoices are automatically generated monthly by the background task system. For this Quick Start, we're creating one manually.
+<!-- VERIFY: whether Invoice Number is auto-generated, and how the Amount is filled in when the lease is selected. INVOICE NUMBER IS AUTOGENERATED AND THE INVOICE AMOUNT IS PULLED FROM THE LEASE AGREEMENT MONTHLY RENT AMOUNT-->
 
 ---
 
-## 🏦 Step 8: Record a Payment (1 minute)
+## Step 7: Record a Payment (1 minute)
 
-Now let's record that the tenant paid their rent.
+1. Open the invoice.
+2. Click **Record Payment**.
+3. Fill in the form:
+   - **Invoice** (already selected)
+   - **Payment Date** (defaults to current date)
+   - **Amount** (defaults to the invoice amount. Partial payments may be accepted.)
+   - **Payment Method:** Online Payment, Debit Card, Credit Card, Check, Cash, Bank Transfer or Other (Online payment is the default)
+   - Optional: **Notes**
+4. Click **Record Payment**.
 
-### Navigate to Payments
+**Checkpoint:** Open the invoice again; it should show the payment.
 
-1. Stay in **"Financial Management"**
-2. Click **"Payments"**
-3. Click **"Record Payment"** button
+<!-- VERIFY: that recording a full payment changes the invoice status to Paid and updates the paid amount. VERIFIED-->
 
-### Enter Payment Details
+### Payment receipt (optional)
 
-**Payment Information:**
-
-- **Invoice:** Select "February 2026 Rent - Jane Doe" from dropdown
-- **Payment Method:** Check (or select what applies)
-
-**Financial Details:**
-
-- **Amount:** $1,500.00 (full rent payment)
-- **Payment Date:** Today's date (or actual payment date)
-- **Payment Reference:** Check #1234 (optional but recommended)
-
-**Notes (Optional):**
-
-- "Check received and deposited on [date]"
-
-### Save Payment
-
-1. Click **"Save"** button
-2. Payment is recorded
-3. Invoice status automatically updates to: **Paid**
-4. Invoice "Amount Paid" field updates to $1,500.00
-
-**✅ Checkpoint:** When you view the invoice list, the invoice should now show status "Paid" with green indicator.
-
-### View Payment Receipt (Optional)
-
-1. Click on the payment to view details
-2. Click **"Generate Receipt"** button
-3. PDF receipt generated showing payment confirmation
+Open the payment and use **Generate Receipt**, then **View Receipt** or **Download Receipt**.
 
 ---
 
-## 🔍 Step 9: Schedule an Inspection (1 minute)
+## Step 8: Record an Inspection (3 minutes)
 
-Let's schedule a move-in inspection for the property.
+The **Inspections** page is a routine inspection schedule by property: it shows which properties are scheduled, due soon, overdue or not yet scheduled. When a property is created, a routine inspection is automatically scheduled due within the first 90 days. Completion of an inspections automatically schedules another inspection for 12 months later. In essence, routine inspections are auto-generated and scheduled annually.
 
-### Navigate to Inspections
+1. Click **Inspections** in the left menu.
+2. On the property you want, click the clipboard icon (**Create Inspection**). You can also start from the property's own page.
+3. Fill in **Inspection Details:**
+   - **Inspection Date**
+   - **Inspection Type:** Routine, Move-In, Move-Out or Maintenance
+   - **Inspected By**
+4. Work through the checklist sections: **Exterior, Interior, Kitchen, Bathroom** and **Systems**. Mark each item as good or not good and add notes for any issues.
+5. Set the **Overall Condition** (Excellent, Good, Fair or Poor) and add **General Notes** and **Action Items Required**.
+6. Click **Save Inspection**.
 
-1. Click **"Maintenance & Inspections"** in left navigation
-2. Click **"Inspections"**
-3. Click **"Schedule Inspection"** button
+**Checkpoint:** The inspection appears on the property's inspection history.
 
-### Enter Inspection Details
+Open the saved inspection to use **Generate PDF**, then **View PDF** or **Download PDF**.
 
-**Inspection Information:**
-
-- **Property:** Select "123 Main Street House"
-- **Inspection Type:** Move-In (from dropdown)
-- **Inspection Date:** Choose today's date or soon after move-in
-
-**Scheduled By:**
-
-- Your name (auto-filled)
-
-**Notes (Optional):**
-
-- "Initial move-in inspection before tenant occupancy"
-
-### Save Inspection
-
-1. Click **"Schedule"** button
-2. Inspection is added to calendar and inspection list
-
-**✅ Checkpoint:** You should see the inspection scheduled on the calendar and in the inspection list.
-
-### Complete Inspection (Optional)
-
-Later, when you perform the inspection:
-
-1. Click on the inspection from the list
-2. Click **"Start Inspection"** button
-3. Go through **26-item checklist:**
-   - **Exterior** (4 items): Roof, Siding, Windows, Landscaping
-   - **Interior** (6 items): Walls, Floors, Ceilings, Doors, Closets, Light Fixtures
-   - **Kitchen** (4 items): Appliances, Cabinets, Countertops, Sink/Plumbing
-   - **Bathroom** (4 items): Fixtures, Toilet, Sink, Shower/Tub
-   - **Systems** (8 items): HVAC, Electrical, Plumbing, Water Heater, etc.
-4. Mark each item: **Pass** / **Fail** / **Needs Repair**
-5. Add notes for any issues found
-6. Click **"Complete Inspection"**
-7. Click **"Generate PDF Report"**
+<!-- VERIFY: where the saved inspection is listed (property page vs. Inspections page), and that the Systems checklist section is titled "Systems". -->
 
 ---
 
-## 🎉 Congratulations!
+## Congratulations
 
-**You've successfully completed the Quick Start Guide!**
+You have completed the Quick Start Guide. You have:
 
-In just 15 minutes, you've learned how to:
-
-- ✅ Install Nine
-- ✅ Create your organization
-- ✅ Register your user account
-- ✅ Add a property
-- ✅ Add a tenant
-- ✅ Create a lease
-- ✅ Generate a rent invoice
-- ✅ Record a payment
-- ✅ Schedule an inspection
+- Installed Nine
+- Created your account and organization
+- Added a property
+- Added a tenant
+- Created a lease
+- Created an invoice
+- Recorded a payment
+- Recorded an inspection
 
 ---
 
-## 🧭 What's Next?
+## What's Next
 
-### Explore More Features
+### Explore more features
 
-**Property Management:**
+- **Properties:** track expenses, upload documents, and mark properties as Under Renovation or Off Market.
+- **Repairs:** record and track repair work and costs per property.
+- **Calendar:** see events in a monthly calendar or list view.
+- **Documents:** find lease PDFs, invoices and receipts in one place.
+- **Reports:** Income Statement, Rent Roll, Property Performance and Tax Report.
+- **Notifications:** use the notification bell and set your preferences under **Notifications**.
+- **Late fees:** configure under **Application** (see Settings below).
 
-- Add up to nine (9) properties
-- Upload property documents (certificates, insurance, photos)
-- Mark properties as Under Renovation or Off Market
-- Track property value and appreciation
-
-**Tenant Workflow:**
-
-- Use the **Prospect-to-Tenant** journey for new tenants:
-  1. Add Prospect (inquiry phase)
-  2. Schedule Tour
-  3. Submit Rental Application
-  4. Screen Application (background/credit checks)
-  5. Approve/Deny Application
-  6. Generate Lease Offer
-  7. Tenant Accepts Lease
-  8. Automatic Tenant Creation
-
-**Financial Management:**
-
-- Set up **recurring rent invoices** (auto-generated monthly)
-- Configure **late fees** (grace period + amount/percentage)
-- Generate **financial reports** (income, expenses, payment history)
-- Track **security deposits** and annual dividends
-
-**Maintenance & Inspections:**
-
-- Create **maintenance requests** from tenants
-- Assign requests to vendors
-- Track repair costs and completion
-- Schedule **routine inspections** (quarterly, semi-annual, annual)
-- Generate inspection reports
-
-**Calendar & Scheduling:**
-
-- View all events in **monthly calendar**
-- Schedule **property tours** for prospects
-- Track **lease expiration dates**
-- Set **payment due date reminders**
-
-**Notifications:**
-
-- Configure **email notifications** (SendGrid)
-- Enable **SMS alerts** (Twilio)
-- Customize **notification preferences** per user
-- View **notification history** in Notification Center
-
-**Background Automation:**
-
-- Let the system automatically:
-  - Apply late fees after grace period
-  - Send lease expiration warnings (60/30/14 days)
-  - Calculate and distribute security deposit dividends
-  - Schedule routine inspections
-  - Clean up old data
+<!-- VERIFY: the following older claims were removed because no matching UI was found: Prospect-to-Tenant workflow, recurring rent invoices, security deposit dividends UI, vendor assignment, email/SMS configuration. Re-add any that exist. -->
 
 ---
 
-## 📚 Additional Resources
+## Uninstalling Nine
+
+**IMPORTANT: BEFORE GETTING STARTED CREATE A DATABASE BACKUP AND DOWNLOAD/COPY IT TO A LOCATION OUTSIDE OF THE APPLICATION.**
+
+An encrypted or an unencrypted backup can be generated and downloaded to the local hard drive, a USB drive, or a cloud storage location.
+
+**SEE THE [Database Management Guide](https://github.com/xnodeoncode/Nine/blob/main/Documentation/Database-Management-Guide.md)**
+
+**BEFORE YOU BEGIN, CLOSE ALL RUNNING INSTANCES OF NINE.**
+
+### Linux
+
+You can use the removal script (recommended) or follow the manual steps below it.
+
+#### Using the removal script
+
+`nine-removal.sh` is in the `Utilities` folder of the Linux download, next to `install-desktop-integration.sh`. If you used the desktop integration script, it was also copied to `~/Applications/Nine/Utilities`, so you can run it from there. It undoes what the desktop integration script did, and removes your data and encryption key only when you ask it to.
+
+```bash
+chmod +x nine-removal.sh
+
+# Preview what would be removed; nothing is changed
+./nine-removal.sh --dry-run
+
+# Remove one version only (Option 1 below); data and encryption key are kept
+./nine-removal.sh --only Nine-1.2.0-x86_64.AppImage
+
+# Remove the launcher entry, icon and AppImages; data and encryption key are kept
+./nine-removal.sh
+
+# Remove the launcher entry, icon, AppImage and data; encryption key is kept
+./nine-removal.sh --remove-data
+
+# Remove the launcher entry, icon, AppImage and encryption key; data is kept
+./nine-removal.sh --remove-keychain
+
+# Remove the encryption key only; the application, database, and configuration files are kept
+./nine-removal.sh --remove-keychain-only
+
+# Remove everything, including all data and the encryption key (Option 2 below)
+./nine-removal.sh --all
+```
+
+- The script asks before it removes anything. Removing the data or the encryption key also requires typing `DELETE`.
+- `--all` is the same as `--remove-data --remove-keychain`. Use those two options separately to remove only your data or only the encryption key.
+- It will not run while Nine is open.
+- It only knows about AppImages in `~/Applications/Nine`. Delete any AppImage stored elsewhere yourself.
+- Run `./nine-removal.sh --help` for all options.
+
+#### Manual steps
+
+Choose the option that matches what you want to remove.
+
+#### Option 1: Remove one version only
+
+Use this when you keep another version of Nine installed. Your data stays in place.
+
+1. Delete that version's AppImage: in your file manager, right-click it and choose "Delete", "Delete Permanently", or "Move to Trash". If the desktop integration script was used, the AppImages are in `~/Applications/Nine`. From the terminal:
+
+```bash
+rm ~/Applications/Nine/<appimage-name>   # for example Nine-1.2.0-x86_64.AppImage
+```
+
+2. If the Nine launcher entry pointed to the version you removed, it no longer works. Run `install-desktop-integration.sh` again with the version you kept to fix it.
+
+**Do not delete `~/.config/Nine` or the keychain entry in this case.** They hold the databases and the database encryption key for **every** version of Nine on this computer.
+
+#### Option 2: Remove Nine completely
+
+Use this when you no longer need Nine or any of its data. **This permanently deletes the databases and backups of all versions.**
+
+1. Delete the AppImage files. Delete them in your file manager if they are stored somewhere other than `~/Applications/Nine`.
+
+2. Open the terminal and run the commands below.
+
+```bash
+# Remove application support, configuration, resource and database files
+# (the default location; it is $XDG_CONFIG_HOME/Nine if that variable is set)
+rm -rf ~/.config/Nine
+
+# RUN THESE COMMANDS IF THE DESKTOP INTEGRATION SCRIPT WAS USED.
+
+# Remove all installed releases and the scripts copied to the Utilities folder
+rm -rf ~/Applications/Nine
+
+# Remove the desktop integration entry (GNOME)
+rm ~/.local/share/applications/nine.desktop
+
+# Remove the desktop icon file
+rm ~/.local/share/icons/hicolor/512x512/apps/nine.png
+
+# Refresh the desktop database
+update-desktop-database ~/.local/share/applications
+```
+
+3. Only if you ever turned on database encryption, remove the stored encryption key. This key is shared by every version of Nine on this account. Run the command only when you no longer need any encrypted database or encrypted backup, because they cannot be opened without it.
+
+```bash
+secret-tool clear key-type database-encryption-Nine-Electron
+```
+
+### Windows
+
+## Additional Resources
 
 ### Documentation
 
-- **Release Notes** - What's new in v1.0.0
-- **User Guide** - Comprehensive 10-chapter guide covering all features
-- **Administrator Guide** - System configuration and management
-- **Database Management Guide** - Backup, restore, troubleshooting
+- **[CHANGELOG](https://github.com/xnodeoncode/Nine/blob/main/CHANGELOG.md)** - What's new in each release
+- **[Database Management Guide](https://github.com/xnodeoncode/Nine/blob/main/Documentation/Database-Management-Guide.md)** - Backup, restore and troubleshooting
+- **[Compatibility Matrix](https://github.com/xnodeoncode/Nine/blob/main/Documentation/Compatibility-Matrix.md)** - Version compatibility and upgrade paths
 
 ### Getting Help
 
-**Support Channels:**
-
-- 📧 **Email Support:** cisguru@outlook.com
-- 🐛 **Report Bugs:** [GitHub Issues](https://github.com/xnodeoncode/nine/issues)
-- 💡 **Request Features:** [GitHub Discussions](https://github.com/xnodeoncode/nine/discussions)
-- 📖 **Documentation:** `/Documentation/v1.0.0/`
-
-**Community:**
-
-- Star the project on GitHub
-- Contribute to development
-- Share feedback and suggestions
+- **Email Support:** [cisguru@outlook.com](mailto:cisguru@outlook.com?subject=Nine%20Support%20-%20Quick%20Start%20Guide)
+- **Report Bugs:** [GitHub Issues](https://github.com/xnodeoncode/Nine/issues)
+- **Request Features:** [GitHub Discussions](https://github.com/xnodeoncode/Nine/discussions)
+- **Documentation:** [Documentation](https://github.com/xnodeoncode/Nine/tree/main/Documentation)
 
 ---
 
-## ⚙️ Settings & Configuration
+## Settings & Configuration
 
-### Essential Settings to Configure
+**Organization:** click **Organization** in the left menu (administrators) to edit your organization's details.
 
-**Organization Settings:**
+**Your account:** click your name or email in the navigation to open **Account → Manage**. From there you can update your profile and change your password.
 
-1. Navigate to **Settings** → **Organization**
-2. Update business hours, contact information, logo
+**Notifications:** open **Notifications → Preferences** to choose which in-app notifications you receive.
 
-**User Settings:**
+**Application settings:** click **Application** in the left menu. This page includes the **Late Fee Settings:**
 
-1. Navigate to **Settings** → **Profile**
-2. Update personal information, password, notification preferences
+- **Enable Late Fees** and **Auto-apply**
+- **Grace Period** (days): the default is 5 days. Check the requirements where your property is and change it if they differ.
+- **Late Fee Percentage** (and maximum fee)
 
-**Notification Settings:**
+**Database settings:** open the **Database Settings** page from **Application** (see "Backups and the database" below).
 
-1. Navigate to **Settings** → **Notifications**
-2. Enable/disable email, SMS, in-app notifications
-3. Configure SendGrid (email) and Twilio (SMS) API keys if needed
+**Inspection scheduling:** the routine inspection interval is set per property on the property's edit page, not in a global setting.
 
-**Database Settings:**
-
-1. Navigate to **Settings** → **Database**
-2. Configure **automatic backups:**
-   - Enable scheduled backups
-   - Set backup frequency (daily, weekly, monthly)
-   - Choose backup time (default: 2 AM)
-3. Monitor database health and size
-
-**Financial Settings:**
-
-1. Navigate to **Settings** → **Financial**
-2. Configure **late fees:**
-   - Grace period (default: 5 days)
-   - Late fee amount ($50 or 5% of rent)
-   - Apply late fees automatically: Yes/No
-
-**Inspection Settings:**
-
-1. Navigate to **Settings** → **Inspections**
-2. Configure **routine inspection frequency:**
-   - None, Quarterly, Semi-Annual, Annual
-3. Enable auto-scheduling of move-in inspections
+<!-- VERIFY: exact path to Database Settings from the Application page, and the Late Fee field labels (percentage / maximum). -->
 
 ---
 
-## 🔒 Security & Data Protection
+## Security & Data Protection
 
-### Best Practices
+**Passwords:** use a strong, unique password (Nine requires at least 12 characters). Change it periodically and consider a password manager.
 
-**Password Management:**
+**Session security:** Nine signs you out after **18 minutes of inactivity** and warns you shortly before. Always log out when leaving your computer unattended.
 
-- Use a **strong, unique password**
-- Enable **password manager** for secure storage
-- Change password periodically
+**Database encryption:** database encryption is optional. Turn it on in **Database Settings → Database Encryption**; you create a password that is required to open the database. If encryption is off, the database file is stored unencrypted on your computer. Keep your password somewhere safe; it cannot be recovered.
 
-**Data Backups:**
+**Archived and deleted records:** records can be archived and restored, and some can be permanently deleted. The delete confirmation lists the related records that will be affected.
 
-- Enable **automatic daily backups**
-- Store backups in **multiple locations** (local + cloud)
-- Test restore process periodically
+**Audit trail:** Nine records who created or changed a record and when.
 
-**Session Security:**
-
-- Application auto-locks after **18 minutes of inactivity**
-- Always **log out** when leaving computer unattended
-
-**Data Privacy:**
-
-- All tenant data encrypted at rest
-- Soft delete enabled (data recoverable if accidentally deleted)
-- Audit trails track all data changes (who, when, what)
+<!-- VERIFY: "audit trail" wording against what the UI actually shows; and the archive/delete behavior per record type. -->
 
 ---
 
-## ❓ Common Questions
+## Common Questions
 
-### Q: Can I import data from another property management system?
+### Can I import data from another property management system?
 
-**A:** Not directly in v1.0.0. You'll need to manually enter your properties, tenants, and leases. Data import features are planned for a future release.
+Not directly. Enter your properties, tenants and leases manually, or restore from a Nine backup.
 
-### Q: What happens when I reach the 9-property limit?
+### Can I have more than 4 users?
 
-**A:** When you try to add a 10th property, you'll see an upgrade message explaining that Nine is limited to 9 properties. You can either:
+Nine is limited to 4 accounts per organization: 1 system account and 3 login accounts.
 
-- Remove an inactive property to add a new one
-- Upgrade to Nine Professional (future release) for unlimited properties
+<!-- VERIFY: property limit. The previous guide said 9 properties; no enforcement was found in the code. Confirm and add or remove. -->
 
-### Q: Can I have more than 3 users?
+### Is my data stored in the cloud?
 
-**A:** No, Nine is limited to 3 users (1 system account + 2 login users). This is a product-level restriction. For more users, you'll need to upgrade to Nine Professional when available.
+No. Nine stores all data locally on your computer in a SQLite database file. The app does not send your data over the internet.
 
-### Q: Is my data stored in the cloud?
+### Do I need internet access?
 
-**A:** No, Nine stores all data **locally on your computer** in a SQLite database file. Your data never leaves your device unless you choose to enable email/SMS notifications or back up to a cloud service.
+No. Nine works fully offline. Links to external documentation open in your default web browser.
 
-### Q: Do I need internet access?
+### How do I back up my data?
 
-**A:** **No** for core features - the application works completely offline. **Yes** for optional features:
+Open **Database Settings** and use **Create Manual Backup**. Nine also creates a backup automatically before each database migration and encryption change, and keeps the 10 most recent backups. Use **Download** on a backup to copy it to an external drive or cloud storage.
 
-- Email notifications (SendGrid)
-- SMS notifications (Twilio)
-- Future online payment processing
+### How do I restore a backup?
 
-### Q: How do I back up my data?
+In **Database Settings → Available Backups**, use **Restore** on the backup you want (use **Preview** first to look inside it). You can also use **Upload Backup File** to bring in a backup from another location. Nine saves a copy of the current database before restoring.
 
-**A:** Navigate to **Settings** → **Database** → **Backup & Restore**:
+### Can I run this on a Mac?
 
-- Click **"Create Backup"** for manual backup (recommended before major changes)
-- Enable **"Schedule Automatic Backups"** for daily/weekly backups
-- Backups stored in: `Data/Backups/` folder
-- Copy backups to external drive or cloud storage for safety
+Not in this release. Use a Windows or Linux computer.
 
-### Q: What if I accidentally delete something?
+### Is there a mobile app?
 
-**A:** Nine uses **soft delete** - deleted records are marked as deleted but not permanently removed. Contact support for data recovery assistance if needed.
+Not yet.
 
-### Q: Can I run this on a Mac?
-
-**A:** Not in v1.0.0. macOS support is planned for a future release. For now, use a Windows or Linux computer.
-
-### Q: Is there a mobile app?
-
-**A:** Not yet. A mobile companion app (view-only) is planned for a future release.
+<!-- VERIFY: macOS and mobile statements are carried over from the previous guide. -->
 
 ---
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Application won't start
 
 **Windows:**
 
-- Right-click installer → "Run as Administrator"
-- Check if antivirus is blocking the application
-- Ensure .NET 10 Runtime is installed (bundled with app)
+- Right-click the installer and choose "Run as Administrator"
+- Check whether antivirus is blocking the application
 
 **Linux:**
 
-- Ensure AppImage has execute permissions: `chmod +x Nine*.AppImage`
+- Make sure the AppImage is executable: `chmod +x Nine*.AppImage`
 - Check system logs: `journalctl -xe`
-- Verify dependencies installed (usually auto-included)
 
-### Database connection error
+### Database error or "Database Locked"
 
-1. Navigate to **Settings** → **Database**
-2. Click **"Check Database Health"**
-3. If corrupted, click **"Restore from Backup"**
-4. If no backup, click **"Reset Database"** (⚠️ loses all data)
+- If you enabled encryption, enter your database password on the unlock screen.
+- In **Database Settings**, click **Check Health**.
+- If the database is corrupted, try **Auto-Recover from Corruption**, or **Restore** a backup.
+- As a last resort, **Reset Database (Create New Blank)** creates an empty database (this removes your data from the active database).
 
 ### Can't log in
 
-- Verify email and password are correct
-- Check Caps Lock is off
-- If forgotten password, use **"Reset Password"** link
-- If still stuck, check logs in `Data/Logs/` folder
+- Verify your email and password and check Caps Lock.
+- After repeated failed attempts the account can be locked temporarily; wait and try again.
+- If you forgot your password, work with an administrator who has access to unlock your account.
 
-### Email notifications not working
-
-1. Navigate to **Settings** → **Notifications**
-2. Verify SendGrid API key is correct
-3. Check SendGrid account is active and not rate-limited
-4. View error logs in **Settings** → **System** → **Logs**
-
-### Application is slow
-
-- Check database size: **Settings** → **Database** → **Database Size**
-- Run database optimization: **Settings** → **Database** → **Optimize**
-- Close other applications to free up memory
-- Consider hardware upgrade if below minimum specs
+<!-- VERIFY: that the login page has a forgot-password link in the Electron build and that account lockout applies. Also confirm where application logs are stored so a logs entry can be added. -->
 
 ---
 
-## 📞 Support
+## Support
 
-Need help? We're here for you!
+**Email:** [cisguru@outlook.com](mailto:cisguru@outlook.com?subject=Nine%20Support%20-%20Quick%20Start%20Guide)  
+**GitHub:** [https://github.com/xnodeoncode/Nine](https://github.com/xnodeoncode/Nine)
 
-**Email:** cisguru@outlook.com  
-**GitHub:** [https://github.com/xnodeoncode/nine](https://github.com/xnodeoncode/nine)
+When contacting support, please include:
 
-**When contacting support, please include:**
-
-1. **Version number** (Settings → About)
-2. **Operating system** (Windows/Linux)
-3. **Description of issue** (what happened vs what you expected)
-4. **Steps to reproduce** (how to recreate the problem)
-5. **Screenshots** (if applicable)
-6. **Log files** (Settings → System → Export Logs)
+1. **Version number** (see the **About** page)
+2. **Operating system** (Windows or Linux)
+3. **What happened** compared with what you expected
+4. **Steps to reproduce** the problem
+5. **Screenshots**, if applicable
 
 ---
 
-## 🎓 Next Steps
+## Next Steps
 
-**Ready to dive deeper?**
+1. **Add your remaining properties and tenants.**
+2. **Set up late fees** under **Application**.
+3. **Explore reports** under **Reports**.
+4. **Review Database Settings** and decide whether to enable encryption.
 
-1. **Read the User Guide** - Comprehensive 10-chapter guide covering every feature
-2. **Configure automation** - Set up late fees, recurring invoices, backups
-3. **Explore reports** - Generate financial and operational reports
-4. **Customize settings** - Tailor the application to your workflow
-5. **Join the community** - Connect with other landlords using Nine
-
-**Thank you for choosing Nine!** 🏠
-
-We hope this Quick Start Guide helped you get up and running quickly. Enjoy managing your properties with confidence!
-
----
-
-**Document Version:** 1.1  
-**Last Updated:** February 18, 2026  
-**Author:** CIS Guru with GitHub Copilot
+Thank you for choosing Nine.

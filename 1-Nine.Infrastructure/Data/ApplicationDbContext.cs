@@ -70,6 +70,9 @@ namespace Nine.Infrastructure.Data
         public DbSet<Inspection> Inspections { get; set; }
         public DbSet<MaintenanceRequest> MaintenanceRequests { get; set; }
         public DbSet<Repair> Repairs { get; set; }
+        public DbSet<PropertyExpense> PropertyExpenses { get; set; }
+        public DbSet<ExpenseDue> ExpenseDues { get; set; }
+        public DbSet<ExpensePayment> ExpensePayments { get; set; }
         public DbSet<OrganizationSettings> OrganizationSettings { get; set; }
         public DbSet<SchemaVersion> SchemaVersions { get; set; }
         public DbSet<DatabaseSettings> DatabaseSettings { get; set; }
@@ -148,13 +151,10 @@ namespace Nine.Infrastructure.Data
                     .HasForeignKey(l => l.TenantId)
                     .OnDelete(DeleteBehavior.Restrict);
 
-                entity.HasOne(l => l.Document)
-                    .WithMany()
-                    .HasForeignKey(l => l.DocumentId)
-                    .OnDelete(DeleteBehavior.SetNull);
-
                 entity.Property(e => e.MonthlyRent).HasPrecision(18, 2);
                 entity.Property(e => e.SecurityDeposit).HasPrecision(18, 2);
+
+                entity.HasIndex(e => e.IsActive);
                 
                 // Configure relationship with Organization
                 entity.HasOne<Organization>()
@@ -245,7 +245,12 @@ namespace Nine.Infrastructure.Data
                     .WithMany()
                     .HasForeignKey(d => d.PaymentId)
                     .OnDelete(DeleteBehavior.SetNull);
-                
+
+                entity.HasOne(d => d.Repair)
+                    .WithMany(r => r.Documents)
+                    .HasForeignKey(d => d.RepairId)
+                    .OnDelete(DeleteBehavior.SetNull);
+
                 // FileData is automatically stored as BLOB in SQLite
                 // No need to specify column type
                 
@@ -331,6 +336,73 @@ namespace Nine.Infrastructure.Data
                 entity.HasIndex(e => e.LeaseId);
                 entity.HasIndex(e => e.CompletedOn);
                 entity.HasIndex(e => e.RepairType);
+            });
+
+            // Configure PropertyExpense entity
+            modelBuilder.Entity<PropertyExpense>(entity =>
+            {
+                // Required relationship: Property (Restrict - can't delete property with expenses)
+                entity.HasOne(e => e.Property)
+                    .WithMany(p => p.Expenses)
+                    .HasForeignKey(e => e.PropertyId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                // Decimal precision for Amount field
+                entity.Property(e => e.Amount).HasPrecision(18, 2);
+
+                // Mandatory 1:1 recurrence definition, owned by PropertyExpense and
+                // stored in the same table (shared primary key, no independent
+                // existence or identity of its own).
+                entity.OwnsOne(e => e.RecurrencePattern, pattern =>
+                {
+                    pattern.Property(p => p.Frequency).HasColumnName("RecurrenceFrequency").IsRequired().HasMaxLength(20);
+                    pattern.Property(p => p.DueDayOfMonth).HasColumnName("RecurrenceDueDayOfMonth");
+                    pattern.Property(p => p.AnchorMonth).HasColumnName("RecurrenceAnchorMonth");
+                });
+                entity.Navigation(e => e.RecurrencePattern).IsRequired();
+
+                // Indexes for query optimization
+                entity.HasIndex(e => e.OrganizationId);
+                entity.HasIndex(e => e.PropertyId);
+                entity.HasIndex(e => e.ExpenseType);
+                entity.HasIndex(e => e.EffectiveDate);
+            });
+
+            // Configure ExpenseDue entity
+            modelBuilder.Entity<ExpenseDue>(entity =>
+            {
+                // Cascade on delete: PropertyExpense is only ever hard-deleted via
+                // VoidExpenseAsync (an expense entered in error), which is intended
+                // to remove the expense and all its ExpenseDue/ExpensePayment
+                // history as if it never existed. CancelExpenseAsync (the normal
+                // "this expense has ended" path) never deletes the row, so this
+                // cascade cannot be triggered by anything other than Void.
+                entity.HasOne(e => e.PropertyExpense)
+                    .WithMany(p => p.ExpenseDues)
+                    .HasForeignKey(e => e.PropertyExpenseId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.Property(e => e.AmountDue).HasPrecision(18, 2);
+
+                entity.HasIndex(e => e.OrganizationId);
+                entity.HasIndex(e => e.PropertyExpenseId);
+                entity.HasIndex(e => e.PropertyId);
+                entity.HasIndex(e => e.DueDate);
+            });
+
+            // Configure ExpensePayment entity
+            modelBuilder.Entity<ExpensePayment>(entity =>
+            {
+                entity.HasOne(e => e.ExpenseDue)
+                    .WithMany(d => d.Payments)
+                    .HasForeignKey(e => e.ExpenseDueId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.Property(e => e.AmountPaid).HasPrecision(18, 2);
+
+                entity.HasIndex(e => e.OrganizationId);
+                entity.HasIndex(e => e.ExpenseDueId);
+                entity.HasIndex(e => e.PaidOn);
             });
 
             // Configure OrganizationSettings entity

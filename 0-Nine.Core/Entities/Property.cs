@@ -119,6 +119,7 @@ namespace Nine.Core.Entities
         public virtual ICollection<Document> Documents { get; set; } = new List<Document>();
         public virtual ICollection<Repair> Repairs { get; set; } = new List<Repair>();
         public virtual ICollection<MaintenanceRequest> MaintenanceRequests { get; set; } = new List<MaintenanceRequest>();
+        public virtual ICollection<PropertyExpense> Expenses { get; set; } = new List<PropertyExpense>();
 
         // Computed property for pending application count
         [NotMapped]

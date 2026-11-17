@@ -11,7 +11,7 @@ namespace Nine.Infrastructure.Data.CompiledModels
     public partial class ApplicationDbContextModel
     {
         private ApplicationDbContextModel()
-            : base(skipDetectChanges: false, modelId: new Guid("409a29cb-f330-41bb-8099-305ed7a81084"), entityTypeCount: 35)
+            : base(skipDetectChanges: false, modelId: new Guid("927d7770-b498-4af1-823a-f66b01919da1"), entityTypeCount: 39)
         {
         }
 
@@ -26,6 +26,8 @@ namespace Nine.Infrastructure.Data.CompiledModels
             var checklistTemplateItem = ChecklistTemplateItemEntityType.Create(this);
             var databaseSettings = DatabaseSettingsEntityType.Create(this);
             var document = DocumentEntityType.Create(this);
+            var expenseDue = ExpenseDueEntityType.Create(this);
+            var expensePayment = ExpensePaymentEntityType.Create(this);
             var inspection = InspectionEntityType.Create(this);
             var invoice = InvoiceEntityType.Create(this);
             var lease = LeaseEntityType.Create(this);
@@ -40,7 +42,9 @@ namespace Nine.Infrastructure.Data.CompiledModels
             var organizationUser = OrganizationUserEntityType.Create(this);
             var payment = PaymentEntityType.Create(this);
             var property = PropertyEntityType.Create(this);
+            var propertyExpense = PropertyExpenseEntityType.Create(this);
             var prospectiveTenant = ProspectiveTenantEntityType.Create(this);
+            var recurrencePattern = RecurrencePatternEntityType.Create(this);
             var rentalApplication = RentalApplicationEntityType.Create(this);
             var repair = RepairEntityType.Create(this);
             var schemaVersion = SchemaVersionEntityType.Create(this);
@@ -66,17 +70,19 @@ namespace Nine.Infrastructure.Data.CompiledModels
             DocumentEntityType.CreateForeignKey3(document, organization);
             DocumentEntityType.CreateForeignKey4(document, payment);
             DocumentEntityType.CreateForeignKey5(document, property);
-            DocumentEntityType.CreateForeignKey6(document, tenant);
+            DocumentEntityType.CreateForeignKey6(document, repair);
+            DocumentEntityType.CreateForeignKey7(document, tenant);
+            ExpenseDueEntityType.CreateForeignKey1(expenseDue, propertyExpense);
+            ExpensePaymentEntityType.CreateForeignKey1(expensePayment, expenseDue);
             InspectionEntityType.CreateForeignKey1(inspection, document);
             InspectionEntityType.CreateForeignKey2(inspection, lease);
             InspectionEntityType.CreateForeignKey3(inspection, property);
             InvoiceEntityType.CreateForeignKey1(invoice, document);
             InvoiceEntityType.CreateForeignKey2(invoice, lease);
             InvoiceEntityType.CreateForeignKey3(invoice, organization);
-            LeaseEntityType.CreateForeignKey1(lease, document);
-            LeaseEntityType.CreateForeignKey2(lease, organization);
-            LeaseEntityType.CreateForeignKey3(lease, property);
-            LeaseEntityType.CreateForeignKey4(lease, tenant);
+            LeaseEntityType.CreateForeignKey1(lease, organization);
+            LeaseEntityType.CreateForeignKey2(lease, property);
+            LeaseEntityType.CreateForeignKey3(lease, tenant);
             LeaseOfferEntityType.CreateForeignKey1(leaseOffer, property);
             LeaseOfferEntityType.CreateForeignKey2(leaseOffer, prospectiveTenant);
             LeaseOfferEntityType.CreateForeignKey3(leaseOffer, rentalApplication);
@@ -90,7 +96,9 @@ namespace Nine.Infrastructure.Data.CompiledModels
             PaymentEntityType.CreateForeignKey2(payment, invoice);
             PaymentEntityType.CreateForeignKey3(payment, organization);
             PropertyEntityType.CreateForeignKey1(property, organization);
+            PropertyExpenseEntityType.CreateForeignKey1(propertyExpense, property);
             ProspectiveTenantEntityType.CreateForeignKey1(prospectiveTenant, property);
+            RecurrencePatternEntityType.CreateForeignKey1(recurrencePattern, propertyExpense);
             RentalApplicationEntityType.CreateForeignKey1(rentalApplication, property);
             RentalApplicationEntityType.CreateForeignKey2(rentalApplication, prospectiveTenant);
             RepairEntityType.CreateForeignKey1(repair, lease);
@@ -117,6 +125,8 @@ namespace Nine.Infrastructure.Data.CompiledModels
             ChecklistTemplateItemEntityType.CreateAnnotations(checklistTemplateItem);
             DatabaseSettingsEntityType.CreateAnnotations(databaseSettings);
             DocumentEntityType.CreateAnnotations(document);
+            ExpenseDueEntityType.CreateAnnotations(expenseDue);
+            ExpensePaymentEntityType.CreateAnnotations(expensePayment);
             InspectionEntityType.CreateAnnotations(inspection);
             InvoiceEntityType.CreateAnnotations(invoice);
             LeaseEntityType.CreateAnnotations(lease);
@@ -131,7 +141,9 @@ namespace Nine.Infrastructure.Data.CompiledModels
             OrganizationUserEntityType.CreateAnnotations(organizationUser);
             PaymentEntityType.CreateAnnotations(payment);
             PropertyEntityType.CreateAnnotations(property);
+            PropertyExpenseEntityType.CreateAnnotations(propertyExpense);
             ProspectiveTenantEntityType.CreateAnnotations(prospectiveTenant);
+            RecurrencePatternEntityType.CreateAnnotations(recurrencePattern);
             RentalApplicationEntityType.CreateAnnotations(rentalApplication);
             RepairEntityType.CreateAnnotations(repair);
             SchemaVersionEntityType.CreateAnnotations(schemaVersion);

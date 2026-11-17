@@ -99,6 +99,7 @@ public class Repair : BaseModel
     public virtual Property? Property { get; set; }
     public virtual MaintenanceRequest? MaintenanceRequest { get; set; }
     public virtual Lease? Lease { get; set; }
+    public virtual ICollection<Document> Documents { get; set; } = new List<Document>();
 
     // Computed Properties
     [NotMapped]

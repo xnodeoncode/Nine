@@ -1,6 +1,5 @@
 using Nine.Shared.UI.Components.Notifications;
 using Bunit;
-using FluentAssertions;
 using Xunit;
 
 namespace Nine.Shared.UI.Tests.Features.Notifications;
@@ -9,7 +8,7 @@ namespace Nine.Shared.UI.Tests.Features.Notifications;
 /// Basic structure tests for NotificationPreferences component.
 /// Full functional testing requires NotificationService and UserContextService implementation.
 /// </summary>
-public class NotificationPreferencesTests : TestContext
+public class NotificationPreferencesTests : BunitContext
 {
     [Fact]
     public void NotificationPreferences_Component_Exists_And_Can_Be_Instantiated()
@@ -19,8 +18,8 @@ public class NotificationPreferencesTests : TestContext
         // For now, we're just verifying the component exists and can be imported
         
         // Assert
-        typeof(NotificationPreferences).Should().NotBeNull();
-        typeof(NotificationPreferences).Name.Should().Be("NotificationPreferences");
+        Assert.NotNull(typeof(NotificationPreferences));
+        Assert.Equal("NotificationPreferences", typeof(NotificationPreferences).Name);
     }
 
     // Additional tests to be added when services are implemented:

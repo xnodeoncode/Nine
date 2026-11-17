@@ -1,25 +1,36 @@
 @page "/propertymanagement/repairs"
 @using Nine.Core.Entities
+@using Nine.Shared.UI.Components.Entities.Repairs
 @attribute [OrganizationAuthorize("Owner", "Administrator", "PropertyManager")]
 
 @inject RepairService RepairService
 @inject PropertyService PropertyService
 @inject NavigationManager Navigation
 @inject ToastService ToastService
+@inject IJSRuntime JSRuntime
+
 @rendermode InteractiveServer
 
 <PageTitle>Repairs - Nine</PageTitle>
 
-<div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3 mb-0">
-            <i class="bi bi-tools me-2"></i>Repairs
-        </h1>
+        <h1><span class="bi bi-tools me-2"> Repairs</span></h1>
         <button class="btn btn-primary" @onclick="NavigateToCreate">
             <i class="bi bi-plus-lg me-1"></i>New Repair
         </button>
     </div>
-
+    <hr />
+    <div class="mb-4">
+        <RepairMetricsCard ScheduledCount="FilteredRepairs.Count(r => !r.IsCompleted)"
+                             InProgressCount="FilteredRepairs.Count(r => !r.IsCompleted)"
+                             TotalCount="FilteredRepairs.Count()"
+                             TotalExpense="FilteredRepairs.Sum(r => r.Cost)"
+                             ShowScheduled="true"
+                             ShowInProgress="true"
+                             ShowTotalCount="true"
+                             ShowTotalExpense="true" />
+    </div>
+    <hr />
     @if (isLoading)
     {
         <div class="text-center py-5">
@@ -29,23 +40,23 @@
             <p class="mt-3 text-muted">Loading repairs...</p>
         </div>
     }
-    else if (!repairs.Any())
-    {
-        <div class="alert alert-info">
-            <i class="bi bi-info-circle me-2"></i>
-            No repairs have been logged yet. Click "Log New Repair" to record work performed on your properties.
-        </div>
-    }
     else
     {
         <div class="card">
             <div class="card-header">
                 <div class="row g-3 align-items-center">
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <input type="text" class="form-control" placeholder="Search repairs..."
                                @bind="searchTerm" @bind:event="oninput" />
                     </div>
-                    <div class="col-md-3">
+                     <div class="col-md-2">
+                        <select class="form-select" @bind="selectedRepairStatus">
+                            <option value="@RepairStatusFilter.AllRepairs">All Repairs</option>
+                            <option value="@RepairStatusFilter.InProgress">In Progress</option>
+                            <option value="@RepairStatusFilter.Completed">Completed</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
                         <select class="form-select" @bind="selectedPropertyId">
                             <option value="">All Properties</option>
                             @foreach (var property in properties)
@@ -54,7 +65,7 @@
                             }
                         </select>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <select class="form-select" @bind="selectedRepairType">
                             <option value="">All Types</option>
                             @foreach (var type in ApplicationConstants.RepairTypes.AllRepairTypes)
@@ -63,30 +74,57 @@
                             }
                         </select>
                     </div>
-                    <div class="col-md-2">
-                        <div class="form-check">
+                   
+                    <div class="col-md-3">
+                        <div class="form-check form-switch">
                             <input class="form-check-input" type="checkbox" id="showInProgressOnly"
                                    @bind="showInProgressOnly" />
                             <label class="form-check-label" for="showInProgressOnly">
                                 In Progress Only
                             </label>
                         </div>
+                        <div class="form-check form-switch pt-1">
+                            <input class="form-check-input" type="checkbox" id="showArchivedRepairs"
+                                   @bind="_showArchived" @bind:after="LoadData" />
+                            <label class="form-check-label" for="showArchivedRepairs">Show Archived</label>
+                        </div>
                     </div>
                 </div>
             </div>
-
             <div class="card-body p-0">
+                @if (!repairs.Any())
+                {
+                    <div class="alert alert-info m-3">
+                        <i class="bi bi-info-circle me-2"></i>
+                        @if (_showArchived)
+                        {
+                            <span>No archived repairs found.</span>
+                        }
+                        else
+                        {
+                            <span>No repairs have been logged yet. Click "New Repair" to record work performed on your properties.</span>
+                        }
+                    </div>
+                }
+                else if (!FilteredRepairs.Any())
+                {
+                    <div class="alert alert-info m-3">
+                        <i class="bi bi-info-circle me-2"></i>No repairs match the current filters.
+                    </div>
+                }
+                else
+                {
                 <div class="table-responsive">
                     <table class="table table-hover mb-0">
                         <thead class="table">
                             <tr>
-                                <th>Property</th>
+                                <th><button class="btn btn-link p-0 text-decoration-none text-dark fw-bold" @onclick='() => SortBy("Property")'>Property @if (_sortColumn == "Property") { <i class="bi @(_sortAscending ? "bi-caret-up" : "bi-caret-down")"></i> }</button></th>
                                 <th>Description</th>
-                                <th>Type</th>
-                                <th>Completed</th>
-                                <th>Cost</th>
+                                <th><button class="btn btn-link p-0 text-decoration-none text-dark fw-bold" @onclick='() => SortBy("RepairType")'>Type @if (_sortColumn == "RepairType") { <i class="bi @(_sortAscending ? "bi-caret-up" : "bi-caret-down")"></i> }</button></th>
+                                <th><button class="btn btn-link p-0 text-decoration-none text-dark fw-bold" @onclick='() => SortBy("CompletedOn")'>Completed @if (_sortColumn == "CompletedOn") { <i class="bi @(_sortAscending ? "bi-caret-up" : "bi-caret-down")"></i> }</button></th>
+                                <th><button class="btn btn-link p-0 text-decoration-none text-dark fw-bold" @onclick='() => SortBy("Cost")'>Cost @if (_sortColumn == "Cost") { <i class="bi @(_sortAscending ? "bi-caret-up" : "bi-caret-down")"></i> }</button></th>
                                 <th>Duration</th>
-                                <th>Status</th>
+                                <th><button class="btn btn-link p-0 text-decoration-none text-dark fw-bold" @onclick='() => SortBy("Status")'>Status @if (_sortColumn == "Status") { <i class="bi @(_sortAscending ? "bi-caret-up" : "bi-caret-down")"></i> }</button></th>
                                 <th class="text-end">Actions</th>
                             </tr>
                         </thead>
@@ -174,6 +212,20 @@
                                                     title="Edit Repair">
                                                 <i class="bi bi-pencil"></i>
                                             </button>
+                                            @if (!repair.IsArchived)
+                                            {
+                                                <button class="btn btn-outline-warning" @onclick="() => ArchiveRepair(repair.Id)"
+                                                        title="Archive Repair">
+                                                    <i class="bi bi-archive"></i>
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                <button class="btn btn-outline-success" @onclick="() => RestoreRepair(repair.Id)"
+                                                        title="Restore Repair">
+                                                    <i class="bi bi-arrow-counterclockwise"></i>
+                                                </button>
+                                            }
                                             <button class="btn btn-outline-danger" @onclick="() => DeleteRepair(repair.Id)"
                                                     title="Delete Repair">
                                                 <i class="bi bi-trash"></i>
@@ -185,6 +237,7 @@
                         </tbody>
                     </table>
                 </div>
+                }
             </div>
 
             <div class="card-footer">
@@ -199,9 +252,20 @@
             </div>
         </div>
     }
-</div>
 
 @code {
+    /// <summary>
+    /// Repairs have no stored Status field (see Repair.IsCompleted), so this
+    /// filter is a UI-only concept derived from CompletedOn, not persisted
+    /// or part of ApplicationConstants.
+    /// </summary>
+    private enum RepairStatusFilter
+    {
+        AllRepairs,
+        InProgress,
+        Completed
+    }
+
     private List<Repair> repairs = new();
     private List<Property> properties = new();
     private bool isLoading = true;
@@ -209,7 +273,11 @@
     private string searchTerm = string.Empty;
     private string selectedPropertyId = string.Empty;
     private string selectedRepairType = string.Empty;
+    private RepairStatusFilter selectedRepairStatus = RepairStatusFilter.InProgress;
     private bool showInProgressOnly = false;
+    private bool _showArchived = false;
+    private string _sortColumn = "CompletedOn";
+    private bool _sortAscending = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -221,7 +289,9 @@
         isLoading = true;
         try
         {
-            repairs = await RepairService.GetAllAsync();
+            repairs = _showArchived
+                ? await RepairService.GetArchivedAsync()
+                : await RepairService.GetAllAsync();
             properties = await PropertyService.GetAllAsync();
         }
         catch (Exception ex)
@@ -259,12 +329,50 @@
                 filtered = filtered.Where(r => r.RepairType == selectedRepairType);
             }
 
+            if (selectedRepairStatus == RepairStatusFilter.InProgress)
+            {
+                filtered = filtered.Where(r => !r.IsCompleted);
+            }
+            else if (selectedRepairStatus == RepairStatusFilter.Completed)
+            {
+                filtered = filtered.Where(r => r.IsCompleted);
+            }
+
             if (showInProgressOnly)
             {
                 filtered = filtered.Where(r => !r.IsCompleted);
             }
 
-            return filtered.OrderByDescending(r => r.CompletedOn ?? r.CreatedOn);
+            return _sortColumn switch
+            {
+                "Property" => _sortAscending
+                    ? filtered.OrderBy(r => r.Property?.Address)
+                    : filtered.OrderByDescending(r => r.Property?.Address),
+                "RepairType" => _sortAscending
+                    ? filtered.OrderBy(r => r.RepairType)
+                    : filtered.OrderByDescending(r => r.RepairType),
+                "CompletedOn" => _sortAscending
+                    ? filtered.OrderBy(r => r.CompletedOn ?? r.CreatedOn)
+                    : filtered.OrderByDescending(r => r.CompletedOn ?? r.CreatedOn),
+                "Cost" => _sortAscending
+                    ? filtered.OrderBy(r => r.Cost)
+                    : filtered.OrderByDescending(r => r.Cost),
+                "Status" => _sortAscending
+                    ? filtered.OrderBy(r => r.IsCompleted)
+                    : filtered.OrderByDescending(r => r.IsCompleted),
+                _ => filtered.OrderByDescending(r => r.CompletedOn ?? r.CreatedOn)
+            };
+        }
+    }
+
+    private void SortBy(string column)
+    {
+        if (_sortColumn == column)
+            _sortAscending = !_sortAscending;
+        else
+        {
+            _sortColumn = column;
+            _sortAscending = true;
         }
     }
 
@@ -272,8 +380,59 @@
     private void NavigateToView(Guid id) => Navigation.NavigateTo($"/propertymanagement/repairs/{id}");
     private void NavigateToEdit(Guid id) => Navigation.NavigateTo($"/propertymanagement/repairs/{id}/edit");
 
+    private async Task ArchiveRepair(Guid id)
+    {
+        var repair = repairs.FirstOrDefault(r => r.Id == id);
+        if (repair == null)        {
+            ToastService.ShowError("Repair not found.");
+            return;
+        }
+
+        if(!repair.IsCompleted)
+        {
+            ToastService.ShowError("Only completed repairs can be archived.");
+            return;
+        }
+        try
+        {
+            await RepairService.ArchiveAsync(repair.Id);
+            ToastService.ShowSuccess("Repair archived successfully.");
+            await LoadData();
+        }
+        catch (Exception ex)
+        {
+            ToastService.ShowError($"Error archiving repair: {ex.Message}");
+        }
+    }
+
+    private async Task RestoreRepair(Guid id)
+    {
+        var repair = repairs.FirstOrDefault(r => r.Id == id);
+        if (repair == null)
+        {
+            ToastService.ShowError("Repair not found.");
+            return;
+        }
+
+        try
+        {
+            await RepairService.RestoreAsync(repair.Id);
+            ToastService.ShowSuccess("Repair restored successfully.");
+            await LoadData();
+        }
+        catch (Exception ex)
+        {
+            ToastService.ShowError($"Error restoring repair: {ex.Message}");
+        }
+    }
+
     private async Task DeleteRepair(Guid id)
     {
+        var repair = repairs.FirstOrDefault(r => r.Id == id);
+        if (repair == null)        {
+            ToastService.ShowError("Repair not found.");
+            return;
+        }
         try
         {
             await RepairService.DeleteAsync(id);

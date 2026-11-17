@@ -367,7 +367,7 @@ public class LeaseWorkflowServiceTests
         // Arrange
         await using var ctx = await CreateTestContextAsync();
         var (_, _, lease) = await CreateTenantPropertyAndLeaseAsync(ctx, 
-            leaseStatus: ApplicationConstants.LeaseStatuses.MonthToMonth);
+            leaseStatus: ApplicationConstants.LeaseStatuses.Active);
 
         // Act
         var result = await ctx.WorkflowService.RecordTerminationNoticeAsync(
@@ -396,7 +396,7 @@ public class LeaseWorkflowServiceTests
         Assert.True(result.Success, string.Join(";", result.Errors));
 
         var dbLease = await ctx.Context.Leases.FirstAsync(l => l.Id == lease.Id);
-        Assert.Equal(ApplicationConstants.LeaseStatuses.MonthToMonth, dbLease.Status);
+        Assert.Equal(ApplicationConstants.LeaseStatuses.Active, dbLease.Status);
     }
 
     [Fact]
@@ -487,7 +487,7 @@ public class LeaseWorkflowServiceTests
 
         // Verify old lease updated
         var dbOldLease = await ctx.Context.Leases.FirstAsync(l => l.Id == lease.Id);
-        Assert.Equal(ApplicationConstants.LeaseStatuses.Renewed, dbOldLease.Status);
+        Assert.Equal(ApplicationConstants.LeaseStatuses.Terminated, dbOldLease.Status);
     }
 
     [Fact]
@@ -541,7 +541,7 @@ public class LeaseWorkflowServiceTests
         // Arrange
         await using var ctx = await CreateTestContextAsync();
         var (_, _, lease) = await CreateTenantPropertyAndLeaseAsync(ctx, 
-            leaseStatus: ApplicationConstants.LeaseStatuses.MonthToMonth);
+            leaseStatus: ApplicationConstants.LeaseStatuses.Active);
 
         var renewalModel = new LeaseRenewalModel
         {
@@ -1010,20 +1010,25 @@ public class LeaseWorkflowServiceTests
     #region State Machine Tests
 
     [Theory]
-    [InlineData(WorkflowLeaseStatus.Pending, WorkflowLeaseStatus.Active, true)]
+    // Pending transitions
+    [InlineData(WorkflowLeaseStatus.Pending, WorkflowLeaseStatus.Active,     true)]
+    [InlineData(WorkflowLeaseStatus.Pending, WorkflowLeaseStatus.Declined,   true)]
     [InlineData(WorkflowLeaseStatus.Pending, WorkflowLeaseStatus.Terminated, true)]
-    [InlineData(WorkflowLeaseStatus.Pending, WorkflowLeaseStatus.Expired, false)]
-    [InlineData(WorkflowLeaseStatus.Active, WorkflowLeaseStatus.Renewed, true)]
-    [InlineData(WorkflowLeaseStatus.Active, WorkflowLeaseStatus.MonthToMonth, true)]
+    [InlineData(WorkflowLeaseStatus.Pending, WorkflowLeaseStatus.Expired,    false)]
+    // Active transitions
     [InlineData(WorkflowLeaseStatus.Active, WorkflowLeaseStatus.NoticeGiven, true)]
-    [InlineData(WorkflowLeaseStatus.Active, WorkflowLeaseStatus.Pending, false)]
-    [InlineData(WorkflowLeaseStatus.MonthToMonth, WorkflowLeaseStatus.NoticeGiven, true)]
-    [InlineData(WorkflowLeaseStatus.MonthToMonth, WorkflowLeaseStatus.Renewed, true)]
-    [InlineData(WorkflowLeaseStatus.NoticeGiven, WorkflowLeaseStatus.Expired, true)]
+    [InlineData(WorkflowLeaseStatus.Active, WorkflowLeaseStatus.Expired,     true)]
+    [InlineData(WorkflowLeaseStatus.Active, WorkflowLeaseStatus.Terminated,  true)]
+    [InlineData(WorkflowLeaseStatus.Active, WorkflowLeaseStatus.Pending,     false)]
+    // NoticeGiven transitions
     [InlineData(WorkflowLeaseStatus.NoticeGiven, WorkflowLeaseStatus.Terminated, true)]
-    [InlineData(WorkflowLeaseStatus.NoticeGiven, WorkflowLeaseStatus.Active, false)]
-    [InlineData(WorkflowLeaseStatus.Terminated, WorkflowLeaseStatus.Active, false)]
-    [InlineData(WorkflowLeaseStatus.Expired, WorkflowLeaseStatus.Active, false)]
+    [InlineData(WorkflowLeaseStatus.NoticeGiven, WorkflowLeaseStatus.Active,     false)]
+    // Expired transitions
+    [InlineData(WorkflowLeaseStatus.Expired, WorkflowLeaseStatus.Terminated, true)]
+    [InlineData(WorkflowLeaseStatus.Expired, WorkflowLeaseStatus.Active,     false)]
+    // Terminal states
+    [InlineData(WorkflowLeaseStatus.Terminated, WorkflowLeaseStatus.Active,  false)]
+    [InlineData(WorkflowLeaseStatus.Declined,   WorkflowLeaseStatus.Active,  false)]
     public void IsValidTransition_ReturnsExpectedResult(WorkflowLeaseStatus from, WorkflowLeaseStatus to, bool expected)
     {
         // Arrange
@@ -1045,9 +1050,7 @@ public class LeaseWorkflowServiceTests
         // Act
         var validStates = service.GetValidNextStates(WorkflowLeaseStatus.Active);
 
-        // Assert
-        Assert.Contains(WorkflowLeaseStatus.Renewed, validStates);
-        Assert.Contains(WorkflowLeaseStatus.MonthToMonth, validStates);
+        // Assert — Active can move to NoticeGiven, Expired, or Terminated
         Assert.Contains(WorkflowLeaseStatus.NoticeGiven, validStates);
         Assert.Contains(WorkflowLeaseStatus.Expired, validStates);
         Assert.Contains(WorkflowLeaseStatus.Terminated, validStates);

@@ -61,6 +61,9 @@ namespace Nine.Application.Services.Workflows
                     var properties = await GeneratePropertiesAsync(orgId, systemUserId);
                     _logger.LogInformation($"Created {properties.Count} properties");
 
+                    var propertyExpenses = await GeneratePropertyExpensesAsync(properties, orgId, systemUserId);
+                    _logger.LogInformation($"Created {propertyExpenses.Count} property expenses");
+
                     var calendarEvents = await GenerateCalendarEventsForPropertiesAsync(properties);
                     _logger.LogInformation($"Created {calendarEvents.Count} calendar events");
 
@@ -194,7 +197,10 @@ namespace Nine.Application.Services.Workflows
                     
                     var tenantsDeleted = await RemoveTenantsAsync(orgId);
                     _logger.LogInformation($"Deleted {tenantsDeleted} tenants");
-                    
+
+                    var propertyExpensesDeleted = await RemovePropertyExpensesAsync(orgId);
+                    _logger.LogInformation($"Deleted {propertyExpensesDeleted} property expenses");
+
                     var propertiesDeleted = await RemovePropertiesAsync(orgId);
                     _logger.LogInformation($"Deleted {propertiesDeleted} properties");
 
@@ -205,7 +211,7 @@ namespace Nine.Application.Services.Workflows
                                      repairsDeleted + maintenanceRequestsDeleted + inspectionsDeleted + toursDeleted +
                                      applicationScreeningsDeleted + rentalApplicationsDeleted + prospectiveTenantsDeleted +
                                      leaseOffersDeleted + securityDepositsDeleted + securityDepositDividendsDeleted +
-                                     securityDepositInvestmentPoolsDeleted;
+                                     securityDepositInvestmentPoolsDeleted + propertyExpensesDeleted;
 
                     // Log workflow completion
                     await LogTransitionAsync(
@@ -239,24 +245,31 @@ namespace Nine.Application.Services.Workflows
             var properties = new List<Property>();
             var now = DateTime.UtcNow;
 
-            // Define 9 properties in Texas with varied characteristics
+            // Define 9 properties in Texas with varied characteristics.
+            // Rent is intentionally NOT hardcoded here — it is derived from
+            // calculated monthly expenses at 1.5x so sample data always shows
+            // a healthy margin rather than an operating loss.
             var propertyData = new[]
             {
-                new { Address = "1234 Riverside Dr", City = "Austin", State = "TX", Zip = "78701", Type = ApplicationConstants.PropertyTypes.House, Beds = 3, Baths = 2.0m, SqFt = 1850, Rent = 1850m, Status = ApplicationConstants.PropertyStatuses.Occupied },
-                new { Address = "5678 Oak Street", City = "Houston", State = "TX", Zip = "77002", Type = ApplicationConstants.PropertyTypes.Apartment, Beds = 2, Baths = 2.0m, SqFt = 1200, Rent = 1450m, Status = ApplicationConstants.PropertyStatuses.Occupied },
-                new { Address = "910 Maple Ave", City = "Dallas", State = "TX", Zip = "75201", Type = ApplicationConstants.PropertyTypes.House, Beds = 4, Baths = 3.0m, SqFt = 2500, Rent = 2200m, Status = ApplicationConstants.PropertyStatuses.Occupied },
-                new { Address = "1122 Pine Ln", City = "San Antonio", State = "TX", Zip = "78205", Type = ApplicationConstants.PropertyTypes.Condo, Beds = 2, Baths = 1.0m, SqFt = 1100, Rent = 1200m, Status = ApplicationConstants.PropertyStatuses.Available },
-                new { Address = "3344 Elm Ct", City = "Fort Worth", State = "TX", Zip = "76102", Type = ApplicationConstants.PropertyTypes.House, Beds = 3, Baths = 2.0m, SqFt = 1750, Rent = 1750m, Status = ApplicationConstants.PropertyStatuses.Available },
-                new { Address = "5566 Cedar Rd", City = "El Paso", State = "TX", Zip = "79901", Type = ApplicationConstants.PropertyTypes.Apartment, Beds = 1, Baths = 1.0m, SqFt = 850, Rent = 1100m, Status = ApplicationConstants.PropertyStatuses.Available },
-                new { Address = "7789 Bluebonnet Blvd", City = "Austin", State = "TX", Zip = "78758", Type = ApplicationConstants.PropertyTypes.House, Beds = 3, Baths = 2.5m, SqFt = 2000, Rent = 1950m, Status = ApplicationConstants.PropertyStatuses.Occupied },
-                new { Address = "9012 Ranch Road", City = "Plano", State = "TX", Zip = "75024", Type = ApplicationConstants.PropertyTypes.Townhouse, Beds = 3, Baths = 2.5m, SqFt = 1650, Rent = 1800m, Status = ApplicationConstants.PropertyStatuses.Occupied },
-                new { Address = "4455 Lonestar Dr", City = "Corpus Christi", State = "TX", Zip = "78401", Type = ApplicationConstants.PropertyTypes.Condo, Beds = 2, Baths = 2.0m, SqFt = 1300, Rent = 1350m, Status = ApplicationConstants.PropertyStatuses.Available }
+                new { Address = "1234 Riverside Dr",    City = "Austin",         State = "TX", Zip = "78701", Type = ApplicationConstants.PropertyTypes.House,     Beds = 3, Baths = 2.0m, SqFt = 1850, Status = ApplicationConstants.PropertyStatuses.Occupied  },
+                new { Address = "5678 Oak Street",      City = "Houston",        State = "TX", Zip = "77002", Type = ApplicationConstants.PropertyTypes.Apartment,  Beds = 2, Baths = 2.0m, SqFt = 1200, Status = ApplicationConstants.PropertyStatuses.Occupied  },
+                new { Address = "910 Maple Ave",        City = "Dallas",         State = "TX", Zip = "75201", Type = ApplicationConstants.PropertyTypes.House,     Beds = 4, Baths = 3.0m, SqFt = 2500, Status = ApplicationConstants.PropertyStatuses.Occupied  },
+                new { Address = "1122 Pine Ln",         City = "San Antonio",    State = "TX", Zip = "78205", Type = ApplicationConstants.PropertyTypes.Condo,     Beds = 2, Baths = 1.0m, SqFt = 1100, Status = ApplicationConstants.PropertyStatuses.Available },
+                new { Address = "3344 Elm Ct",          City = "Fort Worth",     State = "TX", Zip = "76102", Type = ApplicationConstants.PropertyTypes.House,     Beds = 3, Baths = 2.0m, SqFt = 1750, Status = ApplicationConstants.PropertyStatuses.Available },
+                new { Address = "5566 Cedar Rd",        City = "El Paso",        State = "TX", Zip = "79901", Type = ApplicationConstants.PropertyTypes.Apartment,  Beds = 1, Baths = 1.0m, SqFt =  850, Status = ApplicationConstants.PropertyStatuses.Available },
+                new { Address = "7789 Bluebonnet Blvd", City = "Austin",         State = "TX", Zip = "78758", Type = ApplicationConstants.PropertyTypes.House,     Beds = 3, Baths = 2.5m, SqFt = 2000, Status = ApplicationConstants.PropertyStatuses.Occupied  },
+                new { Address = "9012 Ranch Road",      City = "Plano",          State = "TX", Zip = "75024", Type = ApplicationConstants.PropertyTypes.Townhouse, Beds = 3, Baths = 2.5m, SqFt = 1650, Status = ApplicationConstants.PropertyStatuses.Occupied  },
+                new { Address = "4455 Lonestar Dr",     City = "Corpus Christi", State = "TX", Zip = "78401", Type = ApplicationConstants.PropertyTypes.Condo,     Beds = 2, Baths = 2.0m, SqFt = 1300, Status = ApplicationConstants.PropertyStatuses.Available }
             };
 
             for (int i = 0; i < propertyData.Length; i++)
             {
                 var data = propertyData[i];
                 var createdDate = GetRandomDate(new DateTime(2025, 4, 1), new DateTime(2025, 6, 30));
+
+                // Calculate expense totals from square footage so rent can be set at 1.5x.
+                var totalMonthlyExpenses = CalculateSampleMonthlyExpenses(data.SqFt);
+                var rent = Math.Round(totalMonthlyExpenses * 1.5m, 0);
 
                 var property = new Property
                 {
@@ -270,9 +283,9 @@ namespace Nine.Application.Services.Workflows
                     Bedrooms = data.Beds,
                     Bathrooms = data.Baths,
                     SquareFeet = data.SqFt,
-                    MonthlyRent = data.Rent,
+                    MonthlyRent = rent,
                     Status = data.Status,
-                    IsActive = data.Status == ApplicationConstants.PropertyStatuses.Available,
+                    IsActive = true,
                     Description = $"Beautiful {data.Beds} bedroom, {data.Baths} bath {data.Type.ToLower()} in {data.City}. " +
                                  $"{data.SqFt} square feet with modern amenities and convenient location.",
                     RoutineInspectionIntervalMonths = 12,
@@ -291,6 +304,243 @@ namespace Nine.Application.Services.Workflows
             _logger.LogInformation($"Generated {properties.Count} properties");
 
             return properties;
+        }
+
+        #endregion
+
+        #region Property Expense Generation
+
+        private async Task<List<PropertyExpense>> GeneratePropertyExpensesAsync(List<Property> properties, Guid organizationId, string userId)
+        {
+            var expenses = new List<PropertyExpense>();
+            var today = DateTime.Today;
+
+            foreach (var property in properties)
+            {
+                // Use the same sq-footage rates as CalculateSampleMonthlyExpenses so that
+                // the amounts saved here are consistent with the rent set during property generation.
+                var sqFt = property.SquareFeet;
+                var mortgageMonthly = Math.Round(sqFt * 0.55m, 2);
+                var insuranceAnnual = Math.Round(sqFt * 0.864m, 2);   // $0.072/sqft/mo × 12
+                var taxAnnual = Math.Round(sqFt * 1.08m, 2);          // $0.09/sqft/mo  × 12
+                var hoaQuarterly = Math.Round(sqFt * 0.90m, 2);       // $0.30/sqft/mo x 3
+
+                var propertyExpenses = new[]
+                {
+                    new PropertyExpense
+                    {
+                        Id = Guid.NewGuid(),
+                        OrganizationId = organizationId,
+                        PropertyId = property.Id,
+                        ExpenseType = ApplicationConstants.PropertyExpenseTypes.Mortgage,
+                        Description = "Primary mortgage",
+                        Amount = mortgageMonthly,
+                        RecurrencePattern = new RecurrencePattern
+                        {
+                            Frequency = ApplicationConstants.ExpenseFrequencies.Monthly,
+                            DueDayOfMonth = 1
+                        },
+                        EffectiveDate = today.AddYears(-1),
+                        CreatedBy = userId,
+                        CreatedOn = property.CreatedOn,
+                        IsSampleData = true
+                    },
+                    new PropertyExpense
+                    {
+                        Id = Guid.NewGuid(),
+                        OrganizationId = organizationId,
+                        PropertyId = property.Id,
+                        ExpenseType = ApplicationConstants.PropertyExpenseTypes.Insurance,
+                        Description = "Homeowner's insurance (annual)",
+                        Amount = insuranceAnnual,
+                        RecurrencePattern = new RecurrencePattern
+                        {
+                            Frequency = ApplicationConstants.ExpenseFrequencies.Annual,
+                            DueDayOfMonth = 1,
+                            AnchorMonth = today.AddYears(-1).Month
+                        },
+                        EffectiveDate = today.AddYears(-1),
+                        CreatedBy = userId,
+                        CreatedOn = property.CreatedOn,
+                        IsSampleData = true
+                    },
+                    new PropertyExpense
+                    {
+                        Id = Guid.NewGuid(),
+                        OrganizationId = organizationId,
+                        PropertyId = property.Id,
+                        ExpenseType = ApplicationConstants.PropertyExpenseTypes.PropertyTax,
+                        Description = "Annual property tax",
+                        Amount = taxAnnual,
+                        RecurrencePattern = new RecurrencePattern
+                        {
+                            Frequency = ApplicationConstants.ExpenseFrequencies.Annual,
+                            DueDayOfMonth = 1,
+                            AnchorMonth = today.AddYears(-1).Month
+                        },
+                        EffectiveDate = today.AddYears(-1),
+                        CreatedBy = userId,
+                        CreatedOn = property.CreatedOn,
+                        IsSampleData = true
+                    },
+                    new PropertyExpense
+                    {
+                        Id = Guid.NewGuid(),
+                        OrganizationId = organizationId,
+                        PropertyId = property.Id,
+                        ExpenseType = ApplicationConstants.PropertyExpenseTypes.HOA,
+                        Description = "HOA dues (quarterly)",
+                        Amount = hoaQuarterly,
+                        // Demonstrates a non-1st due day, e.g. quarterly due on the 22nd.
+                        RecurrencePattern = new RecurrencePattern
+                        {
+                            Frequency = ApplicationConstants.ExpenseFrequencies.Quarterly,
+                            DueDayOfMonth = 22,
+                            AnchorMonth = today.AddYears(-1).Month
+                        },
+                        EffectiveDate = today.AddYears(-1),
+                        CreatedBy = userId,
+                        CreatedOn = property.CreatedOn,
+                        IsSampleData = true
+                    },
+                    new PropertyExpense
+                    {
+                        Id = Guid.NewGuid(),
+                        OrganizationId = organizationId,
+                        PropertyId = property.Id,
+                        ExpenseType = ApplicationConstants.PropertyExpenseTypes.Maintenance,
+                        Description = "Move-in inspection fee",
+                        Amount = 150m,
+                        // One-off expense: no recurrence at all.
+                        RecurrencePattern = new RecurrencePattern
+                        {
+                            Frequency = ApplicationConstants.ExpenseFrequencies.OneTime
+                        },
+                        EffectiveDate = today.AddMonths(-6),
+                        CreatedBy = userId,
+                        CreatedOn = property.CreatedOn,
+                        IsSampleData = true
+                    }
+                };
+
+                _context.PropertyExpenses.AddRange(propertyExpenses);
+                expenses.AddRange(propertyExpenses);
+            }
+
+            await _context.SaveChangesAsync();
+
+            await GenerateExpenseDueHistoryAsync(expenses, organizationId, userId);
+
+            return expenses;
+        }
+
+        /// <summary>
+        /// Seeds ExpenseDue (and mostly-paid ExpensePayment) history for sample
+        /// PropertyExpenses, from EffectiveDate through today, so demos show
+        /// realistic cycle-by-cycle due/paid data rather than an empty history.
+        /// The most recent cycle for each expense is left unpaid to demonstrate
+        /// the "Mark Paid" action.
+        /// </summary>
+        private async Task GenerateExpenseDueHistoryAsync(List<PropertyExpense> expenses, Guid organizationId, string userId)
+        {
+            var today = DateTime.Today;
+            var duesToAdd = new List<ExpenseDue>();
+            var paymentsToAdd = new List<ExpensePayment>();
+
+            foreach (var expense in expenses)
+            {
+                var cycles = BuildSampleCycleDates(expense, today);
+
+                for (var i = 0; i < cycles.Count; i++)
+                {
+                    var due = new ExpenseDue
+                    {
+                        Id = Guid.NewGuid(),
+                        OrganizationId = organizationId,
+                        PropertyExpenseId = expense.Id,
+                        PropertyId = expense.PropertyId,
+                        DueDate = cycles[i],
+                        AmountDue = expense.Amount,
+                        CreatedBy = userId,
+                        CreatedOn = expense.CreatedOn,
+                        IsSampleData = true
+                    };
+                    duesToAdd.Add(due);
+
+                    // Leave the most recent cycle unpaid so demos show a pending payment.
+                    var isMostRecentCycle = i == cycles.Count - 1;
+                    if (!isMostRecentCycle)
+                    {
+                        paymentsToAdd.Add(new ExpensePayment
+                        {
+                            Id = Guid.NewGuid(),
+                            OrganizationId = organizationId,
+                            ExpenseDueId = due.Id,
+                            AmountPaid = due.AmountDue,
+                            PaidOn = due.DueDate,
+                            CreatedBy = userId,
+                            CreatedOn = due.CreatedOn,
+                            IsSampleData = true
+                        });
+                    }
+                }
+            }
+
+            _context.Set<ExpenseDue>().AddRange(duesToAdd);
+            _context.Set<ExpensePayment>().AddRange(paymentsToAdd);
+            await _context.SaveChangesAsync();
+        }
+
+        /// <summary>
+        /// Builds the list of cycle due dates from EffectiveDate through today for
+        /// a sample expense, based on its RecurrencePattern. OneTime expenses
+        /// produce exactly one date (EffectiveDate itself).
+        /// </summary>
+        private static List<DateTime> BuildSampleCycleDates(PropertyExpense expense, DateTime today)
+        {
+            var pattern = expense.RecurrencePattern;
+            var dates = new List<DateTime>();
+
+            if (pattern.Frequency == ApplicationConstants.ExpenseFrequencies.OneTime)
+            {
+                dates.Add(expense.EffectiveDate);
+                return dates;
+            }
+
+            var day = pattern.DueDayOfMonth ?? 1;
+            var monthStep = pattern.Frequency switch
+            {
+                ApplicationConstants.ExpenseFrequencies.Monthly => 1,
+                ApplicationConstants.ExpenseFrequencies.Quarterly => 3,
+                ApplicationConstants.ExpenseFrequencies.Annual => 12,
+                _ => 1
+            };
+
+            var cursor = new DateTime(expense.EffectiveDate.Year, expense.EffectiveDate.Month,
+                Math.Min(day, DateTime.DaysInMonth(expense.EffectiveDate.Year, expense.EffectiveDate.Month)));
+
+            while (cursor <= today)
+            {
+                dates.Add(cursor);
+                cursor = cursor.AddMonths(monthStep);
+                cursor = new DateTime(cursor.Year, cursor.Month,
+                    Math.Min(day, DateTime.DaysInMonth(cursor.Year, cursor.Month)));
+            }
+
+            return dates;
+        }
+
+        /// <summary>
+        /// Calculates the total normalized monthly expense for a property based on square footage.
+        /// Mortgage is monthly; insurance and tax are annual (divided by 12 for monthly equivalent).
+        /// Used during sample data generation so rent can be set at 1.5× expenses.
+        /// </summary>
+        private static decimal CalculateSampleMonthlyExpenses(int squareFeet)
+        {
+            var mortgageMonthly       = squareFeet * 0.55m;    // $0.55/sqft/mo
+            var insuranceMonthlyEquiv = squareFeet * 0.072m;   // annual ÷ 12
+            var taxMonthlyEquiv       = squareFeet * 0.09m;    // annual ÷ 12
+            return mortgageMonthly + insuranceMonthlyEquiv + taxMonthlyEquiv;
         }
 
         #endregion
@@ -384,7 +634,9 @@ namespace Nine.Application.Services.Workflows
                     MonthlyRent = property.MonthlyRent,
                     SecurityDeposit = property.MonthlyRent, // 1x rent
                     Status = ApplicationConstants.LeaseStatuses.Active,
-                    Terms = $"12-month {ApplicationConstants.LeaseTypes.FixedTerm} lease. Rent: ${property.MonthlyRent}/month. " +
+                    LeaseType = ApplicationConstants.LeaseTypes.Term,
+                    IsActive = true,
+                    Terms = $"12-month {ApplicationConstants.LeaseTypes.Term} lease. Rent: ${property.MonthlyRent}/month. " +
                            $"Security Deposit: ${property.MonthlyRent}. Payment due on the 5th of each month.",
                     SignedOn = startDate.AddDays(-10), // Signed 10 days before start
                     OfferedOn = startDate.AddDays(-20), // Offered 20 days before start
@@ -399,7 +651,6 @@ namespace Nine.Application.Services.Workflows
 
                 // Update property status to Occupied
                 property.Status = ApplicationConstants.PropertyStatuses.Occupied;
-                property.IsActive = false;
             }
 
             // Create 2 new leases expiring soon (properties 6 and 7, tenants 3 and 4)
@@ -417,7 +668,9 @@ namespace Nine.Application.Services.Workflows
                 MonthlyRent = properties[6].MonthlyRent,
                 SecurityDeposit = properties[6].MonthlyRent,
                 Status = ApplicationConstants.LeaseStatuses.Active,
-                Terms = $"12-month {ApplicationConstants.LeaseTypes.FixedTerm} lease. Rent: ${properties[6].MonthlyRent}/month. " +
+                LeaseType = ApplicationConstants.LeaseTypes.Term,
+                IsActive = true,
+                Terms = $"12-month {ApplicationConstants.LeaseTypes.Term} lease. Rent: ${properties[6].MonthlyRent}/month. " +
                        $"Security Deposit: ${properties[6].MonthlyRent}. Payment due on the 5th of each month. EXPIRING SOON.",
                 SignedOn = startDate30.AddDays(-10), // Signed 10 days before start
                 OfferedOn = startDate30.AddDays(-20), // Offered 20 days before start
@@ -429,7 +682,6 @@ namespace Nine.Application.Services.Workflows
             _context.Leases.Add(lease30Days);
             leases.Add(lease30Days);
             properties[6].Status = ApplicationConstants.PropertyStatuses.Occupied;
-            properties[6].IsActive = false;
 
             // Lease 2: Expires in 60 days from current date
             var endDate60 = currentDate.AddDays(60);
@@ -445,7 +697,9 @@ namespace Nine.Application.Services.Workflows
                 MonthlyRent = properties[7].MonthlyRent,
                 SecurityDeposit = properties[7].MonthlyRent,
                 Status = ApplicationConstants.LeaseStatuses.Active,
-                Terms = $"12-month {ApplicationConstants.LeaseTypes.FixedTerm} lease. Rent: ${properties[7].MonthlyRent}/month. " +
+                LeaseType = ApplicationConstants.LeaseTypes.Term,
+                IsActive = true,
+                Terms = $"12-month {ApplicationConstants.LeaseTypes.Term} lease. Rent: ${properties[7].MonthlyRent}/month. " +
                        $"Security Deposit: ${properties[7].MonthlyRent}. Payment due on the 5th of each month. EXPIRING SOON.",
                 SignedOn = startDate60.AddDays(-10), // Signed 10 days before start
                 OfferedOn = startDate60.AddDays(-20), // Offered 20 days before start
@@ -457,7 +711,6 @@ namespace Nine.Application.Services.Workflows
             _context.Leases.Add(lease60Days);
             leases.Add(lease60Days);
             properties[7].Status = ApplicationConstants.PropertyStatuses.Occupied;
-            properties[7].IsActive = false;
 
             await _context.SaveChangesAsync();
             _logger.LogInformation($"Generated {leases.Count} leases");
@@ -647,6 +900,14 @@ namespace Nine.Application.Services.Workflows
                     invoice.PaidOn = paymentDate;
                     invoice.LastModifiedBy = userId;
                     invoice.LastModifiedOn = paymentDate;
+
+                    // Record late fee on invoice so BalanceDue = Amount + LateFeeAmount - AmountPaid = 0
+                    if (lateFee > 0)
+                    {
+                        invoice.LateFeeAmount = lateFee;
+                        invoice.LateFeeApplied = true;
+                        invoice.LateFeeAppliedOn = paymentDate;
+                    }
                     
                     // Save invoice status update immediately
                     await _context.SaveChangesAsync();
@@ -912,6 +1173,20 @@ namespace Nine.Application.Services.Workflows
             await _context.SaveChangesAsync();
 
             return repairs.Count;
+        }
+
+        private async Task<int> RemovePropertyExpensesAsync(Guid organizationId)
+        {
+            var expenses = await _context.PropertyExpenses
+                .Where(e => e.OrganizationId == organizationId && e.IsSampleData)
+                .ToListAsync();
+
+            // PropertyExpense -> ExpenseDue -> ExpensePayment cascade on delete,
+            // so removing the expense is sufficient to remove its full history.
+            _context.PropertyExpenses.RemoveRange(expenses);
+            await _context.SaveChangesAsync();
+
+            return expenses.Count;
         }
 
         private async Task<int> RemoveMaintenanceRequestsAsync(Guid organizationId)

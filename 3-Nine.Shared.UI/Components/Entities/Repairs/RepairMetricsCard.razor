@@ -1,0 +1,64 @@
+<div class="row mb-3">
+    @if(ShowScheduled){
+    <div class="col-md-3">
+        <div class="card text-white bg-success">
+            <div class="card-body">
+                <h6>Scheduled</h6>
+                <h4>@ScheduledCount</h4>
+            </div>
+        </div>
+    </div>
+    }
+    @if(ShowInProgress){
+    <div class="col-md-3">
+        <div class="card text-white bg-warning">
+            <div class="card-body">
+                <h6>In Progress</h6>
+                <h4>@InProgressCount</h4>
+            </div>
+        </div>
+    </div>
+    }
+    @if(ShowTotalCount){
+    <div class="col-md-3">
+        <div class="card text-white bg-primary">
+            <div class="card-body">
+                <h6>Total</h6>
+                <h4>@TotalCount</h4>
+            </div>
+        </div>
+    </div>
+    }
+     @if(ShowTotalExpense){
+    <div class="col-md-3">
+        <div class="card text-white bg-info">
+            <div class="card-body">
+                <h6>Total Expense</h6>
+                <h4>@TotalExpense.ToString("C")</h4>
+            </div>
+        </div>
+    </div>
+    }
+</div>
+@code {
+    [Parameter]
+    public int ScheduledCount { get; set; }
+
+    [Parameter]
+    public int InProgressCount { get; set; }
+
+    [Parameter]
+    public decimal TotalExpense { get; set; }
+
+    [Parameter]
+    public int TotalCount { get; set; }
+
+    [Parameter]
+    public bool ShowScheduled { get; set; } = false;
+    [Parameter]
+    public bool ShowInProgress { get; set; } = false;
+    [Parameter]
+    public bool ShowTotalExpense { get; set; } = false;
+    [Parameter]
+    public bool ShowTotalCount { get; set; } = false;
+}
