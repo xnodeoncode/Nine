@@ -22,6 +22,19 @@
     <script src="js/fileDownload.js"></script>
     <script src="js/sessionTimeout.js"></script>
     <script src="js/externalLinks.js"></script>
+    @*
+    SEE: https://github.com/xnodeoncode/Nine/pull/8#pullrequestreview-5931395107
+    Only override external link behavior with externalLinks.js in non-Electron environments
+    Per Copilot suggestion, this script should only be included in Electron environments.
+    
+    @if (ElectronNET.API.HybridSupport.IsElectronActive)
+     {
+        
+        // Hands external http(s) links to the system browser (Electron build) instead of opening an app window.
+        // In a normal browser the endpoint returns 404 and the link should open as usual.
+        
+         <script src="js/externalLinks.js"></script>
+     }*@
     <script src="_framework/blazor.web.js"></script>
 </body>
 

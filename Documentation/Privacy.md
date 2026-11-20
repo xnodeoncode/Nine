@@ -1,6 +1,6 @@
 # Nine. - Privacy Statement
 
-**Version:** 1.2.0  
+**Version:** 1.2.1  
 **Last Updated:** November 14, 2026
 
 ---
@@ -33,20 +33,10 @@ can include:
 
 All of this is stored in a local encrypted (see [Database Encryption](#database-encryption) below) SQLite database file. It is not sent anywhere.
 
-### Where it is stored
-
-Nine keeps its data in a folder in your user profile:
-
-- **Linux:** `~/.config/Nine/`
-- **Windows:** `%APPDATA%\Nine\`
-
-This folder contains the database (`app_vX.Y.Z.db`), the `Backups` folder, and the cookies and cache used by the
-application window. The portable Windows version may keep its data with the program instead.
-
 ### Database encryption
 
 Database encryption is optional. When you turn it on (via the Database Settings page), Nine encrypts the database with a password you
-choose, using SQLCipher. The key is kept in your operating system's credential store (the Windows credential store or the
+choose. The key is kept in your operating system's credential store (the Windows credential store or the
 Linux keychain), not in a file. If you lose the password, your data cannot be recovered, so keep it somewhere safe. If you
 do not turn encryption on, the database file is not encrypted and is protected only by your computer's own security.
 

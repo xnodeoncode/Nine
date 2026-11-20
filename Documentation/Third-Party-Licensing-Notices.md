@@ -62,24 +62,25 @@ The QuestPDF package ships additional components under their own licenses (licen
 
 Licenses below were read from each package's `.nuspec` in the NuGet cache unless noted.
 
-| Component                                            | Version   | License    | Notes                                                       |
-| ---------------------------------------------------- | --------- | ---------- | ----------------------------------------------------------- |
-| Microsoft.AspNetCore.Identity.EntityFrameworkCore    | 10.0.1    | MIT        | Authentication / user management                            |
-| Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore | 10.0.1    | MIT        |                                                             |
-| Microsoft.AspNetCore.Components.Web                  | 10.0.1    | MIT        | Blazor components                                           |
-| Microsoft.AspNetCore.SignalR.Client                  | 10.0.1    | MIT        |                                                             |
-| Microsoft.EntityFrameworkCore                        | 10.0.1    | MIT        |                                                             |
-| Microsoft.EntityFrameworkCore.Sqlite                 | 10.0.1    | MIT        |                                                             |
-| Microsoft.Data.Sqlite.Core                           | 10.0.9    | MIT        |                                                             |
-| Microsoft.Extensions.Logging.Abstractions            | 10.0.1    | MIT        |                                                             |
-| Microsoft.Extensions.Options                         | 10.0.1    | MIT        |                                                             |
-| System.Security.Cryptography.ProtectedData           | 9.0.0     | MIT        |                                                             |
-| System.Security.Cryptography.Pkcs                    | 9.0.21    | MIT        |                                                             |
-| SQLitePCLRaw.bundle_e_sqlcipher                      | 2.1.11    | Apache-2.0 | SourceGear. Bundles native SQLCipher builds (see below)     |
-| SendGrid                                             | 9.29.3    | MIT        | Email delivery client                                       |
-| Twilio                                               | 7.14.0    | MIT        | SMS client. License file at the project's GitHub repository |
-| ElectronNET.Core / ElectronNET.Core.AspNet           | 0.4.1     | MIT        | Desktop host                                                |
-| QuestPDF                                             | 2025.12.1 | See above  | **Action required — see QuestPDF section**                  |
+| Component                                            | Version       | License    | Notes                                                       |
+| ---------------------------------------------------- | ------------- | ---------- | ----------------------------------------------------------- |
+| Microsoft.AspNetCore.Identity.EntityFrameworkCore    | 10.0.1        | MIT        | Authentication / user management                            |
+| Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore | 10.0.1        | MIT        |                                                             |
+| Microsoft.AspNetCore.Components.Web                  | 10.0.1        | MIT        | Blazor components                                           |
+| Microsoft.AspNetCore.SignalR.Client                  | 10.0.1        | MIT        |                                                             |
+| Microsoft.EntityFrameworkCore                        | 10.0.1        | MIT        |                                                             |
+| Microsoft.EntityFrameworkCore.Sqlite                 | 10.0.1        | MIT        |                                                             |
+| Microsoft.Data.Sqlite.Core                           | 10.0.9        | MIT        |                                                             |
+| Microsoft.Extensions.Logging.Abstractions            | 10.0.1        | MIT        |                                                             |
+| Microsoft.Extensions.Options                         | 10.0.1        | MIT        |                                                             |
+| System.Security.Cryptography.ProtectedData           | 9.0.0         | MIT        |                                                             |
+| System.Security.Cryptography.Pkcs                    | 9.0.21        | MIT        |                                                             |
+| SQLitePCLRaw.bundle_e_sqlcipher                      | 2.1.11        | Apache-2.0 | SourceGear. Bundles native SQLCipher builds (see below)     |
+| SQLitePCLRaw.lib.e_sqlite3                           | 3.53.4.1-pre1 | Apache-2.0 | SourceGear. SQLite core override for version 2.1.11         |
+| SendGrid                                             | 9.29.3        | MIT        | Email delivery client                                       |
+| Twilio                                               | 7.14.0        | MIT        | SMS client. License file at the project's GitHub repository |
+| ElectronNET.Core / ElectronNET.Core.AspNet           | 0.4.1         | MIT        | Desktop host                                                |
+| QuestPDF                                             | 2025.12.1     | See above  | **Action required — see QuestPDF section**                  |
 
 ### Transitive dependencies (pulled in by the packages above)
 
@@ -104,7 +105,7 @@ Transitive Microsoft packages (`Microsoft.*`, `System.*`) are omitted; they are 
 
 ### Electron (desktop builds)
 
-The desktop build uses ElectronNET.Core to host the application in **Electron** (`ElectronVersion` 30.4.0, `ElectronBuilderVersion` 26.0 in `4-Nine/Nine.csproj`). Electron and electron-builder are MIT licensed. Electron bundles **Chromium** and other third-party components under their own licenses (primarily BSD-style, plus others); these license texts are included in the Electron distribution as `LICENSES.chromium.html` and `LICENSE`. Packaged desktop builds (AppImage, Flatpak, installers) should keep these files. **To do:** confirm they are retained in each packaging target.
+The desktop build uses ElectronNET.Core to host the application in **Electron** (`ElectronVersion` 30.4.0, `ElectronBuilderVersion` 26.0 in `4-Nine/Nine.csproj`). Electron and electron-builder are MIT licensed. Electron bundles **Chromium** and other third-party components under their own licenses (primarily BSD-style, plus others); these license texts are included in the Electron distribution as `LICENSES.chromium.html` and `LICENSE`. Packaged desktop builds (AppImage, Flatpak, installers) should keep these files.
 
 ### .NET runtime
 

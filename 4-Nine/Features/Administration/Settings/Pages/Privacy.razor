@@ -16,19 +16,28 @@
     <div class="alert alert-success" role="alert">
         <h5 class="alert-heading">Summary</h5>
         <p class="mb-2">
-            Nine runs entirely on your computer. It stores the information you enter on your computer, and that
-            information stays there. Nine does not transmit it or share it with anyone, and it has no accounts, servers
-            or services of its own.
+            Nine is a desktop application, built using web technologies, designed to run entirely on your computer.
+            Nine does not transmit it nor share data with any third parties.
         </p>
         <ul class="mb-0">
-            <li><strong>Your data is stored locally</strong> in a database file on your computer. You can encrypt it.</li>
+            <li><strong>Your data is stored locally</strong> in a database file on your computer.</li>
+            <li><strong>Encryption is optional.</strong> You can choose to encrypt the database with a password.</li>
             <li>
-                <strong>Nine shares nothing.</strong> It does not send your information anywhere, and it has no analytics,
-                telemetry, advertising or crash-reporting code. The only information it holds is what you enter.
+                <strong>Nine shares nothing.</strong> It does not send your data anywhere. * It has no analytics,
+                telemetry, advertising or crash-reporting code.
             </li>
-            <li><strong>Nine makes no outbound network connections.</strong> It works fully offline.</li>
+            <li><strong>* Nine makes no outbound network connections.</strong> It works fully offline.</li>
             <li><strong>You are in control.</strong> You decide what to enter, back up, export or delete.</li>
         </ul>
+    </div>
+
+    <div class="alert alert-warning" role="alert">
+        <p class="mb-0">
+            * Nine uses some [third-party technologies](https://github.com/xnodeoncode/Nine/blob/main/Documentation/Third-Party-Licensing-Notices.md) which may include,
+             or decide to include, mechanisms for telemetry, analytics, and/or crash reporting.
+            Each components licensing information is provided in the linked third-party licensing notices.
+            Nine is built and tested to run with no internet connectivity and has no direct network access requirements.
+        </p>
     </div>
 
     <h2 class="h4 mt-4">What Nine stores</h2>
@@ -50,39 +59,25 @@
         </li>
         <li>Application and organization settings</li>
     </ul>
-    <p>All of this is stored in a local SQLite database file. It is not sent anywhere.</p>
-
-    <h3 class="h5 mt-3">Where it is stored</h3>
-    <p>Nine keeps its data in a folder in your user profile:</p>
-    <ul>
-        <li><strong>Linux:</strong> <code>~/.config/Nine/</code></li>
-        <li><strong>Windows:</strong> <code>%APPDATA%\Nine\</code></li>
-    </ul>
-    <p>
-        This folder contains the database (<code>app_vX.Y.Z.db</code>), the <code>Backups</code> folder, and the cookies and
-        cache used by the application window. The portable Windows version may keep its data with the program instead.
-    </p>
 
     <h3 class="h5 mt-3">Database encryption</h3>
     <p>
-        Database encryption is optional. When you turn it on (Application Settings &rarr; Database Settings), Nine encrypts
-        the database with a password you choose, using SQLCipher. The key is kept in your operating system's credential
-        store (the Windows credential store or the Linux keychain), not in a file. If you lose the password, your data
-        cannot be recovered, so keep it somewhere safe. If you do not turn encryption on, the database file is not
-        encrypted and is protected only by your computer's own security.
+        Database encryption is optional. When you turn it on (Application Settings &rarr; Manage Database), Nine encrypts
+        the database with a password you choose. **Keep your password safe.** If you forget or lose the password, your data
+        cannot be recovered. If you do not turn encryption on, the database file is not
+        encrypted and anyone with access to the file can read its contents using the proper software and tools.
     </p>
 
     <h3 class="h5 mt-3">Cookies</h3>
     <p>
         Nine uses a small number of cookies inside its own application window for signing in, keeping your session, and
-        protecting forms from forged requests. They stay on your computer and are not used for tracking.
+        protecting forms from forged requests.
     </p>
 
     <h2 class="h4 mt-4">What Nine does not do</h2>
     <ul>
         <li>
-            It does not collect anything about you or how you use it, such as usage data, analytics or diagnostics. The
-            only information it holds is what you enter.
+            It does not collect anything about you or how you use it, such as usage data, analytics or diagnostics.
         </li>
         <li>It does not contain advertising or third-party tracking.</li>
         <li>It does not send crash reports.</li>
@@ -91,14 +86,13 @@
             screens for setting one up.
         </li>
         <li>It does not check for updates in the background or contact any server.</li>
-        <li>It does not sell, rent or share your information. It has no information about you to sell or share.</li>
+        <li>It does not sell, rent or share your information.</li>
     </ul>
 
     <h2 class="h4 mt-4">Network access</h2>
     <p>
-        Nine runs a small web server that the Nine window uses on your computer. It listens on your local machine only
-        (<code>localhost</code>) and is not reachable from other computers. As with any local service, other programs
-        running on your computer can reach it. The Nine window is set to block its own requests to anything outside
+        Nine runs on an embedded web server that the Nine window uses on your computer. As with any local service, other programs
+        running on your computer can reach it. The Nine window is designed to block its own requests to anything outside
         your computer.
     </p>
     <p>
@@ -109,8 +103,8 @@
 
     <h2 class="h4 mt-4">Backups, exports and documents</h2>
     <p>
-        Backups, downloaded documents and exports are files on your computer. Nine does not upload them. If you copy them to
-        an external drive or a cloud storage service, you decide where they go and you are responsible for protecting them.
+        Database backup files and documents that you export from Nine copy to external drives or a cloud storage service, are your responsibility.
+        You are responsible for protecting them.
     </p>
 
     <h2 class="h4 mt-4">Your responsibilities</h2>
@@ -122,15 +116,15 @@
     <ul>
         <li>Turning on database encryption and using a strong password</li>
         <li>Keeping your computer's operating system and disk protected</li>
-        <li>Keeping backups in a safe place, and removing ones you no longer need</li>
+        <li>Keeping backups in a safe place, and removing the ones you no longer need</li>
         <li>Archiving or deleting records you no longer need to keep</li>
     </ul>
 
     <h3 class="h5 mt-3">Removing your data</h3>
     <p>
-        To remove all Nine data from a computer, uninstall Nine and then delete its data folder (see above). Uninstalling
-        the application may leave that folder in place. Deleting records inside Nine removes them from the database, and
-        deleted records may still exist in older backups until you delete those too.
+        To remove all Nine data from a computer, follow the **Uninstall** instructions in the [Install Guide](https://github.com/xnodeoncode/Nine/blob/main/Documentation/Install-Guide.md#uninstall). Uninstalling
+        the application may leave that folder in place. Deleting records inside Nine removes them from the currently active database, these
+        records may still exist in backups made prior to their deletion.
     </p>
 
     <h2 class="h4 mt-4">Third-party software</h2>

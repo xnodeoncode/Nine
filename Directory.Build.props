@@ -6,8 +6,11 @@
       The lib.e_sqlite3 native library is never loaded at runtime — SQLCipher
       replaces it. No patched version exists (2.1.11 is the latest 2.x release
       and v3.x removed free encryption support). Suppressing the advisory.
+
+      11/18/2026 - Suppression no longer needed as a mediation is in place.
+      See https://github.com/xnodeoncode/Nine/blob/main/Documentation/Security-Advisory.md
     -->
-    <NuGetAuditSuppressUrls>https://github.com/advisories/GHSA-2m69-gcr7-jv3q</NuGetAuditSuppressUrls>
-    <NoWarn>$(NoWarn);NU1903</NoWarn>
+    <!-- <NuGetAuditSuppressUrls>https://github.com/advisories/GHSA-2m69-gcr7-jv3q</NuGetAuditSuppressUrls> -->
+    <!-- <NoWarn>$(NoWarn);NU1903</NoWarn> -->
   </PropertyGroup>
 </Project>
